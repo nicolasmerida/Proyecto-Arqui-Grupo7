@@ -1,6 +1,6 @@
-# Proyecto-Arqui-Grupo7
+# Sistema de Gestión de Restaurante 🧑‍🍳
 
-Proyecto desarrollado para la materia **Arquitectura y Diseño de Sistemas** (DCIC - UNS).
+Proyecto desarrollado para la materia **Arquitectura y Diseño de Sistemas** (DCIC - UNS).  
 Se trata de una aplicación web para un Sistema de Gestión de Restaurante
 
 ---
@@ -33,5 +33,5 @@ Se trata de una aplicación web para un Sistema de Gestión de Restaurante
 
 ## Créditos
 
-Grupo 7 - Arquitectura y Diseño de Sistemas - 2026
+Grupo 7 - Arquitectura y Diseño de Sistemas - 2026  
 Departamento de Ciencias e Ingeniería de la Computación - Universidad Nacional del Sur
