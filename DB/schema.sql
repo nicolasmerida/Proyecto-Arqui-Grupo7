@@ -4,28 +4,8 @@ CREATE TABLE IF NOT EXISTS usuario (
     nombre VARCHAR(25) NOT NULL,
     email TEXT NOT NULL UNIQUE,
     password TEXT NOT NULL,
+    rol VARCHAR(15) NOT NULL CHECK (rol IN ('administrador', 'mozo', 'cocinero')),
     PRIMARY KEY (id_usuario)
-);
-
-CREATE TABLE IF NOT EXISTS administrador ( 
-    id_administrador INTEGER,
-
-    PRIMARY KEY (id_administrador),
-    FOREIGN KEY (id_administrador) REFERENCES usuario(id_usuario) ON DELETE CASCADE
-);
-
-CREATE TABLE IF NOT EXISTS mozo (
-    id_mozo INTEGER,
-
-    PRIMARY KEY (id_mozo),
-    FOREIGN KEY (id_mozo) REFERENCES usuario(id_usuario) ON DELETE CASCADE
-);
-
-CREATE TABLE IF NOT EXISTS cocinero (
-    id_cocinero INTEGER,
-
-    PRIMARY KEY (id_cocinero),
-    FOREIGN KEY (id_cocinero) REFERENCES usuario(id_usuario) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS mesa (
@@ -80,11 +60,11 @@ CREATE TABLE IF NOT EXISTS mov_stock (
     fecha TIMESTAMP DEFAULT NOW(),
     cantidad INTEGER NOT NULL,
     id_ingrediente INTEGER NOT NULL,
-    id_administrador INTEGER NOT NULL,
+    id_usuario INTEGER NOT NULL,
 
-    PRIMARY KEY (id_mov, id_administrador),
+    PRIMARY KEY (id_mov, id_usuario),
     FOREIGN KEY (id_ingrediente) REFERENCES ingrediente(id_ingrediente),
-    FOREIGN KEY (id_administrador) REFERENCES administrador(id_administrador)
+    FOREIGN KEY (id_usuario) REFERENCES usuario(id_usuario)
 );
 
 -----Creo las tablas para las entidades debiles-----
@@ -102,11 +82,11 @@ CREATE TABLE IF NOT EXISTS item_pedido (
 
 -----Creo las tablas para las relaciones-----
 CREATE TABLE IF NOT EXISTS mozo_comanda (
-    id_mozo INTEGER NOT NULL,
+    id_usuario INTEGER NOT NULL,
     numero_comanda INTEGER NOT NULL,
     
-    PRIMARY KEY (id_mozo, numero_comanda),
-    FOREIGN KEY (id_mozo) REFERENCES mozo(id_mozo) ON DELETE CASCADE ON UPDATE CASCADE,
+    PRIMARY KEY (id_usuario, numero_comanda),
+    FOREIGN KEY (id_usuario) REFERENCES usuario(id_usuario) ON DELETE CASCADE ON UPDATE CASCADE,
     FOREIGN KEY (numero_comanda) REFERENCES comanda(numero_comanda) ON DELETE CASCADE
 );
 
