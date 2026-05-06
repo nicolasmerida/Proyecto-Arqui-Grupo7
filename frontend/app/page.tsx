@@ -1,4 +1,4 @@
-import Image from "next/image";
+// app/page.tsx
 
 export default function Home() {
   return (

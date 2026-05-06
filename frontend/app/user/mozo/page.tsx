@@ -1,4 +1,4 @@
-//app/user/mozo/page.tsx
+// app/user/mozo/page.tsx
 import { Metadata } from "next";
 
 export const metadata: Metadata = {

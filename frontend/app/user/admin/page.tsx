@@ -1,4 +1,4 @@
-//app/user/admin/page.tsx
+// app/user/admin/page.tsx
 import { Metadata } from "next";
 
 export const metadata: Metadata = {

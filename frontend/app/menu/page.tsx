@@ -1,14 +1,14 @@
-// app/user/cocinero/page.tsx
+//app/menu/page.tsx
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: 'Cocinero',
+  title: 'Menú',
 };
 
-export default function Cocinero() {
+export default function Menu() {
   return (
     <div className="flex flex-col flex-1 items-center justify-center">
-      Hola! Soy un Cocinero 🧑‍🍳
+      Bienvenido al menú de nuestro restaurante 🍽️
     </div>
   );
 }
