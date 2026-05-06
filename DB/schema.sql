@@ -1,19 +1,18 @@
------Creo las tablas para las entidades-----
 CREATE TABLE IF NOT EXISTS usuario (
     id_usuario INTEGER GENERATED ALWAYS AS IDENTITY,
     nombre VARCHAR(25) NOT NULL,
     email TEXT NOT NULL UNIQUE,
     password TEXT NOT NULL,
     rol VARCHAR(15) NOT NULL CHECK (rol IN ('Administrador', 'Mozo', 'Cocinero')),
-    
+
     PRIMARY KEY (id_usuario)
 );
 
 CREATE TABLE IF NOT EXISTS mesa (
     numero_mesa INTEGER GENERATED ALWAYS AS IDENTITY,
     capacidad INTEGER NOT NULL,
-    sector varchar(15) NOT NULL,
-    estado_mesa VARCHAR(15) NOT NULL,
+    sector VARCHAR(15) NOT NULL,
+    estado_mesa VARCHAR(15) NOT NULL CHECK (estado_mesa IN ('Libre', 'Ocupada', 'Reservada')),
 
     PRIMARY KEY (numero_mesa)
 );
@@ -21,8 +20,9 @@ CREATE TABLE IF NOT EXISTS mesa (
 CREATE TABLE IF NOT EXISTS comanda (
     numero_comanda INTEGER GENERATED ALWAYS AS IDENTITY,
     fecha TIMESTAMP DEFAULT NOW(),
-    estado_comanda VARCHAR(15) NOT NULL,
-    numero_mesa INTEGER,
+    -- HU: Abierta -> Cancelada | En preparacion -> Lista -> Entregada -> Cerrada
+    estado_comanda VARCHAR(15) NOT NULL CHECK (estado_comanda IN ('Abierta', 'Cancelada', 'En preparacion', 'Lista', 'Entregada', 'Cerrada')),
+    numero_mesa INTEGER NOT NULL,
 
     PRIMARY KEY (numero_comanda),
     FOREIGN KEY (numero_mesa) REFERENCES mesa(numero_mesa)
@@ -40,6 +40,8 @@ CREATE TABLE IF NOT EXISTS plato (
     nombre VARCHAR(25) NOT NULL,
     precio NUMERIC(7, 2) NOT NULL,
     descripcion VARCHAR(100) NOT NULL,
+    -- HU-13: activar/desactivar sin eliminar (platos de temporada)
+    activo BOOLEAN NOT NULL DEFAULT TRUE,
     id_categoria INTEGER NOT NULL,
 
     PRIMARY KEY (id_plato),
@@ -63,29 +65,28 @@ CREATE TABLE IF NOT EXISTS mov_stock (
     id_ingrediente INTEGER NOT NULL,
     id_usuario INTEGER NOT NULL,
 
-    PRIMARY KEY (id_mov, id_usuario),
+    PRIMARY KEY (id_mov),
     FOREIGN KEY (id_ingrediente) REFERENCES ingrediente(id_ingrediente),
     FOREIGN KEY (id_usuario) REFERENCES usuario(id_usuario)
 );
 
------Creo las tablas para las entidades debiles-----
 CREATE TABLE IF NOT EXISTS item_pedido (
     cantidad INTEGER NOT NULL,
-    notas TEXT NOT NULL,
-    estado_item VARCHAR(15) NOT NULL,
+    notas TEXT,
+    -- HU-14: Cancelado devuelve stock automaticamente
+    estado_item VARCHAR(15) NOT NULL CHECK (estado_item IN ('Pendiente', 'En preparacion', 'Listo', 'Entregado', 'Cancelado')),
     numero_comanda INTEGER NOT NULL,
     id_plato INTEGER NOT NULL,
-    
+
     PRIMARY KEY (id_plato, numero_comanda),
     FOREIGN KEY (id_plato) REFERENCES plato(id_plato),
     FOREIGN KEY (numero_comanda) REFERENCES comanda(numero_comanda) ON DELETE CASCADE
 );
 
------Creo las tablas para las relaciones-----
 CREATE TABLE IF NOT EXISTS mozo_comanda (
     id_usuario INTEGER NOT NULL,
     numero_comanda INTEGER NOT NULL,
-    
+
     PRIMARY KEY (id_usuario, numero_comanda),
     FOREIGN KEY (id_usuario) REFERENCES usuario(id_usuario) ON DELETE CASCADE ON UPDATE CASCADE,
     FOREIGN KEY (numero_comanda) REFERENCES comanda(numero_comanda) ON DELETE CASCADE

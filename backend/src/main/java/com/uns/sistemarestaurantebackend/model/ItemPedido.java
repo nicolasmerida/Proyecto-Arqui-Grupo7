@@ -1,21 +1,32 @@
 package com.uns.sistemarestaurantebackend.model;
 
+import com.uns.sistemarestaurantebackend.model.enums.EstadoItem;
 import jakarta.persistence.*;
+import lombok.*;
+
 import java.io.Serializable;
 
+// HU-04: agregar items / HU-06: cocina ve items pendientes / HU-07: actualizar estado
+// Clave primaria compuesta: (id_plato, numero_comanda)
 @Entity
 @Table(name = "item_pedido")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class ItemPedido {
 
     @EmbeddedId
     private ItemPedidoId id;
 
-    @ManyToOne
+    // CORRECCION: faltaba FetchType.LAZY en ambos @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("numeroComanda")
     @JoinColumn(name = "numero_comanda")
     private Comanda comanda;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("idPlato")
     @JoinColumn(name = "id_plato")
     private Plato plato;
@@ -23,39 +34,30 @@ public class ItemPedido {
     @Column(nullable = false)
     private Integer cantidad;
 
-    @Column
+    // Notas opcionales: "sin cebolla", "punto medio" — TEXT en DB = sin limite de largo
+    @Column(columnDefinition = "TEXT")
     private String notas;
 
-    @Column(name = "estado_item", length = 15)
-    private String estadoItem;
+    // CORRECCION: era String -> ahora enum con Converter
+    // nullable=false faltaba tambien
+    @Column(name = "estado_item", nullable = false, length = 15)
+    private EstadoItem estadoItem;
 
-    public ItemPedidoId getId() { return id; }
-    public void setId(ItemPedidoId id) { this.id = id; }
-
-    public Comanda getComanda() { return comanda; }
-    public void setComanda(Comanda comanda) { this.comanda = comanda; }
-
-    public Plato getPlato() { return plato; }
-    public void setPlato(Plato plato) { this.plato = plato; }
-
-    public Integer getCantidad() { return cantidad; }
-    public void setCantidad(Integer cantidad) { this.cantidad = cantidad; }
-
-    public String getNotas() { return notas; }
-    public void setNotas(String notas) { this.notas = notas; }
-
-    public String getEstadoItem() { return estadoItem; }
-    public void setEstadoItem(String estadoItem) { this.estadoItem = estadoItem; }
-
+    // CORRECCION CRITICA: faltaban equals() y hashCode()
+    // JPA los necesita para comparar IDs compuestos en findById() y caches de primer nivel
+    // Sin ellos, dos ItemPedidoId iguales se tratan como distintos -> queries incorrectos
     @Embeddable
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @EqualsAndHashCode
     public static class ItemPedidoId implements Serializable {
+
+        @Column(name = "numero_comanda")
         private Integer numeroComanda;
+
+        @Column(name = "id_plato")
         private Integer idPlato;
-
-        public Integer getNumeroComanda() { return numeroComanda; }
-        public void setNumeroComanda(Integer numeroComanda) { this.numeroComanda = numeroComanda; }
-
-        public Integer getIdPlato() { return idPlato; }
-        public void setIdPlato(Integer idPlato) { this.idPlato = idPlato; }
     }
 }

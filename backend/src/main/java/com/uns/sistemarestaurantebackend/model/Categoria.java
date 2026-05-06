@@ -1,10 +1,16 @@
 package com.uns.sistemarestaurantebackend.model;
 
 import jakarta.persistence.*;
+import lombok.*;
 
-
+// Agrupa platos por tipo: entradas, principales, postres, bebidas (HU-04, HU-13)
 @Entity
 @Table(name = "categoria")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Categoria {
 
     @Id
@@ -14,10 +20,4 @@ public class Categoria {
 
     @Column(nullable = false, length = 15)
     private String nombre;
-
-    public Integer getIdCategoria() { return idCategoria; }
-    public void setIdCategoria(Integer idCategoria) { this.idCategoria = idCategoria; }
-
-    public String getNombre() { return nombre; }
-    public void setNombre(String nombre) { this.nombre = nombre; }
 }

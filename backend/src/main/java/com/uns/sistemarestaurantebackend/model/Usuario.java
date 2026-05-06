@@ -1,41 +1,40 @@
 package com.uns.sistemarestaurantebackend.model;
 
+import com.uns.sistemarestaurantebackend.model.enums.RolUsuario;
 import jakarta.persistence.*;
+import lombok.*;
 
+// Puede ser Mozo, Cocinero o Administrador
 @Entity
 @Table(name = "usuario")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Usuario {
 
+    // CORRECCION 1: faltaba @Column(name="id_usuario")
+    // Hibernate buscaba columna "id" en la DB, que no existe -> app no arrancaba
+    // CORRECCION 2: el campo se llama idUsuario (no "id") para ser consistente con la DB
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    @Column(name = "id_usuario")
+    private Integer idUsuario;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 25)
     private String nombre;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false, unique = true, columnDefinition = "TEXT")
     private String email;
 
-    @Column(nullable = false)
+    // Se almacena el hash, nunca el password en texto plano
+    @Column(nullable = false, columnDefinition = "TEXT")
     private String password;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private Rol rol;
-
-    // Getters y Setters
-    public Integer getId() { return id; }
-    public void setId(Integer id) { this.id = id; }
-
-    public String getNombre() { return nombre; }
-    public void setNombre(String nombre) { this.nombre = nombre; }
-
-    public String getEmail() { return email; }
-    public void setEmail(String email) { this.email = email; }
-
-    public String getPassword() { return password; }
-    public void setPassword(String password) { this.password = password; }
-
-    public Rol getRol() { return rol; }
-    public void setRol(Rol rol) { this.rol = rol; }
+    // CORRECCION 3: era "Rol" con @Enumerated(STRING) -> guardaba "MOZO" pero la DB
+    // tiene CHECK con 'Mozo' -> todos los inserts fallaban por constraint violation
+    // Ahora usa RolUsuario + RolUsuarioConverter (autoApply) que traduce correctamente
+    @Column(nullable = false, length = 15)
+    private RolUsuario rol;
 }

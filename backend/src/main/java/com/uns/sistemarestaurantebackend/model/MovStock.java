@@ -1,10 +1,20 @@
 package com.uns.sistemarestaurantebackend.model;
 
 import jakarta.persistence.*;
+import lombok.*;
+
 import java.time.LocalDateTime;
 
+// Registro de cada cambio de stock
+// Ingreso de mercaderia (HU-10), descuento automatico (HU-11), devolucion al cancelar (HU-14)
+// HU-17: historial completo para auditoria
 @Entity
 @Table(name = "mov_stock")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class MovStock {
 
     @Id
@@ -12,39 +22,24 @@ public class MovStock {
     @Column(name = "id_mov")
     private Integer idMov;
 
-    @Column(nullable = false)
-    private LocalDateTime fecha;
+    @Builder.Default
+    @Column
+    private LocalDateTime fecha = LocalDateTime.now();
 
+    // Positivo = ingreso (HU-10), Negativo = consumo (HU-11), Positivo = devolucion (HU-14)
     @Column(nullable = false)
     private Integer cantidad;
 
-    @ManyToOne
-    @JoinColumn(name = "id_ingrediente")
+    // CORRECCION: faltaba FetchType.LAZY y nullable=false
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_ingrediente", nullable = false)
     private Ingrediente ingrediente;
 
-    @ManyToOne
-    @JoinColumn(name = "id_usuario")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_usuario", nullable = false)
     private Usuario usuario;
 
-    @ManyToOne
-    @JoinColumn(name = "id_plato")
-    private Plato plato;
-
-    public Integer getIdMov() { return idMov; }
-    public void setIdMov(Integer idMov) { this.idMov = idMov; }
-
-    public LocalDateTime getFecha() { return fecha; }
-    public void setFecha(LocalDateTime fecha) { this.fecha = fecha; }
-
-    public Integer getCantidad() { return cantidad; }
-    public void setCantidad(Integer cantidad) { this.cantidad = cantidad; }
-
-    public Ingrediente getIngrediente() { return ingrediente; }
-    public void setIngrediente(Ingrediente ingrediente) { this.ingrediente = ingrediente; }
-
-    public Usuario getUsuario() { return usuario; }
-    public void setUsuario(Usuario usuario) { this.usuario = usuario; }
-
-    public Plato getPlato() { return plato; }
-    public void setPlato(Plato plato) { this.plato = plato; }
+    // CORRECCION CRITICA: la version original tenia @JoinColumn(name = "id_plato")
+    // pero mov_stock NO tiene columna id_plato en el schema SQL
+    // Hibernate tiraba error de validacion al arrancar — campo eliminado
 }

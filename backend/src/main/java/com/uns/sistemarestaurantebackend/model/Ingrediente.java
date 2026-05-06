@@ -1,9 +1,16 @@
 package com.uns.sistemarestaurantebackend.model;
 
 import jakarta.persistence.*;
+import lombok.*;
 
+// HU-09: ver stock / HU-10: registrar ingreso / HU-11: descuento auto / HU-12: stock minimo
 @Entity
 @Table(name = "ingrediente")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Ingrediente {
 
     @Id
@@ -20,22 +27,12 @@ public class Ingrediente {
     @Column(name = "stock_minimo", nullable = false)
     private Integer stockMinimo;
 
+    // Unidad de medida: kg, g, l, ml, u (max 5 chars segun schema)
     @Column(nullable = false, length = 5)
     private String unidad;
 
-    // Getters y Setters
-    public Integer getIdIngrediente() { return idIngrediente; }
-    public void setIdIngrediente(Integer idIngrediente) { this.idIngrediente = idIngrediente; }
-
-    public String getNombre() { return nombre; }
-    public void setNombre(String nombre) { this.nombre = nombre; }
-
-    public Integer getStock() { return stock; }
-    public void setStock(Integer stock) { this.stock = stock; }
-
-    public Integer getStockMinimo() { return stockMinimo; }
-    public void setStockMinimo(Integer stockMinimo) { this.stockMinimo = stockMinimo; }
-
-    public String getUnidad() { return unidad; }
-    public void setUnidad(String unidad) { this.unidad = unidad; }
+    // Logica de dominio usada por HU-09 (alerta visual) y HU-12 (evaluar umbral)
+    public boolean estaBajoMinimo() {
+        return this.stock < this.stockMinimo;
+    }
 }

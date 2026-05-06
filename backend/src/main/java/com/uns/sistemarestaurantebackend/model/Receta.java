@@ -1,51 +1,53 @@
 package com.uns.sistemarestaurantebackend.model;
 
 import jakarta.persistence.*;
+import lombok.*;
+
 import java.io.Serializable;
 
+// Tabla pivote Plato <-> Ingrediente con cantidad requerida
+// Usada en HU-11 (descontar stock al crear item) y HU-14 (devolver al cancelar)
 @Entity
 @Table(name = "receta")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Receta {
 
     @EmbeddedId
     private RecetaId id;
 
-    @ManyToOne
+    // CORRECCION: faltaba FetchType.LAZY en ambos @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("idPlato")
     @JoinColumn(name = "id_plato")
     private Plato plato;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("idIngrediente")
     @JoinColumn(name = "id_ingrediente")
     private Ingrediente ingrediente;
 
+    // Cantidad del ingrediente necesaria para preparar una unidad del plato
     @Column(nullable = false)
     private Integer cantidad;
 
-    // Getters y Setters
-    public RecetaId getId() { return id; }
-    public void setId(RecetaId id) { this.id = id; }
-
-    public Plato getPlato() { return plato; }
-    public void setPlato(Plato plato) { this.plato = plato; }
-
-    public Ingrediente getIngrediente() { return ingrediente; }
-    public void setIngrediente(Ingrediente ingrediente) { this.ingrediente = ingrediente; }
-
-    public Integer getCantidad() { return cantidad; }
-    public void setCantidad(Integer cantidad) { this.cantidad = cantidad; }
-
-    // Clave compuesta
+    // CORRECCION CRITICA: faltaban equals() y hashCode()
+    // @EqualsAndHashCode de Lombok los genera automaticamente sobre todos los campos
     @Embeddable
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @EqualsAndHashCode
     public static class RecetaId implements Serializable {
+
+        @Column(name = "id_plato")
         private Integer idPlato;
+
+        @Column(name = "id_ingrediente")
         private Integer idIngrediente;
-
-        public Integer getIdPlato() { return idPlato; }
-        public void setIdPlato(Integer idPlato) { this.idPlato = idPlato; }
-
-        public Integer getIdIngrediente() { return idIngrediente; }
-        public void setIdIngrediente(Integer idIngrediente) { this.idIngrediente = idIngrediente; }
     }
 }

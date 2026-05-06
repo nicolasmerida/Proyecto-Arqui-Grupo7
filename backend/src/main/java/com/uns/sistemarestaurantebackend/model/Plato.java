@@ -1,10 +1,18 @@
 package com.uns.sistemarestaurantebackend.model;
 
 import jakarta.persistence.*;
+import lombok.*;
+
 import java.math.BigDecimal;
 
+// HU-04: mozo navega menu / HU-13: admin gestiona platos
 @Entity
 @Table(name = "plato")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Plato {
 
     @Id
@@ -15,35 +23,23 @@ public class Plato {
     @Column(nullable = false, length = 25)
     private String nombre;
 
+    // BigDecimal para dinero: evita errores de precision flotante en calculos de totales
     @Column(nullable = false, precision = 7, scale = 2)
     private BigDecimal precio;
 
-    @Column(length = 100)
+    // CORRECCION: faltaba nullable = false (la DB tiene NOT NULL)
+    @Column(nullable = false, length = 100)
     private String descripcion;
 
-    @ManyToOne
-    @JoinColumn(name = "id_categoria")
-    private Categoria categoria;
-
+    // HU-13: se puede desactivar sin eliminar
+    // @Builder.Default: cuando se usa el Builder sin llamar .activo(), vale true por defecto
+    // Sin @Builder.Default Lombok ignoraria el "= true" y el campo quedaria null
     @Column(nullable = false)
-    private Boolean activo;
+    @Builder.Default
+    private Boolean activo = true;
 
-    // Getters y Setters
-    public Integer getIdPlato() { return idPlato; }
-    public void setIdPlato(Integer idPlato) { this.idPlato = idPlato; }
-
-    public String getNombre() { return nombre; }
-    public void setNombre(String nombre) { this.nombre = nombre; }
-
-    public BigDecimal getPrecio() { return precio; }
-    public void setPrecio(BigDecimal precio) { this.precio = precio; }
-
-    public String getDescripcion() { return descripcion; }
-    public void setDescripcion(String descripcion) { this.descripcion = descripcion; }
-
-    public Categoria getCategoria() { return categoria; }
-    public void setCategoria(Categoria categoria) { this.categoria = categoria; }
-
-    public Boolean getActivo() { return activo; }
-    public void setActivo(Boolean activo) { this.activo = activo; }
+    // CORRECCION: faltaba FetchType.LAZY y nullable=false en @JoinColumn
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_categoria", nullable = false)
+    private Categoria categoria;
 }
