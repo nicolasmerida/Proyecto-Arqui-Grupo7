@@ -1,16 +1,12 @@
-// app/ui/Navbar.tsx
+// app/ui/navbar.tsx
 
 export default function Navbar() {
     return (
-        <nav className="fixed top-0 left-0 w-full">
-            <div className="flex justify-between items-center">
-                Nombre
-            </div>
-            <div className="flex justify-between items-center">
-                Opciones
-            </div>
-            <div className="flex justify-between items-center">
-                Acceso
+        <nav className="fixed top-0 left-0 w-full p-4">
+            <div className="flex flex-row justify-between items-center">
+                <div>Nombre</div>
+                <div>Opciones</div>
+                <div>Acceso</div>
             </div>
         </nav>
     );

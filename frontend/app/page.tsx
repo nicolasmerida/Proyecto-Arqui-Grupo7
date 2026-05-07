@@ -2,7 +2,7 @@
 
 export default function Home() {
   return (
-    <div className="flex flex-col flex-1 items-center justify-center">
+    <div className="flex flex-col items-center justify-center pt-50">
       Sistema de Gestión de Restaurante 🧑‍🍳
     </div>
   );
