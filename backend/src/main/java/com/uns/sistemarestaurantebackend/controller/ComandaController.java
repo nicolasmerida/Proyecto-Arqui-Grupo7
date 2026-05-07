@@ -5,7 +5,9 @@ import com.uns.sistemarestaurantebackend.service.ComandaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import java.util.Optional;
 import java.util.List;
+
 
 @RestController
 @RequestMapping("/comandas")
@@ -27,7 +29,7 @@ public class ComandaController {
     }
 
     @GetMapping("/mesa/{numeroMesa}")
-    public List<Comanda> obtenerPorMesa(@PathVariable Integer numeroMesa) {
+    public Optional<Comanda> obtenerPorMesa(@PathVariable Integer numeroMesa) {
         return comandaService.obtenerPorMesa(numeroMesa);
     }
 

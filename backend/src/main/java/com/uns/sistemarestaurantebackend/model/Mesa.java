@@ -1,5 +1,7 @@
 package com.uns.sistemarestaurantebackend.model;
 
+import java.time.LocalDateTime;
+
 import jakarta.persistence.*;
 
 @Entity
@@ -19,6 +21,9 @@ public class Mesa {
     @Column(name = "estado_mesa", nullable = false, length = 15)
     private String estadoMesa;
 
+    @Column(name = "hora_de_apertura")
+    private LocalDateTime horaApertura;
+
     public Integer getNumeroMesa() { return numeroMesa; }
     public void setNumeroMesa(Integer numeroMesa) { this.numeroMesa = numeroMesa; }
 
@@ -30,4 +35,9 @@ public class Mesa {
 
     public String getEstadoMesa() { return estadoMesa; }
     public void setEstadoMesa(String estadoMesa) { this.estadoMesa = estadoMesa; }
+
+    public LocalDateTime getHoraApertura() { return horaApertura; }
+    public void setHorarioApertura(LocalDateTime horarioApertura) { this.horaApertura = horarioApertura; } 
+
+
 }

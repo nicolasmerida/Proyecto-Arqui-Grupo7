@@ -21,7 +21,7 @@ public class ComandaService {
         return comandaRepository.findById(id);
     }
 
-    public List<Comanda> obtenerPorMesa(Integer numeroMesa) {
+    public Optional<Comanda> obtenerPorMesa(Integer numeroMesa) {
         return comandaRepository.findByMesaNumeroMesa(numeroMesa);
     }
 

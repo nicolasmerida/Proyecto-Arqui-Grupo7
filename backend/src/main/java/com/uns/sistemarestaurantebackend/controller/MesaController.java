@@ -37,8 +37,8 @@ public class MesaController {
     }
 
     @PutMapping("/{numero}/abrir")
-    public ResponseEntity<Mesa> abrir(@PathVariable Integer numero) {
-        return ResponseEntity.ok(mesaService.abrirMesa(numero));
+    public ResponseEntity<Mesa> abrir(@PathVariable Integer numero, @RequestParam Integer numeroComensales) {
+        return ResponseEntity.ok(mesaService.abrirMesa(numero,numeroComensales));
     }
 
     @PutMapping("/{numero}/cerrar")
