@@ -5,9 +5,12 @@ export default function Navbar() {
     return (
         <nav className="fixed top-0 left-0 w-full p-4">
             <div className="flex flex-row justify-between items-center">
-                <Link href="/">Nombre del sitio</Link>
-                <div>Opciones</div>
-                <div>Acceso</div>
+                <Link href="/">Gestion_Restaurante</Link>
+                <div className="hidden md:flex ml-6 space-x-6 justify-center">
+                    <Link href="/">Inicio</Link>
+                    <Link href="/menu">Menú</Link>
+                </div>
+                <div>Opciones acceso</div>
             </div>
         </nav>
     );

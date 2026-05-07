@@ -1,12 +1,12 @@
 // app/layout.tsx
-import "./globals.css"
+import "./ui/globals.css"
 import type { Metadata } from "next";
 import Navbar from "./ui/navbar";
 import Footer from "./ui/footer";
 
 export const metadata: Metadata = {
   title: {
-    template: '%s | Sistema de Gestión de Restaurante',
+    template: '%s | SGR',
     default: 'Sistema de Gestión de Restaurante',
   },
 };

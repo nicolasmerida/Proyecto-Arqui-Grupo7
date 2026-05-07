@@ -14,7 +14,7 @@ export default function Footer() {
             <div className="flex flex-col items-center m-1 mr-2">
                 <p className="flex items-center gap-1 hover:opacity-80 transition-opacity"> 
                     <Link
-                    href="" 
+                    href="https://github.com/Faust0g" 
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-white hover:underline"
@@ -66,7 +66,7 @@ export default function Footer() {
                 </p>
                 <p className="flex items-center gap-1 hover:opacity-80 transition-opacity"> 
                     <Link
-                    href="" 
+                    href="https://github.com/5imontl" 
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-white hover:underline"
