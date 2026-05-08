@@ -17,4 +17,10 @@ public interface MovStockRepository extends JpaRepository<MovStock, Integer> {
     // HU-17: filtrar historial por rango de fechas
     List<MovStock> findByIngredienteAndFechaBetweenOrderByFechaDesc(
             Ingrediente ingrediente, LocalDateTime desde, LocalDateTime hasta);
+
+    // Buscar movimientos por id de ingrediente sin necesitar el objeto Ingrediente
+    List<MovStock> findByIngredienteIdIngrediente(Integer idIngrediente);
+
+    // Buscar movimientos por id de usuario
+    List<MovStock> findByUsuarioIdUsuario(Integer idUsuario);
 }

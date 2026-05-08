@@ -18,4 +18,7 @@ public interface PlatoRepository extends JpaRepository<Plato, Integer> {
 
     // HU-13: admin puede ver todos incluyendo desactivados
     List<Plato> findByCategoria(Categoria categoria);
+
+    // Buscar por id de categoria sin necesitar el objeto Categoria
+    List<Plato> findByCategoriaIdCategoria(Integer idCategoria);
 }

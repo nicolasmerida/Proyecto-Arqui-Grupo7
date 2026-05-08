@@ -20,4 +20,10 @@ public interface ItemPedidoRepository extends JpaRepository<ItemPedido, ItemPedi
 
     // HU-07: verificar si todos los items de una comanda estan Listos (para notificar al mozo)
     List<ItemPedido> findByComandaAndEstadoItem(Comanda comanda, EstadoItem estado);
+
+    // Buscar items por numero de comanda sin necesitar el objeto Comanda
+    List<ItemPedido> findByComandaNumeroComanda(Integer numeroComanda);
+
+    // Buscar items por estado
+    List<ItemPedido> findByEstadoItem(EstadoItem estado);
 }

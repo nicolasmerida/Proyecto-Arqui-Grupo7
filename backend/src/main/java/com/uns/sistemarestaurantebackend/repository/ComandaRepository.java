@@ -20,4 +20,7 @@ public interface ComandaRepository extends JpaRepository<Comanda, Integer> {
 
     // HU-15: metricas — comandas cerradas para calcular total facturado del dia
     List<Comanda> findByEstadoComanda(EstadoComanda estado);
+
+    // Buscar comanda activa de una mesa por numero (sin necesitar el objeto Mesa)
+    Optional<Comanda> findByMesaNumeroMesa(Integer numeroMesa);
 }
