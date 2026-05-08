@@ -1,17 +1,17 @@
 // app/ui/forms/AddUserForm.tsx
 'use client';
 
-import { Roles } from "@/app/lib/definitions";
+import { Rol } from "@/app/lib/definitions";
 import { useActionState, useState } from "react";
 import { useSearchParams } from "next/navigation";
 
-const ROL_OPTIONS = Object.values(Roles) as Roles[];
+const ROL_OPTIONS = Object.values(Rol) as Rol[];
 
 export function AddUserForm() {
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [rol, setRol] = useState<'' | Roles>('');
+    const [rol, setRol] = useState<'' | Rol>('');
 
     //const initialState: StateUser = { message: null, errors: {} };
     //const [state, formAction] = useActionState(addUser, initialState); Agregar funcion a invocar
