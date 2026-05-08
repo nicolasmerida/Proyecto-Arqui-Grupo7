@@ -25,4 +25,11 @@ export enum EstadoItem {
   Listo = "listo",
   Entregado = "entregado",
   Cancelado = "cancelado"
+};
+
+export type Course = {
+  id: number;
+  nombre: string;
+  precio: number;
+  descripcion: string;
 }
