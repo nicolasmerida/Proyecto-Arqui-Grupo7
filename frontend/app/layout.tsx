@@ -1,8 +1,8 @@
 // app/layout.tsx
 import "./ui/globals.css"
 import type { Metadata } from "next";
-import Navbar from "./ui/navbar";
-import Footer from "./ui/footer";
+import Navbar from "./ui/Navbar";
+import Footer from "./ui/Footer";
 
 export const metadata: Metadata = {
   title: {
