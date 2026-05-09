@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname, useSearchParams } from 'next/navigation';
+import { HiArrowSmLeft, HiArrowSmRight } from 'react-icons/hi';
 
 type Props = {
   currentPage: number;
@@ -31,7 +32,7 @@ export default function Pagination({ currentPage, totalPages }: Props) {
           ${isFirst ? 'opacity-30 pointer-events-none' : 'hover:bg-white/20'}`}
         aria-disabled={isFirst}
       >
-        {/*Flecha hacia atras => <IoIosArrowBack className="text-xl" />*/}
+        <HiArrowSmLeft className="text-xl" />
       </Link>
 
       {/* Page indicator */}
@@ -47,7 +48,7 @@ export default function Pagination({ currentPage, totalPages }: Props) {
           ${isLast ? 'opacity-30 pointer-events-none' : 'hover:bg-white/20'}`}
         aria-disabled={isLast}
       >
-        {/*Flecha hacia adelante => <IoIosArrowForward className="text-xl" />*/}
+        <HiArrowSmRight className="text-xl" />
       </Link>
     </nav>
   );

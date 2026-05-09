@@ -1,11 +1,9 @@
 // app/ui/forms/LoginForm.tsx
 'use client';
 
-import { useState } from 'react';
-import { useActionState } from 'react';
-import { authenticate } from '@/app/lib/actions';
-import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
+import { useState } from 'react';
+import { HiOutlineEye, HiOutlineEyeOff } from 'react-icons/hi';
 
 const navLinkClass =
   "relative text-white text-sm transition-transform duration-300 hover:scale-105";
@@ -20,7 +18,7 @@ export function LoginForm() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false); // Nuevo estado para mostrar/ocultar contraseña
-  const [errorMessage, formAction, isPending] = useActionState(authenticate, undefined);
+  //const [errorMessage, formAction, isPending] = useActionState(authenticate, undefined); Agregar funcion a invocar
 
   // Función para alternar la visibilidad de la contraseña
   const handleTogglePassword = () => {
@@ -75,9 +73,9 @@ export function LoginForm() {
               aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
             >
               {showPassword ? (
-                <EyeSlashIcon className="h-5 w-5" /> // Icono de ojo cerrado
+                <HiOutlineEyeOff className="h-5 w-5" /> // Icono de ojo cerrado
               ) : (
-                <EyeIcon className="h-5 w-5" /> // Icono de ojo abierto
+                <HiOutlineEye className="h-5 w-5" /> // Icono de ojo abierto
               )}
             </button>
           </div>
