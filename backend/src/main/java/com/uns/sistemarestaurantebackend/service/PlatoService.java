@@ -1,6 +1,8 @@
 package com.uns.sistemarestaurantebackend.service;
 
 import com.uns.sistemarestaurantebackend.model.Plato;
+import com.uns.sistemarestaurantebackend.model.enums.EstadoComanda;
+import com.uns.sistemarestaurantebackend.model.enums.EstadoItem;
 import com.uns.sistemarestaurantebackend.repository.ItemPedidoRepository;
 import com.uns.sistemarestaurantebackend.repository.PlatoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,8 +50,8 @@ public class PlatoService {
             boolean tienePedidosEnCurso =
                     itemPedidoRepository.existsByPlatoIdPlatoAndEstadoItemInAndComandaEstadoComandaIn(
                             id,
-                            List.of("Pendiente", "En preparacion"),
-                            List.of("Abierta", "En preparacion")
+                            List.of(EstadoItem.PENDIENTE, EstadoItem.EN_PREPARACION),
+                            List.of(EstadoComanda.ABIERTA, EstadoComanda.EN_PREPARACION)
                     );
 
             if (tienePedidosEnCurso) {
@@ -71,8 +73,8 @@ public class PlatoService {
         boolean tienePedidosEnCurso =
                 itemPedidoRepository.existsByPlatoIdPlatoAndEstadoItemInAndComandaEstadoComandaIn(
                         id,
-                        List.of("Pendiente", "En preparacion"),
-                        List.of("Abierta", "En preparacion")
+                        List.of(EstadoItem.PENDIENTE, EstadoItem.EN_PREPARACION),
+                        List.of(EstadoComanda.ABIERTA, EstadoComanda.EN_PREPARACION)
                 );
 
         if (tienePedidosEnCurso) {
