@@ -3,6 +3,7 @@ package com.uns.sistemarestaurantebackend.repository;
 import com.uns.sistemarestaurantebackend.model.Comanda;
 import com.uns.sistemarestaurantebackend.model.ItemPedido;
 import com.uns.sistemarestaurantebackend.model.ItemPedido.ItemPedidoId;
+import com.uns.sistemarestaurantebackend.model.enums.EstadoComanda;
 import com.uns.sistemarestaurantebackend.model.enums.EstadoItem;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -26,4 +27,11 @@ public interface ItemPedidoRepository extends JpaRepository<ItemPedido, ItemPedi
 
     // Buscar items por estado
     List<ItemPedido> findByEstadoItem(EstadoItem estado);
+
+    // HU-13: validar si un plato tiene items pendientes/en preparacion en comandas activas
+    boolean existsByPlatoIdPlatoAndEstadoItemInAndComandaEstadoComandaIn(
+            Integer idPlato,
+            List<EstadoItem> estadosItem,
+            List<EstadoComanda> estadosComanda
+    );
 }

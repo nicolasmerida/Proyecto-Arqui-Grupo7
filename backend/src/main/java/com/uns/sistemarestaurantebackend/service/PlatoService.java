@@ -1,9 +1,11 @@
 package com.uns.sistemarestaurantebackend.service;
 
 import com.uns.sistemarestaurantebackend.model.Plato;
+import com.uns.sistemarestaurantebackend.repository.ItemPedidoRepository;
 import com.uns.sistemarestaurantebackend.repository.PlatoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -12,6 +14,9 @@ public class PlatoService {
 
     @Autowired
     private PlatoRepository platoRepository;
+
+    @Autowired
+    private ItemPedidoRepository itemPedidoRepository;
 
     public List<Plato> obtenerTodos() {
         return platoRepository.findAll();
@@ -34,14 +39,49 @@ public class PlatoService {
     }
 
     public Plato toggleActivo(Integer id) {
-        // TODO: validar que no haya ítems pendientes con este plato antes de desactivar
         Plato plato = platoRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("Plato no encontrado"));
-        plato.setActivo(!plato.getActivo());
+                .orElseThrow(() -> new RuntimeException("Plato no encontrado"));
+
+        boolean seQuiereDesactivar = Boolean.TRUE.equals(plato.getActivo());
+
+        if (seQuiereDesactivar) {
+            boolean tienePedidosEnCurso =
+                    itemPedidoRepository.existsByPlatoIdPlatoAndEstadoItemInAndComandaEstadoComandaIn(
+                            id,
+                            List.of("Pendiente", "En preparacion"),
+                            List.of("Abierta", "En preparacion")
+                    );
+
+            if (tienePedidosEnCurso) {
+                throw new RuntimeException(
+                        "No se puede desactivar el plato porque tiene pedidos pendientes o en preparación"
+                );
+            }
+        }
+
+        plato.setActivo(!Boolean.TRUE.equals(plato.getActivo()));
+
         return platoRepository.save(plato);
     }
 
     public void eliminar(Integer id) {
-        platoRepository.deleteById(id);
+        Plato plato = platoRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Plato no encontrado"));
+
+        boolean tienePedidosEnCurso =
+                itemPedidoRepository.existsByPlatoIdPlatoAndEstadoItemInAndComandaEstadoComandaIn(
+                        id,
+                        List.of("Pendiente", "En preparacion"),
+                        List.of("Abierta", "En preparacion")
+                );
+
+        if (tienePedidosEnCurso) {
+            throw new RuntimeException(
+                    "No se puede eliminar del menú el plato porque tiene pedidos pendientes o en preparación"
+            );
+        }
+
+        plato.setActivo(false);
+        platoRepository.save(plato);
     }
 }

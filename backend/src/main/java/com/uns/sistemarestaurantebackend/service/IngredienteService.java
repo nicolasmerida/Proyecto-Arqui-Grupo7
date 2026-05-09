@@ -23,7 +23,7 @@ public class IngredienteService {
 
     public List<Ingrediente> obtenerBajoStock() {
         // TODO: filtrar ingredientes donde stock <= stock_minimo
-        return ingredienteRepository.findAll();
+        return ingredienteRepository.findIngredientesBajoMinimo();
     }
 
     public Ingrediente guardar(Ingrediente ingrediente) {
