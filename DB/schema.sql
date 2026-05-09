@@ -13,6 +13,7 @@ CREATE TABLE IF NOT EXISTS mesa (
     capacidad INTEGER NOT NULL,
     sector VARCHAR(15) NOT NULL,
     estado_mesa VARCHAR(15) NOT NULL CHECK (estado_mesa IN ('Libre', 'Ocupada', 'Reservada')),
+    hora_de_apertura TIMESTAMP,
 
     PRIMARY KEY (numero_mesa)
 );
