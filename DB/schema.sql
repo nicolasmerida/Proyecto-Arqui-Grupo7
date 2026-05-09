@@ -4,7 +4,6 @@ CREATE TABLE IF NOT EXISTS usuario (
     email TEXT NOT NULL UNIQUE,
     password TEXT NOT NULL,
     rol VARCHAR(15) NOT NULL CHECK (rol IN ('Administrador', 'Mozo', 'Cocinero')),
-
     PRIMARY KEY (id_usuario)
 );
 

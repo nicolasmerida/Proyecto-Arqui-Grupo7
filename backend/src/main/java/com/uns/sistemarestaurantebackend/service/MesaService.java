@@ -61,8 +61,13 @@ public class MesaService {
         mesa.setHoraDeApertura(LocalDateTime.now());
         Mesa mesaGuardada = mesaRepository.save(mesa);
 
-        // TODO: comandaService.crearComandaParaMesa(numeroMesa)
-        // TODO: notificarCambioSalon(mesaGuardada) via WebSocket
+        //crea y abre la comanda asociada a la mesa
+        comandaService.guardar(
+            Comanda.builder()
+                .mesa(mesaGuardada)
+                .estadoComanda(EstadoComanda.ABIERTA)
+                .build()
+        );
 
         return mesaGuardada;
     }
@@ -81,9 +86,9 @@ public class MesaService {
             );
         }
 
-        // TODO: cerrar comanda
-        // TODO: generar cuenta
-        // TODO: notificarCambioSalon via WebSocket
+        // Cierra la comanda — queda como historial asociada a la mesa (no se desliga)
+        comanda.setEstadoComanda(EstadoComanda.CERRADA);
+        comandaService.guardar(comanda);
 
         mesa.setEstadoMesa(EstadoMesa.LIBRE);
         mesa.setHoraDeApertura(null);
