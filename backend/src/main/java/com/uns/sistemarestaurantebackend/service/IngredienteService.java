@@ -31,9 +31,10 @@ public class IngredienteService {
         return ingredienteRepository.save(ingrediente);
     }
 
-    @Transactional
+    @Transactional // requerido para el lock pesimista (HU-11)
     public Ingrediente actualizarStock(Integer id, Integer cantidad) {
-        Ingrediente ingrediente = ingredienteRepository.findById(id)
+        // Usamos el método con Bloqueo Pesimista (FOR UPDATE)
+        Ingrediente ingrediente = ingredienteRepository.findByIdForUpdate(id)
                 .orElseThrow(() -> new RuntimeException("Ingrediente no encontrado"));
 
         int nuevoStock = ingrediente.getStock() + cantidad;
@@ -44,6 +45,8 @@ public class IngredienteService {
         }
 
         ingrediente.setStock(nuevoStock);
+
+        // TODO: generar MovimientoStock automáticamente
 
         // TODO: generar MovimientoStock automáticamente
 
