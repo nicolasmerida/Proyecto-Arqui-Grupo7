@@ -35,7 +35,7 @@ public class UsuarioController {
     public ResponseEntity<Usuario> actualizar(@PathVariable Integer id, @RequestBody Usuario usuario) {
         return usuarioService.obtenerPorId(id)
             .map(u -> {
-                usuario.setId(id);
+                usuario.setIdUsuario(id);
                 return ResponseEntity.ok(usuarioService.guardar(usuario));
             })
             .orElse(ResponseEntity.notFound().build());

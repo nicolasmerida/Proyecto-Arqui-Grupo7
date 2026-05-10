@@ -26,7 +26,7 @@ public class ItemPedidoController {
 
     @PostMapping
     public ItemPedido crear(@RequestBody ItemPedido itemPedido) {
-        return itemPedidoService.guardar(itemPedido);
+        return itemPedidoService.agregarItemAComanda(itemPedido);
     }
 
     @PutMapping("/estado")

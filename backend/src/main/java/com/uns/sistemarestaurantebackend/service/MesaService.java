@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class MesaService {
@@ -18,7 +19,8 @@ public class MesaService {
     @Autowired
     private MesaRepository mesaRepository;
 
-    // NOTA: MesaService inyecta ComandaService. ComandaService NO puede inyectar MesaService
+    // NOTA: MesaService inyecta ComandaService. ComandaService NO puede inyectar
+    // MesaService
     // (dependencia circular -> Spring tira error al arrancar).
     @Autowired
     private ComandaService comandaService;
@@ -39,51 +41,48 @@ public class MesaService {
         return mesaRepository.save(mesa);
     }
 
+    @Transactional // para los saves (aca y ComandaService)
     public Mesa abrirMesa(Integer numeroMesa, Integer numeroComensales) {
         Mesa mesa = mesaRepository.findById(numeroMesa)
-            .orElseThrow(() -> new RuntimeException("Mesa no encontrada"));
+                .orElseThrow(() -> new RuntimeException("Mesa no encontrada"));
 
         if (EstadoMesa.LIBRE != mesa.getEstadoMesa()) {
             throw new IllegalStateException(
-                "No se puede abrir la mesa " + numeroMesa +
-                " porque su estado actual es: " + mesa.getEstadoMesa().getValor()
-            );
+                    "No se puede abrir la mesa " + numeroMesa +
+                            " porque su estado actual es: " + mesa.getEstadoMesa().getValor());
         }
 
         if (numeroComensales > mesa.getCapacidad()) {
             throw new IllegalStateException(
-                "No se puede abrir la mesa " + numeroMesa +
-                " porque la cantidad de comensales es mayor a su capacidad."
-            );
+                    "No se puede abrir la mesa " + numeroMesa +
+                            " porque la cantidad de comensales es mayor a su capacidad.");
         }
 
         mesa.setEstadoMesa(EstadoMesa.OCUPADA);
         mesa.setHoraDeApertura(LocalDateTime.now());
         Mesa mesaGuardada = mesaRepository.save(mesa);
 
-        //crea y abre la comanda asociada a la mesa
-        comandaService.guardar(
-            Comanda.builder()
-                .mesa(mesaGuardada)
-                .estadoComanda(EstadoComanda.ABIERTA)
-                .build()
-        );
+        // HU-02: Al abrir la mesa creamos automáticamente la comanda activa
+        // (en vez de contruir la comanda aca, se construyo en clase comanda)
+        comandaService.crearComandaParaMesa(mesaGuardada);
+
+        // TODO: notificarCambioSalon(mesaGuardada) via WebSocket
 
         return mesaGuardada;
     }
 
+    @Transactional // protege los dos saves
     public Mesa cerrarMesa(Integer numeroMesa) {
         Mesa mesa = mesaRepository.findById(numeroMesa)
-            .orElseThrow(() -> new RuntimeException("Mesa no encontrada"));
+                .orElseThrow(() -> new RuntimeException("Mesa no encontrada"));
 
         Comanda comanda = comandaService.obtenerPorMesa(numeroMesa)
-            .orElseThrow(() -> new RuntimeException("No hay comanda activa para esa mesa"));
+                .orElseThrow(() -> new RuntimeException("No hay comanda activa para esa mesa"));
 
         if (EstadoComanda.ENTREGADA != comanda.getEstadoComanda()) {
             throw new IllegalStateException(
-                "La mesa " + numeroMesa +
-                " no puede ser cerrada porque todavia no se han entregado todos los items."
-            );
+                    "La mesa " + numeroMesa +
+                            " no puede ser cerrada porque todavia no se han entregado todos los items.");
         }
 
         // Cierra la comanda — queda como historial asociada a la mesa (no se desliga)

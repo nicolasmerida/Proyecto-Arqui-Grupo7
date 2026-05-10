@@ -5,6 +5,7 @@ import com.uns.sistemarestaurantebackend.model.ItemPedido;
 import com.uns.sistemarestaurantebackend.model.enums.EstadoComanda;
 import com.uns.sistemarestaurantebackend.model.enums.EstadoItem;
 import com.uns.sistemarestaurantebackend.repository.ComandaRepository;
+import com.uns.sistemarestaurantebackend.model.Mesa;
 import com.uns.sistemarestaurantebackend.repository.ItemPedidoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -45,15 +46,24 @@ public class ComandaService {
         // TODO: validar transiciones de estado validas
         // TODO: notificar via WebSocket al cambiar estado
         Comanda comanda = comandaRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("Comanda no encontrada"));
+                .orElseThrow(() -> new RuntimeException("Comanda no encontrada"));
         comanda.setEstadoComanda(EstadoComanda.fromValor(nuevoEstado));
+        return comandaRepository.save(comanda);
+    }
+
+    public Comanda crearComandaParaMesa(Mesa mesa) {
+        Comanda comanda = Comanda.builder()
+                .mesa(mesa)
+                .estadoComanda(EstadoComanda.ABIERTA)
+                .fecha(java.time.LocalDateTime.now())
+                .build();
         return comandaRepository.save(comanda);
     }
 
     // HU-03: sumar precio*cantidad de cada item no cancelado de la comanda
     public BigDecimal calcularTotal(Integer idComanda) {
         Comanda comanda = comandaRepository.findById(idComanda)
-            .orElseThrow(() -> new RuntimeException("Comanda no encontrada"));
+                .orElseThrow(() -> new RuntimeException("Comanda no encontrada"));
 
         List<ItemPedido> items = itemPedidoRepository.findByComanda(comanda);
         BigDecimal total = BigDecimal.ZERO;
