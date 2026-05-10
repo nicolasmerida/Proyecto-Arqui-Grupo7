@@ -1,11 +1,13 @@
 package com.uns.sistemarestaurantebackend.service;
 
 import com.uns.sistemarestaurantebackend.model.ItemPedido;
+import com.uns.sistemarestaurantebackend.model.Receta;
 import com.uns.sistemarestaurantebackend.model.enums.EstadoItem;
 import com.uns.sistemarestaurantebackend.repository.ItemPedidoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.List;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class ItemPedidoService {
@@ -29,12 +31,47 @@ public class ItemPedidoService {
         // TODO: al marcar como LISTO descontar ingredientes del stock automaticamente
         // TODO: notificar al mozo via WebSocket
         ItemPedido item = itemPedidoRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("Item no encontrado"));
+                .orElseThrow(() -> new RuntimeException("Item no encontrado"));
         item.setEstadoItem(EstadoItem.fromValor(nuevoEstado));
         return itemPedidoRepository.save(item);
     }
 
     public void eliminar(ItemPedido.ItemPedidoId id) {
         itemPedidoRepository.deleteById(id);
+    }
+
+    @Autowired
+    private RecetaService recetaService;
+
+    @Autowired
+    private IngredienteService ingredienteService;
+
+    // En ItemPedidoControllere debe llamar a agregarItemAComanda en vez de
+    // guardar()
+    @Transactional
+    public ItemPedido agregarItemAComanda(ItemPedido itemPedido) {
+        itemPedido.setEstadoItem(EstadoItem.PENDIENTE);
+        ItemPedido guardado = itemPedidoRepository.save(itemPedido);
+
+        // 2. Obtener la receta del plato pedido
+        // itemPedido.getPlato().getIdPlato() no debe ser nulo
+        if (itemPedido.getPlato().getIdPlato() == null) {
+            throw new IllegalStateException("El plato no tiene un ID");
+        }
+        List<Receta> recetas = recetaService.obtenerPorPlato(guardado.getPlato().getIdPlato());
+        if (recetas.isEmpty()) {
+            throw new IllegalStateException("El plato no tiene receta");
+        }
+
+        // 3. Descontar ingredientes de almacén/cocina
+        for (Receta receta : recetas) {
+            // cantidad requerida en receta * cantidad de platos pedidos por el cliente
+            int cantidadADescontar = receta.getCantidad() * guardado.getCantidad();
+
+            // enviamos la cantidad en negativo para que actualizarStock realice la resta
+            ingredienteService.actualizarStock(receta.getIngrediente().getIdIngrediente(), -cantidadADescontar);
+        }
+        // TODO: notificar a cocina vía WebSocket de nuevo pedido pendiente
+        return guardado;
     }
 }

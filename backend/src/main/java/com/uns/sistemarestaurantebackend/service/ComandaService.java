@@ -3,8 +3,10 @@ package com.uns.sistemarestaurantebackend.service;
 import com.uns.sistemarestaurantebackend.model.Comanda;
 import com.uns.sistemarestaurantebackend.model.enums.EstadoComanda;
 import com.uns.sistemarestaurantebackend.repository.ComandaRepository;
+import com.uns.sistemarestaurantebackend.model.Mesa;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Optional;
 
@@ -38,8 +40,18 @@ public class ComandaService {
         // TODO: validar transiciones de estado validas
         // TODO: notificar via WebSocket al cambiar estado
         Comanda comanda = comandaRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("Comanda no encontrada"));
+                .orElseThrow(() -> new RuntimeException("Comanda no encontrada"));
         comanda.setEstadoComanda(EstadoComanda.fromValor(nuevoEstado));
+        return comandaRepository.save(comanda);
+    }
+
+    @Transactional
+    public Comanda crearComandaParaMesa(Mesa mesa) {
+        Comanda comanda = Comanda.builder()
+                .mesa(mesa)
+                .estadoComanda(EstadoComanda.ABIERTA)
+                .fecha(java.time.LocalDateTime.now())
+                .build();
         return comandaRepository.save(comanda);
     }
 
