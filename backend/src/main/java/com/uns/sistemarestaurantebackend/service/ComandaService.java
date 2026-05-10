@@ -9,7 +9,6 @@ import com.uns.sistemarestaurantebackend.model.Mesa;
 import com.uns.sistemarestaurantebackend.repository.ItemPedidoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
@@ -52,7 +51,6 @@ public class ComandaService {
         return comandaRepository.save(comanda);
     }
 
-    @Transactional
     public Comanda crearComandaParaMesa(Mesa mesa) {
         Comanda comanda = Comanda.builder()
                 .mesa(mesa)

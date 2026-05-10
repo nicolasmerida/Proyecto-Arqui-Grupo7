@@ -27,6 +27,7 @@ public class ItemPedidoService {
         return itemPedidoRepository.save(itemPedido);
     }
 
+    @Transactional // para un futuro cuando esten hechos los TODO
     public ItemPedido cambiarEstado(ItemPedido.ItemPedidoId id, String nuevoEstado) {
         // TODO: al marcar como LISTO descontar ingredientes del stock automaticamente
         // TODO: notificar al mozo via WebSocket

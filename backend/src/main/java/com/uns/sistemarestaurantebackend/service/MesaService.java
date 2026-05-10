@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class MesaService {
@@ -40,6 +41,7 @@ public class MesaService {
         return mesaRepository.save(mesa);
     }
 
+    @Transactional // para los saves (aca y ComandaService)
     public Mesa abrirMesa(Integer numeroMesa, Integer numeroComensales) {
         Mesa mesa = mesaRepository.findById(numeroMesa)
                 .orElseThrow(() -> new RuntimeException("Mesa no encontrada"));
@@ -69,6 +71,7 @@ public class MesaService {
         return mesaGuardada;
     }
 
+    @Transactional // protege los dos saves
     public Mesa cerrarMesa(Integer numeroMesa) {
         Mesa mesa = mesaRepository.findById(numeroMesa)
                 .orElseThrow(() -> new RuntimeException("Mesa no encontrada"));
