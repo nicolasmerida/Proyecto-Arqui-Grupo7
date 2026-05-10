@@ -61,6 +61,7 @@ public class MesaService {
         Mesa mesaGuardada = mesaRepository.save(mesa);
 
         // HU-02: Al abrir la mesa creamos automáticamente la comanda activa
+        // (en vez de contruir la comanda aca, se construyo en clase comanda)
         comandaService.crearComandaParaMesa(mesaGuardada);
 
         // TODO: notificarCambioSalon(mesaGuardada) via WebSocket
@@ -81,9 +82,9 @@ public class MesaService {
                             " no puede ser cerrada porque todavia no se han entregado todos los items.");
         }
 
-        // TODO: cerrar comanda
-        // TODO: generar cuenta
-        // TODO: notificarCambioSalon via WebSocket
+        // Cierra la comanda — queda como historial asociada a la mesa (no se desliga)
+        comanda.setEstadoComanda(EstadoComanda.CERRADA);
+        comandaService.guardar(comanda);
 
         mesa.setEstadoMesa(EstadoMesa.LIBRE);
         mesa.setHoraDeApertura(null);

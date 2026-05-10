@@ -5,6 +5,7 @@ import com.uns.sistemarestaurantebackend.service.ComandaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import java.math.BigDecimal;
 import java.util.Optional;
 import java.util.List;
 
@@ -48,6 +49,12 @@ public class ComandaController {
             @PathVariable Integer id,
             @RequestParam String nuevoEstado) {
         return ResponseEntity.ok(comandaService.cambiarEstado(id, nuevoEstado));
+    }
+
+    // HU-03: el mozo consulta el total antes de cobrar
+    @GetMapping("/{id}/total")
+    public ResponseEntity<BigDecimal> obtenerTotal(@PathVariable Integer id) {
+        return ResponseEntity.ok(comandaService.calcularTotal(id));
     }
 
     @DeleteMapping("/{id}")
