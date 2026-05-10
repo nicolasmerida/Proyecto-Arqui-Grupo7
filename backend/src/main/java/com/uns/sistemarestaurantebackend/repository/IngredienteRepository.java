@@ -23,7 +23,8 @@ public interface IngredienteRepository extends JpaRepository<Ingrediente, Intege
     @Query("SELECT i FROM Ingrediente i WHERE i.stock < i.stockMinimo")
     List<Ingrediente> findIngredientesBajoMinimo();
 
-    // Bloqueo Pesimista: evita que dos transacciones modifiquen el stock al mismo tiempo
+    // HU-11: Bloqueo Pesimista: evita que dos transacciones modifiquen el stock al
+    // mismo tiempo
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("SELECT i FROM Ingrediente i WHERE i.idIngrediente = :id")
     Optional<Ingrediente> findByIdForUpdate(@Param("id") Integer id);

@@ -31,8 +31,13 @@ public class IngredienteService {
         return ingredienteRepository.save(ingrediente);
     }
 
-    @Transactional // requerido para el lock pesimista (HU-11)
-    public Ingrediente actualizarStock(Integer id, Integer cantidad) {
+    /* 
+     * ATENCIÓN (Convención de Equipo): Este método es package-private intencionalmente. 
+     * NO SE DEBE LLAMAR DIRECTAMENTE DESDE OTROS MÓDULOS. 
+     * Utilizar GestorStockFacade.registrarMovimiento() para asegurar la auditoría.
+     */
+    @Transactional
+    Ingrediente actualizarStockFisico(Integer id, Integer cantidad) {
         // Usamos el método con Bloqueo Pesimista (FOR UPDATE)
         Ingrediente ingrediente = ingredienteRepository.findByIdForUpdate(id)
                 .orElseThrow(() -> new RuntimeException("Ingrediente no encontrado"));
@@ -45,10 +50,6 @@ public class IngredienteService {
         }
 
         ingrediente.setStock(nuevoStock);
-
-        // TODO: generar MovimientoStock automáticamente
-
-        // TODO: generar MovimientoStock automáticamente
 
         // Evaluar alerta de umbral
         if (ingrediente.estaBajoMinimo()) {

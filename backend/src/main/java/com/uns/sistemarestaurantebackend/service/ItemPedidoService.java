@@ -29,7 +29,6 @@ public class ItemPedidoService {
 
     @Transactional // para un futuro cuando esten hechos los TODO
     public ItemPedido cambiarEstado(ItemPedido.ItemPedidoId id, String nuevoEstado) {
-        // TODO: al marcar como LISTO descontar ingredientes del stock automaticamente
         // TODO: notificar al mozo via WebSocket
         ItemPedido item = itemPedidoRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Item no encontrado"));
@@ -45,7 +44,7 @@ public class ItemPedidoService {
     private RecetaService recetaService;
 
     @Autowired
-    private IngredienteService ingredienteService;
+    private GestorStockFacade gestorStockFacade;
 
     // En ItemPedidoControllere debe llamar a agregarItemAComanda en vez de
     // guardar()
@@ -69,8 +68,9 @@ public class ItemPedidoService {
             // cantidad requerida en receta * cantidad de platos pedidos por el cliente
             int cantidadADescontar = receta.getCantidad() * guardado.getCantidad();
 
-            // enviamos la cantidad en negativo para que actualizarStock realice la resta
-            ingredienteService.actualizarStock(receta.getIngrediente().getIdIngrediente(), -cantidadADescontar);
+            // enviamos la cantidad en negativo para que registrarMovimiento realice la resta
+            // Por ahora, asumimos usuario ID 1 (ej: un mozo default o admin) hasta que haya Security
+            gestorStockFacade.registrarMovimiento(receta.getIngrediente().getIdIngrediente(), -cantidadADescontar, 1);
         }
         // TODO: notificar a cocina vía WebSocket de nuevo pedido pendiente
         return guardado;

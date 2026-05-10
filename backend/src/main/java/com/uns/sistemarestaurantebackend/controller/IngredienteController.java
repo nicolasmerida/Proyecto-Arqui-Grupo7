@@ -1,6 +1,7 @@
 package com.uns.sistemarestaurantebackend.controller;
 
 import com.uns.sistemarestaurantebackend.model.Ingrediente;
+import com.uns.sistemarestaurantebackend.service.GestorStockFacade;
 import com.uns.sistemarestaurantebackend.service.IngredienteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -13,6 +14,9 @@ public class IngredienteController {
 
     @Autowired
     private IngredienteService ingredienteService;
+
+    @Autowired
+    private GestorStockFacade gestorStockFacade;
 
     @GetMapping
     public List<Ingrediente> obtenerTodos() {
@@ -40,7 +44,8 @@ public class IngredienteController {
     public ResponseEntity<Ingrediente> actualizarStock(
             @PathVariable Integer id,
             @RequestParam Integer cantidad) {
-        return ResponseEntity.ok(ingredienteService.actualizarStock(id, cantidad));
+        // Por ahora pasamos usuario 1 por defecto hasta implementar Security
+        return ResponseEntity.ok(gestorStockFacade.registrarMovimiento(id, cantidad, 1));
     }
 
     @DeleteMapping("/{id}")
