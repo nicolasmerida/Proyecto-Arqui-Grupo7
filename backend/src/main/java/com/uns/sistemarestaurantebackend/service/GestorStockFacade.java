@@ -35,7 +35,8 @@ public class GestorStockFacade {
         Ingrediente ingrediente = ingredienteService.actualizarStockFisico(idIngrediente, cantidad);
 
         // 2. Obtener el usuario (Actualmente recibe el ID)
-        // TODO con Spring Security, esto se saca del contexto del token)
+        // TODO: con Spring Security, esto se saca del contexto del token)
+        // HARDCODEADO: por ahora siempre ID = 1
         Usuario usuario = usuarioRepository.findById(idUsuario)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 

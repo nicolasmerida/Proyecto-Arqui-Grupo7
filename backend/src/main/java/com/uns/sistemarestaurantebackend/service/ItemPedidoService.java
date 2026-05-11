@@ -43,10 +43,23 @@ public class ItemPedidoService {
 
         validarTransicionItem(estadoActual, estadoNuevo);
 
+        // HU-14: si se cancela el item, devolver el stock que se habia descontado al
+        // pedirlo
+        if (estadoNuevo == EstadoItem.CANCELADO) {
+            List<Receta> recetas = recetaService.obtenerPorPlato(item.getPlato().getIdPlato());
+            for (Receta receta : recetas) {
+                int cantidadADevolver = receta.getCantidad() * item.getCantidad();
+                // cantidad positiva = sumar al stock (inverso de agregarItemAComanda)
+                // TODO: con Spring Security, reemplazar el 1 por el ID del usuario autenticado
+                // HARDCODEADO: por ahora siempre ID = 1 (igual que agregarItemAComanda)
+                gestorStockFacade.registrarMovimiento(
+                        receta.getIngrediente().getIdIngrediente(), cantidadADevolver, 1);
+            }
+        }
+
         item.setEstadoItem(estadoNuevo);
-        // TODO: notificar al mozo via WebSocket
-        // ejemplo: notificarWebSocket(guardado)
         ItemPedido guardado = itemPedidoRepository.save(item);
+        // TODO: notificar al mozo via WebSocket cuando el item este LISTO
         return guardado;
     }
 
@@ -54,8 +67,7 @@ public class ItemPedidoService {
         boolean valida = false;
         switch (actual) {
             case PENDIENTE:
-                // PENDIENTE → CANCELADO: stock se devuelve (nunca se cocinó)
-                // EN_PREPARACION en adelante: no se puede cancelar, el plato ya está en camino
+                // Solo desde PENDIENTE se puede cancelar: cocina todavia no lo tomó
                 valida = (nuevo == EstadoItem.EN_PREPARACION || nuevo == EstadoItem.CANCELADO);
                 break;
             case EN_PREPARACION:
