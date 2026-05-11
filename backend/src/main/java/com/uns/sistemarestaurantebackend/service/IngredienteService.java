@@ -23,7 +23,6 @@ public class IngredienteService {
     }
 
     public List<Ingrediente> obtenerBajoStock() {
-        // TODO: filtrar ingredientes donde stock <= stock_minimo
         return ingredienteRepository.findIngredientesBajoMinimo();
     }
 
@@ -31,9 +30,15 @@ public class IngredienteService {
         return ingredienteRepository.save(ingrediente);
     }
 
+    /* 
+     * ATENCIÓN (Convención de Equipo): Este método es package-private intencionalmente. 
+     * NO SE DEBE LLAMAR DIRECTAMENTE DESDE OTROS MÓDULOS. 
+     * Utilizar GestorStockFacade.registrarMovimiento() para asegurar la auditoría.
+     */
     @Transactional
-    public Ingrediente actualizarStock(Integer id, Integer cantidad) {
-        Ingrediente ingrediente = ingredienteRepository.findById(id)
+    Ingrediente actualizarStockFisico(Integer id, Integer cantidad) {
+        // Usamos el método con Bloqueo Pesimista (FOR UPDATE)
+        Ingrediente ingrediente = ingredienteRepository.findByIdForUpdate(id)
                 .orElseThrow(() -> new RuntimeException("Ingrediente no encontrado"));
 
         int nuevoStock = ingrediente.getStock() + cantidad;
@@ -44,8 +49,6 @@ public class IngredienteService {
         }
 
         ingrediente.setStock(nuevoStock);
-
-        // TODO: generar MovimientoStock automáticamente
 
         // Evaluar alerta de umbral
         if (ingrediente.estaBajoMinimo()) {

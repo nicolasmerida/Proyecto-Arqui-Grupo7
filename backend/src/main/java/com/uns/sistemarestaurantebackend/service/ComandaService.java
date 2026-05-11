@@ -43,12 +43,49 @@ public class ComandaService {
     }
 
     public Comanda cambiarEstado(Integer id, String nuevoEstado) {
-        // TODO: validar transiciones de estado validas
-        // TODO: notificar via WebSocket al cambiar estado
         Comanda comanda = comandaRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Comanda no encontrada"));
-        comanda.setEstadoComanda(EstadoComanda.fromValor(nuevoEstado));
-        return comandaRepository.save(comanda);
+
+        EstadoComanda estadoActual = comanda.getEstadoComanda(); // guardo el estado actual
+        EstadoComanda estadoNuevo = EstadoComanda.fromValor(nuevoEstado);
+
+        validarTransicion(estadoActual, estadoNuevo); // Valido el actual con el nuevo
+
+        comanda.setEstadoComanda(estadoNuevo);
+
+        Comanda comandaActualizada = comandaRepository.save(comanda);
+
+        // TODO: notificar via WebSocket al cambiar estado
+        // ejemplo: notificarWebSocket(comandaActualizada);
+
+        return comandaActualizada;
+    }
+
+    private void validarTransicion(EstadoComanda actual, EstadoComanda nuevo) {
+        boolean valida = false;
+        switch (actual) {
+            case ABIERTA:
+                valida = (nuevo == EstadoComanda.EN_PREPARACION || nuevo == EstadoComanda.CANCELADA);
+                break;
+            case EN_PREPARACION:
+                valida = (nuevo == EstadoComanda.LISTA);
+                break;
+            case LISTA:
+                valida = (nuevo == EstadoComanda.ENTREGADA);
+                break;
+            case ENTREGADA:
+                valida = (nuevo == EstadoComanda.CERRADA);
+                break;
+            case CANCELADA:
+            case CERRADA:
+                valida = false; // Estados finales, no pueden cambiar
+                break;
+        }
+
+        if (!valida) {
+            throw new IllegalStateException(
+                    "Transición de estado inválida: no se puede pasar de " + actual.name() + " a " + nuevo.name());
+        }
     }
 
     public Comanda crearComandaParaMesa(Mesa mesa) {

@@ -21,8 +21,6 @@ public class MovStockService {
     }
 
     public MovStock registrar(MovStock movimiento) {
-        // TODO: actualizar stock del ingrediente al registrar movimiento
-        // TODO: verificar si el stock queda bajo el mínimo y generar alerta
         return movStockRepository.save(movimiento);
     }
 }

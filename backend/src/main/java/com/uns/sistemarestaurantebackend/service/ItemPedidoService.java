@@ -15,6 +15,12 @@ public class ItemPedidoService {
     @Autowired
     private ItemPedidoRepository itemPedidoRepository;
 
+    @Autowired
+    private RecetaService recetaService;
+
+    @Autowired
+    private GestorStockFacade gestorStockFacade;
+
     public List<ItemPedido> obtenerPorComanda(Integer numeroComanda) {
         return itemPedidoRepository.findByComandaNumeroComanda(numeroComanda);
     }
@@ -27,27 +33,69 @@ public class ItemPedidoService {
         return itemPedidoRepository.save(itemPedido);
     }
 
-    @Transactional // para un futuro cuando esten hechos los TODO
+    @Transactional // para un futuro lo use websockets
     public ItemPedido cambiarEstado(ItemPedido.ItemPedidoId id, String nuevoEstado) {
-        // TODO: al marcar como LISTO descontar ingredientes del stock automaticamente
-        // TODO: notificar al mozo via WebSocket
         ItemPedido item = itemPedidoRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Item no encontrado"));
-        item.setEstadoItem(EstadoItem.fromValor(nuevoEstado));
-        return itemPedidoRepository.save(item);
+
+        EstadoItem estadoActual = item.getEstadoItem();
+        EstadoItem estadoNuevo = EstadoItem.fromValor(nuevoEstado);
+
+        validarTransicionItem(estadoActual, estadoNuevo);
+
+        // HU-14: si se cancela el item, devolver el stock que se habia descontado al
+        // pedirlo
+        if (estadoNuevo == EstadoItem.CANCELADO) {
+            List<Receta> recetas = recetaService.obtenerPorPlato(item.getPlato().getIdPlato());
+            for (Receta receta : recetas) {
+                int cantidadADevolver = receta.getCantidad() * item.getCantidad();
+                // cantidad positiva = sumar al stock (inverso de agregarItemAComanda)
+                // TODO: con Spring Security, reemplazar el 1 por el ID del usuario autenticado
+                // HARDCODEADO: por ahora siempre ID = 1 (igual que agregarItemAComanda)
+                gestorStockFacade.registrarMovimiento(
+                        receta.getIngrediente().getIdIngrediente(), cantidadADevolver, 1);
+            }
+        }
+
+        item.setEstadoItem(estadoNuevo);
+        ItemPedido guardado = itemPedidoRepository.save(item);
+        // TODO: notificar al mozo via WebSocket cuando el item este LISTO
+        return guardado;
+    }
+
+    private void validarTransicionItem(EstadoItem actual, EstadoItem nuevo) {
+        boolean valida = false;
+        switch (actual) {
+            case PENDIENTE:
+                // Solo desde PENDIENTE se puede cancelar: cocina todavia no lo tomó
+                valida = (nuevo == EstadoItem.EN_PREPARACION || nuevo == EstadoItem.CANCELADO);
+                break;
+            case EN_PREPARACION:
+                // Una vez en preparacion, el flujo es lineal: no se puede cancelar
+                valida = (nuevo == EstadoItem.LISTO);
+                break;
+            case LISTO:
+                // El mozo retira el plato de la ventanilla
+                valida = (nuevo == EstadoItem.ENTREGADO);
+                break;
+            case ENTREGADO:
+            case CANCELADO:
+                valida = false; // Estados finales, no pueden cambiar
+                break;
+        }
+
+        if (!valida) {
+            throw new IllegalStateException(
+                    "Transición de estado inválida para item: no se puede pasar de "
+                            + actual.name() + " a " + nuevo.name());
+        }
     }
 
     public void eliminar(ItemPedido.ItemPedidoId id) {
         itemPedidoRepository.deleteById(id);
     }
 
-    @Autowired
-    private RecetaService recetaService;
-
-    @Autowired
-    private IngredienteService ingredienteService;
-
-    // En ItemPedidoControllere debe llamar a agregarItemAComanda en vez de
+    // En ItemPedidoController debe llamar a agregarItemAComanda en vez de
     // guardar()
     @Transactional
     public ItemPedido agregarItemAComanda(ItemPedido itemPedido) {
@@ -69,8 +117,11 @@ public class ItemPedidoService {
             // cantidad requerida en receta * cantidad de platos pedidos por el cliente
             int cantidadADescontar = receta.getCantidad() * guardado.getCantidad();
 
-            // enviamos la cantidad en negativo para que actualizarStock realice la resta
-            ingredienteService.actualizarStock(receta.getIngrediente().getIdIngrediente(), -cantidadADescontar);
+            // enviamos la cantidad en negativo para que registrarMovimiento realice la
+            // resta
+            // Por ahora, asumimos usuario ID 1 (ej: un mozo default o admin) hasta que haya
+            // Security
+            gestorStockFacade.registrarMovimiento(receta.getIngrediente().getIdIngrediente(), -cantidadADescontar, 1);
         }
         // TODO: notificar a cocina vía WebSocket de nuevo pedido pendiente
         return guardado;
