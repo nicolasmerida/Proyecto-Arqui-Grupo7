@@ -85,3 +85,11 @@ export type Usuario = {
   contraseña: string;
   rol: Rol;
 };
+
+export type Mov_Stock = {
+  id: number;
+  cant: number;
+  fecha: Date;
+  ingrediente: Ingrediente;
+  usuario: Usuario;
+};

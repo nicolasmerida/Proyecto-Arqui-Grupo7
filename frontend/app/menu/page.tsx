@@ -1,8 +1,8 @@
 // app/menu/page.tsx
-import { Metadata } from "next";
+import Pagination from "@/app/ui/menu/pagination";
+import CourseDetail from "@/app/ui/menu/CourseDetail";
 import Link from "next/link";
-import Pagination from "../ui/menu/pagination";
-import CourseDetail from "../ui/menu/CourseDetail";
+import { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: 'Menú',
@@ -15,11 +15,18 @@ type MenuProps = {
   searchParams?: SearchParams;
 };
 
-export default function Menu({searchParams} : MenuProps) {
+export default async function Menu({searchParams} : MenuProps) {
   const resolvedParams = searchParams;
   const currentPage = Number(resolvedParams?.page) || 1;
-  let items;  //Items del menú. Consultar desde el backend
-  let totalPages = 0; //Total de páginas disponible. Consultar desde el backend
+  const response = await fetch(`${process.env.BACKEND_URL}/api/menu?page=${currentPage-1}`);
+  //Validar llamada al backend mediante fetch
+  if (!response.ok) {
+    throw new Error(`Eror ${response.status} al consultar el menú`);
+  }
+
+  const data: { content: any[]; totalPages: number } = await response.json();
+  const items = data.content ?? [];  //Revisar nombre del parámetro para que coincida con backend
+  const totalPages = data.totalPages;
 
   return (
     <main>
@@ -27,7 +34,7 @@ export default function Menu({searchParams} : MenuProps) {
         Bienvenido al menú de nuestro restaurante 🍽️
       </h1>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12">
-        {Array.isArray(items) ?
+        {(items.length > 0) ?
           items.map((item) => (
             <div key={item.id} className="relative">
               <Link href={`/menu/course/${item.id}`}>
@@ -36,7 +43,7 @@ export default function Menu({searchParams} : MenuProps) {
               </Link>
             </div>
           ))
-        : console.log("No hay platos")}
+        : <p>No hay platos disponibles.</p>} {/* Revisar esta parte */}
       </div>
       <div className="justify-items-center mt-6">
         <Pagination currentPage={currentPage} totalPages={totalPages} />

@@ -1,5 +1,6 @@
 // app/ui/footer.tsx
 import Link from "next/link";
+import { DiGithubBadge } from "react-icons/di";
 
 export default function Footer() {
   return (
@@ -19,6 +20,7 @@ export default function Footer() {
                     rel="noopener noreferrer"
                     className="text-white hover:underline"
                     >
+                    <DiGithubBadge />
                     Fausto Gonzalo
                     </Link>
                 </p>
@@ -29,6 +31,7 @@ export default function Footer() {
                     rel="noopener noreferrer"
                     className="text-white hover:underline"
                     >
+                    <DiGithubBadge />
                     Esteban Lartigau
                     </Link>
                 </p>
@@ -39,6 +42,7 @@ export default function Footer() {
                     rel="noopener noreferrer"
                     className="text-white hover:underline"
                     >
+                    <DiGithubBadge />
                     Nicolas Mérida
                     </Link>
                 </p>
@@ -51,6 +55,7 @@ export default function Footer() {
                     rel="noopener noreferrer"
                     className="text-white hover:underline"
                     >
+                    <DiGithubBadge />
                     Gonzalo Perez
                     </Link>
                 </p>
@@ -61,6 +66,7 @@ export default function Footer() {
                     rel="noopener noreferrer"
                     className="text-white hover:underline"
                     >
+                    <DiGithubBadge />
                     Lucas Solmoni
                     </Link>
                 </p>
@@ -71,6 +77,7 @@ export default function Footer() {
                     rel="noopener noreferrer"
                     className="text-white hover:underline"
                     >
+                    <DiGithubBadge />
                     Simón Torres Luna
                     </Link>
                 </p>
