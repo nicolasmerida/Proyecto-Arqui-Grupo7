@@ -1,3 +1,4 @@
+// app/ui/Cocinero/command-car.tsx
 import { Comanda, Plato } from "@/app/lib/definitions";
 import { HiOutlineClock } from "react-icons/hi";
 
@@ -26,7 +27,7 @@ export default function CommandCard({command} : CommandProps) {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 rounded-md gap-12">
                 {
                     platos.map((plato) => (
-
+                        <div>Detalles de cada plato de la comanda</div>
                     ))
                 }
             </div>
