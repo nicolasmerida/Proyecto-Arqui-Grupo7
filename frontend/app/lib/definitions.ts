@@ -12,7 +12,7 @@ export enum EstadoMesa {
 
 export enum EstadoComanda {
   Pendiente = "pendiente",
-  Prepracion = "en preparacion",
+  Preparacion = "en preparacion",
   Lista = "lista",
   Entregada = "entregada",
   Cerrada = "cerrada",
