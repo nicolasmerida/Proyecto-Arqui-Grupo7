@@ -2,13 +2,8 @@
 'use client';
 
 import { Comanda, EstadoComanda } from "@/app/lib/definitions";
-import CommandCard from "@/app/ui/Cocinero/command-car";
-import { Metadata } from "next";
+import CommandCard from "@/app/ui/cocinero/command-car";
 import { useEffect, useState } from "react";
-
-export const metadata: Metadata = {
-  title: 'Cocinero',
-};
 
 export default function Cocinero() {
   const [comandas, setComandas] = useState<Comanda[]>([]); //Consultar comandas desde el backend
