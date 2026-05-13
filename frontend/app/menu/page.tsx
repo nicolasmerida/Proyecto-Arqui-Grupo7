@@ -13,9 +13,11 @@ type SearchParams = {
 }
 type MenuProps = {
   searchParams?: SearchParams;
+  editable?: boolean;
+  selectionable?: boolean;
 };
 
-export default async function Menu({searchParams} : MenuProps) {
+export default async function Menu({searchParams, editable=false, selectionable=false} : MenuProps) {
   const resolvedParams = searchParams;
   const currentPage = Number(resolvedParams?.page) || 1;
   const response = await fetch(`${process.env.BACKEND_URL}/api/menu?page=${currentPage-1}`);
