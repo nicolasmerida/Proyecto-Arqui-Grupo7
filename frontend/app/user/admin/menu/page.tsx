@@ -4,15 +4,14 @@ import Menu from "@/app/menu/page";
 type SearchParams = {
   page?: string; 
 };
-type AdminProps = {
-  searchParams?: Promise<SearchParams>; 
+interface AdminProps {
+  searchParams?: SearchParams; 
 };
 
-export default async function AdminMenu({ searchParams }: AdminProps) {
-    const resolvedParams = await searchParams;
+export default function AdminMenu({ searchParams }: AdminProps) {
 
     return (
         // Habilitar edicion de menu
-        <Menu searchParams={resolvedParams} editable={true} selectionable={false} />
+        <Menu searchParams={searchParams} editable={true} selectionable={false} />
     );
 }

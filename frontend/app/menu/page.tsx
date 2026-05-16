@@ -1,6 +1,7 @@
 // app/menu/page.tsx
+import CourseInfo from "@/app/menu/course/[id]/page";
 import Pagination from "@/app/ui/menu/pagination";
-import CourseDetail from "@/app/ui/menu/CourseDetail";
+import { Plato } from "@/app/lib/definitions";
 import Link from "next/link";
 import { Metadata } from "next";
 
@@ -11,14 +12,15 @@ export const metadata: Metadata = {
 type SearchParams = {
   page?: string;
 }
-type MenuProps = {
+interface MenuProps {
   searchParams?: SearchParams;
   editable?: boolean;
   selectionable?: boolean;
+  addItem?: (plato: Plato, notas?: string) => void;
 };
 
-export default async function Menu({searchParams, editable=false, selectionable=false} : MenuProps) {
-  const resolvedParams = searchParams;
+export default async function Menu({searchParams, editable=false, selectionable=false, addItem=(_plato: Plato, _notas?: string) => {} } : MenuProps) {
+  const resolvedParams = await searchParams;
   const currentPage = Number(resolvedParams?.page) || 1;
   const response = await fetch(`${process.env.BACKEND_URL}/api/menu?page=${currentPage-1}`);
   //Validar llamada al backend mediante fetch
@@ -26,22 +28,24 @@ export default async function Menu({searchParams, editable=false, selectionable=
     throw new Error(`Eror ${response.status} al consultar el menú`);
   }
 
-  const data: { content: any[]; totalPages: number } = await response.json();
+  const data: { content: Plato[]; totalPages: number } = await response.json();
   const items = data.content ?? [];  //Revisar nombre del parámetro para que coincida con backend
   const totalPages = data.totalPages;
 
   return (
     <main>
-      <h1 className="flex flex-col flex-1 items-center justify-center">
+      <h1 className="flex flex-1 items-center">
         Bienvenido al menú de nuestro restaurante 🍽️
       </h1>
+      <div className="flex flex-row">
+        {/* Seleccionador de categoria para filtrar el menu */}
+      </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12">
         {(items.length > 0) ?
           items.map((item) => (
             <div key={item.id} className="relative">
               <Link href={`/menu/course/${item.id}`}>
-                {/*Detalles del plato */}
-                <CourseDetail course={item} />
+                <CourseInfo course={item} select={selectionable} edit={editable} addItem={addItem} />
               </Link>
             </div>
           ))

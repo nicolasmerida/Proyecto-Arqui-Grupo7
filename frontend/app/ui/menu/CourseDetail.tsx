@@ -11,7 +11,7 @@ interface CourseDetailProps {
     onClose: () => void;
     selectionable: boolean;
     editable: boolean;
-    addItem: () => void;
+    addItem: (plato: Plato, notas?: string) => void;
 }
 
 const CAT_OPTIONS = Object.values(Category) as Category[];
@@ -121,7 +121,7 @@ export default function CourseDetail({isVisible, course, onClose, selectionable,
                         }
                     </div>
                     {selectionable && (
-                        <button className="justify-center mt-4" onClick={addItem}>
+                        <button className="justify-center mt-4" onClick={() => addItem(course)}>
                             <HiOutlinePlus />
                         </button>
                     )}

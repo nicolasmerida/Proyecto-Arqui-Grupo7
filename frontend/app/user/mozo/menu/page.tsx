@@ -1,36 +1,49 @@
 // app/user/mozo/menu/page.tsx
 'use client';
 
-import { Item_Pedido, Plato } from "@/app/lib/definitions";
+import { EstadoItem, Item_Pedido, Plato } from "@/app/lib/definitions";
 import Menu from "@/app/menu/page";
 import { useState } from "react";
 
 type SearchParams = {
-  page?: string; 
+  page?: string;
+  comanda?: string;
 };
 type MozoProps = {
-  searchParams?: Promise<SearchParams>; 
+  searchParams?: SearchParams; 
 };
 
-export default async function MozoMenu({ searchParams }: MozoProps) {
-    const resolvedParams = await searchParams;
+export default function MozoMenu({ searchParams }: MozoProps) {
+    const numeroComanda = Number(searchParams?.comanda);
     const [itemsComanda, setItemsComanda] = useState<Item_Pedido[]>([]); //Lista de platos seleccionados para la comanda actual
 
-    const agregarItem = (plato: Plato) => {
+    const agregarItem = (plato: Plato, nota?: string) => {
+        const notas = nota ?? "";
+
         setItemsComanda((prev) => {
-            // Verificar si el plato ya está en la comanda
-            const existe = prev.find((item) => item.plato.id === plato.id);
-            if (existe) {   //Si el plato esta en la comanda, incrementar la cantidad
+            // Verificar si el plato ya está en la comanda con las mismas notas
+            const index = prev.findIndex((item) => item.nComanda === numeroComanda && item.plato.id === plato.id && item.notas.trim() === notas.trim());
+            if (index !== -1) {   //Si el plato esta en la comanda, incrementar la cantidad
+                return prev.map((item, i) =>
+                    (i === index) ?
+                    {
+                        ...item,
+                        cant: item.cant + 1,
+                    } :
+                    item
+                );
             }
             //Si el plato no esta en la comanda, agregar nuevo item a la comanda
-            return [];
+            return [...prev, {
+                cant: 1, notas, estado: EstadoItem.Pendiente, nComanda: numeroComanda, plato: plato
+            }];
         })
     }
 
     return (
         <div className="flex flex-row">
-            <Menu searchParams={resolvedParams} editable={false} selectionable={true} />
-            {/* Mostrar comanda con los platos seleccionados */}
+            <Menu searchParams={searchParams} editable={false} selectionable={true} addItem={agregarItem} />
+            {/* Mostrar comanda con los platos seleccionados y boton para confirmar comanda*/}
         </div>
     );
 }

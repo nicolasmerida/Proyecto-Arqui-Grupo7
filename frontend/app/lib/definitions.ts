@@ -61,14 +61,14 @@ export type Plato = {
 export type Receta = {
   cant: number;
   plato: Plato;
-  ingrdiente: Ingrediente;
+  idIngrediente: number;
 };
 
 export type Item_Pedido = {
   cant: number;
   notas: string;
   estado: EstadoItem;
-  comanda: Comanda;
+  nComanda: number;
   plato: Plato;
 };
 
@@ -97,6 +97,6 @@ export type Mov_Stock = {
   id: number;
   cant: number;
   fecha: Date;
-  ingrediente: Ingrediente;
-  usuario: Usuario;
+  idIngrediente: number;
+  idUsuario: number;
 };

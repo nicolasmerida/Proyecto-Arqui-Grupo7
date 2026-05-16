@@ -10,7 +10,7 @@ interface CourseProps {
   course: Plato;
   select: boolean;
   edit: boolean;
-  addItem: () => void;
+  addItem: (plato: Plato, notas?: string) => void;
 }
 
 export default async function CourseInfo({ course, select, edit, addItem } : CourseProps) {
@@ -25,7 +25,8 @@ export default async function CourseInfo({ course, select, edit, addItem } : Cou
   return (
     <div>
       {/*Detalles del plato */}
-      <CourseDetail isVisible={showDetail} course={course} onClose={handleCloseDetail} selectionable={select} editable={edit} addItem={addItem} /> {/* En CourseDetail agregar la opcion de seleccion o edicion */}
+      <CourseDetail isVisible={showDetail} course={course} onClose={handleCloseDetail} selectionable={select} editable={edit} addItem={addItem} />
+      {/* En CourseDetail agregar la opcion de seleccion o edicion */}
     </div>
   );
 }
