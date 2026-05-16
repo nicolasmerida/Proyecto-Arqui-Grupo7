@@ -27,6 +27,13 @@ export enum EstadoItem {
   Cancelado = "cancelado"
 };
 
+export enum Category {
+  Entrada = "entrada",
+  Principal = "principal",
+  Postre = "postre",
+  Bebida = "bebida"
+}
+
 export type Mesa = {
   numero: number;
   capacidad: number;
@@ -67,7 +74,7 @@ export type Item_Pedido = {
 
 export type Categoria = {
   id: number;
-  nombre: string;
+  nombre: Category;
 };
 
 export type Ingrediente = {
