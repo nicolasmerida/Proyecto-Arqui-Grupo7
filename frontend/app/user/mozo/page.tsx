@@ -6,6 +6,7 @@ export const metadata: Metadata = {
 };
 
 export default function Mozo() {
+  
   return (
     <div className="flex flex-row flex-1 items-center justify-center p-2">
       <div className="flex-col">
