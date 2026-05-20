@@ -3,6 +3,7 @@
 
 import { EstadoItem, Item_Pedido, Plato } from "@/app/lib/definitions";
 import Menu from "@/app/menu/page";
+import CommandDetail from "@/app/ui/commands/CommandDetail";
 import { useState } from "react";
 
 type SearchParams = {
@@ -35,7 +36,7 @@ export default function MozoMenu({ searchParams }: MozoProps) {
             }
             //Si el plato no esta en la comanda, agregar nuevo item a la comanda
             return [...prev, {
-                cant: 1, notas, estado: EstadoItem.Pendiente, nComanda: numeroComanda, plato: plato
+                id: prev.length, cant: 1, notas, estado: EstadoItem.Pendiente, nComanda: numeroComanda, plato: plato
             }];
         })
     }
@@ -43,7 +44,7 @@ export default function MozoMenu({ searchParams }: MozoProps) {
     return (
         <div className="flex flex-row">
             <Menu searchParams={searchParams} editable={false} selectionable={true} addItem={agregarItem} />
-            {/* Mostrar comanda con los platos seleccionados y boton para confirmar comanda*/}
+            <CommandDetail items={itemsComanda} />
         </div>
     );
 }

@@ -20,7 +20,7 @@ interface MenuProps {
 };
 
 export default async function Menu({searchParams, editable=false, selectionable=false, addItem=(_plato: Plato, _notas?: string) => {} } : MenuProps) {
-  const resolvedParams = await searchParams;
+  const resolvedParams = searchParams;
   const currentPage = Number(resolvedParams?.page) || 1;
   const response = await fetch(`${process.env.BACKEND_URL}/api/menu?page=${currentPage-1}`);
   //Validar llamada al backend mediante fetch

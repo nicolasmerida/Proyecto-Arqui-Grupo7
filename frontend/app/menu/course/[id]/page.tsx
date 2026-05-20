@@ -26,7 +26,6 @@ export default async function CourseInfo({ course, select, edit, addItem } : Cou
     <div>
       {/*Detalles del plato */}
       <CourseDetail isVisible={showDetail} course={course} onClose={handleCloseDetail} selectionable={select} editable={edit} addItem={addItem} />
-      {/* En CourseDetail agregar la opcion de seleccion o edicion */}
     </div>
   );
 }

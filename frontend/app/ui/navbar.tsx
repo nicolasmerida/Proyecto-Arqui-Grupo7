@@ -9,9 +9,11 @@ export default function Navbar() {
                 <Link href="/">Gestion_Restaurante</Link>
                 <div className="hidden md:flex ml-6 space-x-6 justify-center">
                     <Link href="/">Inicio</Link>
-                    <Link href="/menu">Menú</Link>
+                    <Link href="/menu">Menú</Link> {/* Detectar rol para redirigir al menu del mozo */}
                 </div>
-                <div>Opciones acceso</div>
+                <div className="flex flex-row">
+                    Opciones acceso
+                </div>
             </div>
         </nav>
     );

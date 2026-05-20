@@ -65,6 +65,7 @@ export type Receta = {
 };
 
 export type Item_Pedido = {
+  id: number;
   cant: number;
   notas: string;
   estado: EstadoItem;
