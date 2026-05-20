@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS comanda (
     numero_comanda INTEGER GENERATED ALWAYS AS IDENTITY,
     fecha TIMESTAMP DEFAULT NOW(),
     --HU: Abierta -> Cancelada | En preparación -> Lista -> Entregada -> Cerrada
-    estado_comanda VARCHAR(15) NOT NULL,
+    estado_comanda VARCHAR(15) NOT NULL CHECK (estado_comanda IN ('Abierta', 'En preparacion', 'Lista', 'Entregada', 'Cerrada', 'Cancelada')),
     numero_mesa INTEGER,
 
     PRIMARY KEY (numero_comanda),
@@ -69,7 +69,7 @@ CREATE TABLE IF NOT EXISTS mov_stock (
     id_ingrediente INTEGER NOT NULL,
     id_usuario INTEGER NOT NULL,
 
-    PRIMARY KEY (id_mov, id_usuario),
+    PRIMARY KEY (id_mov),
     FOREIGN KEY (id_ingrediente) REFERENCES ingrediente(id_ingrediente),
     FOREIGN KEY (id_usuario) REFERENCES usuario(id_usuario)
 );
