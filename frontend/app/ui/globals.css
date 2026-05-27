@@ -24,3 +24,29 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+@layer components {
+  .comanda-pendiente {
+    @apply border-solid rounded-md border-gray-300
+  }
+
+  .comanda-preparacion {
+    @apply border-solid rounded-md border-amber-200
+  }
+
+  .comanda-lista {
+    @apply border-solid rounded-md border-green-500
+  }
+
+  .comanda-entregada {
+    @apply border-solid rounded-md border-yellow-300
+  }
+
+  .comanda-cerrada {
+    @apply border-solid rounded-md border-black
+  }
+
+  .comanda-cancelada {
+    @apply border-solid rounded-md border-red-500
+  }
+}
