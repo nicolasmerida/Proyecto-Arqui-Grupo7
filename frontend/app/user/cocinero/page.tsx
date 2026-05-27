@@ -6,6 +6,15 @@ import CommandCard from "@/app/ui/cocinero/command-card";
 import { useEffect, useState } from "react";
 import { HiOutlineBell, HiOutlineCheck, HiOutlineFire } from "react-icons/hi";
 
+const colorByState: Record<EstadoComanda, string> = {
+  [EstadoComanda.Cancelada]: "comanda-cancelada",
+  [EstadoComanda.Cerrada]: "comanda-cerrada",
+  [EstadoComanda.Entregada]: "comanda-entregada",
+  [EstadoComanda.Lista]: "comanda-lista",
+  [EstadoComanda.Pendiente]: "comanda-pendiente",
+  [EstadoComanda.Preparacion]: "comanda-preparacion",
+}
+
 export default function Cocinero() {
   const [comandas, setComandas] = useState<Comanda[]>([]);
 
@@ -50,13 +59,13 @@ export default function Cocinero() {
   return (
     <div className="flex flex-col flex-1 items-center justify-center">  {/* Agregar margen superior segun Userbar */}
       <div className="flex flex-row justify-around items-center w-full m-10 p-5">
-        <div className="items-center rounded-sm px-2 border-amber-200 border-2">
+        <div className="items-center rounded-sm px-2 comanda-pendiente border-2">
           Pendientes
           <div className="flex flex-col py-1">
             {
               pendientes.map((comanda) => (
-                <div className="flex flex-col">
-                  <CommandCard command={comanda} state={comanda.estado} />
+                <div className={`flex flex-col border-y-4 ${colorByState[comanda.estado]}`}>
+                  <CommandCard command={comanda} />
                   <button className="rounded-md" onClick={() => cambiarEstado(comanda.numero_comanda, EstadoComanda.Preparacion)}>
                     <HiOutlineFire /> Empezar a preparar
                   </button>
@@ -65,7 +74,7 @@ export default function Cocinero() {
             }
           </div>
         </div>
-        <div className="items-center rounded-sm px-2 border-amber-200 border-2">
+        <div className="items-center rounded-sm px-2 comanda-preparacion border-2">
           En Preparación
           <div className="flex flex-col py-1">
             {
@@ -80,7 +89,7 @@ export default function Cocinero() {
             }
           </div>
         </div>
-        <div className="items-center rounded-sm px-2 border-amber-200 border-2">
+        <div className="items-center rounded-sm px-2 comanda-lista border-2">
           Listas
           <div className="flex flex-col py-1">
             {

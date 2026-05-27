@@ -1,5 +1,6 @@
 // app/ui/navbar.tsx
 import Link from "next/link"
+import { HiOutlineLogin } from "react-icons/hi";
 
 export default function Navbar() {
 
@@ -11,9 +12,9 @@ export default function Navbar() {
                     <Link href="/">Inicio</Link>
                     <Link href="/menu">Menú</Link> {/* Detectar rol para redirigir al menu del mozo */}
                 </div>
-                <div className="flex flex-row">
-                    Opciones acceso
-                </div>
+                <Link href="/login" className="flex flex-row">
+                    Iniciar sesión <HiOutlineLogin />
+                </Link>
             </div>
         </nav>
     );

@@ -46,8 +46,8 @@ export type Comanda = {
   numero_comanda: number;
   estado: EstadoComanda;
   fecha: Date;
-  mesa: Mesa;
-  mozos: Usuario[];
+  numero_mesa: number;
+  mozo: Usuario;
 };
 
 export type Plato = {
