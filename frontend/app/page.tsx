@@ -1,8 +1,9 @@
 // app/page.tsx
 
 export default function Home() {
+  
   return (
-    <main className="bg-cover bg-center bg-fixed flex flex-col items-center justify-center py-8 px-4 min-h-screen pt-10">
+    <main className="bg-cover bg-center bg-fixed flex flex-col items-center justify-center min-h-screen px-4 py-8 pt-10">
       <section className="text-center py-16 px-4 text-white rounded-xl mb-8 max-w-4xl w-full">
         <h1 className="text-4xl sm:text-5xl font-semibold mb-4 tracking-tight">
           Bienvenido al

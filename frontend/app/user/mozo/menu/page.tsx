@@ -42,7 +42,7 @@ export default function MozoMenu({ searchParams }: MozoProps) {
     }
 
     return (
-        <div className="flex flex-row">
+        <div className="flex flex-row"> {/* Agregar margen superior segun Userbar */}
             <Menu searchParams={searchParams} editable={false} selectionable={true} addItem={agregarItem} />
             <CommandDetail items={itemsComanda} />
         </div>

@@ -6,7 +6,7 @@ import { HiOutlineInformationCircle } from "react-icons/hi";
 export default function Admin() {
   //Consultar ventas, mas vendidos, datos de comandas, tickets y mozos para las estadisticas y alertas de stock
   return (
-    <div className="flex flex-row items-center">
+    <div className="flex flex-row items-center">  {/* Agregar margen superior segun Userbar */}
       <FunctionsPanel />
       <div className="flex flex-col gap-2 w-full">
         <h1 className="text-xl m-1">Bienvenido Admin</h1>

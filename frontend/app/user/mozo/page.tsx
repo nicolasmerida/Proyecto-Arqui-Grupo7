@@ -38,7 +38,7 @@ export default function Mozo() {
   }, []);
   
   return (
-    <div className="flex flex-row flex-1 items-center justify-center p-2">
+    <div className="flex flex-row flex-1 items-center p-2">  {/* Agregar margen superior segun Userbar */}
       <PlanoSalon />
       <div className="flex-col p-1">
         <div className="flex flex-row justify-between content-center">

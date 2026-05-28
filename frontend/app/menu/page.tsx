@@ -33,7 +33,7 @@ export default async function Menu({searchParams, editable=false, selectionable=
   const totalPages = data.totalPages;
 
   return (
-    <main>
+    <main>  {/* Agregar margen superior segun Navbar */}
       <h1 className="flex flex-1 items-center">
         Bienvenido al menú de nuestro restaurante 🍽️
       </h1>

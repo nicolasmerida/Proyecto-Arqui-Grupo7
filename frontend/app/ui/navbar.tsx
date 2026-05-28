@@ -12,8 +12,8 @@ export default function Navbar() {
                     <Link href="/">Inicio</Link>
                     <Link href="/menu">Menú</Link> {/* Detectar rol para redirigir al menu del mozo */}
                 </div>
-                <Link href="/login" className="flex flex-row">
-                    Iniciar sesión <HiOutlineLogin />
+                <Link href="/login" className="flex flex-row items-center gap-x-1">
+                    Iniciar sesión <HiOutlineLogin className="text-base" />
                 </Link>
             </div>
         </nav>
