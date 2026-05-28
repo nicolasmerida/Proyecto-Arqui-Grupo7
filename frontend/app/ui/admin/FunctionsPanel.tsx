@@ -5,8 +5,8 @@ import { HiOutlineChartSquareBar, HiOutlineClipboardList, HiOutlineClock, HiOutl
 export default function FunctionsPanel() {
 
     return (
-        <aside className="fixed top-0 left-0 overflow-y-auto">  {/* Agregar margen superior segun Userbar */}
-            <nav className="flex flex-col rounded-lg" aria-label="Funciones del administrador">
+        <aside className="fixed top-0 left-0 h-[calc(100vh-)] overflow-y-auto">  {/* Agregar margen superior segun Userbar y definir ancho de pnael */}
+            <nav className="flex flex-col gap-4 rounded-lg" aria-label="Funciones del administrador">
                 <Link href="/user/admin" className="flex gap-1 hover:underline">
                     <HiOutlineChartSquareBar className="text-lg" /> Estadísticas
                 </Link>
