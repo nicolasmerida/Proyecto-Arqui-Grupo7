@@ -7,18 +7,16 @@ export default function PlanoSalon() {
 
     return (
         <div className="flex flex-col">
-            <div className="flex flex-row justify-between">
-                <div className="flex flex-col">
-                    <span className="text-xl text-black font-serif">Plano del salon</span>
+            <div className="flex flex-col">
+                    <span className="text-xl text-white font-serif">Plano del salon</span>
                     <span className="text-sm text-gray-400">
                         {/* Cant mesas ocupadas */} ocupadas - {/* Cant mesas libres */} libres
                     </span>
-                </div>
             </div>
             {(vistaSalon) && (
                 <div className="flex flex-col my-1">
-                    <div className="flex flex-row">
-                        <span className="text-base text-black font-serif">Salón</span>
+                    <div className="flex flex-row items-center">
+                        <span className="text-base text-white font-serif">Salón</span>&nbsp;
                         <span className="text-sm text-gray-300"> - {/* Cant mesas salon */}</span>
                     </div>
                     <div className="flex flex-col">
@@ -29,8 +27,8 @@ export default function PlanoSalon() {
             )}
             {(vistaTerraza) && (
                 <div className="flex flex-col my-1">
-                    <div className="flex flex-row">
-                        <span className="text-base text-black font-serif">Terraza</span>
+                    <div className="flex flex-row items-center">
+                        <span className="text-base text-white font-serif">Terraza</span>&nbsp;
                         <span className="text-sm text-gray-300"> - {/* Cant mesas terraza */}</span>
                     </div>
                     <div className="flex flex-col">
