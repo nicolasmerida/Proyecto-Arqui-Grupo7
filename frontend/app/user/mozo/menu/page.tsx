@@ -11,11 +11,11 @@ type SearchParams = {
   comanda?: string;
 };
 type MozoProps = {
-  searchParams?: SearchParams; 
+  searchParams?: Promise<SearchParams>; 
 };
 
-export default function MozoMenu({ searchParams }: MozoProps) {
-    const numeroComanda = Number(searchParams?.comanda);
+export default async function MozoMenu({ searchParams }: MozoProps) {
+    const numeroComanda = Number((await searchParams)?.comanda);
     const [itemsComanda, setItemsComanda] = useState<Item_Pedido[]>([]); //Lista de platos seleccionados para la comanda actual
 
     const agregarItem = (plato: Plato, nota?: string) => {

@@ -13,14 +13,14 @@ type SearchParams = {
   page?: string;
 }
 interface MenuProps {
-  searchParams?: SearchParams;
+  searchParams?: Promise<SearchParams>;
   editable?: boolean;
   selectionable?: boolean;
   addItem?: (plato: Plato, notas?: string) => void;
 };
 
-export default async function Menu({searchParams, editable=false, selectionable=false, addItem=(_plato: Plato, _notas?: string) => {} } : MenuProps) {
-  const resolvedParams = searchParams;
+export default async function Menu({ searchParams, editable=false, selectionable=false, addItem=(_plato: Plato, _notas?: string) => {} } : MenuProps) {
+  const resolvedParams = await searchParams;
   const currentPage = Number(resolvedParams?.page) || 1;
   const response = await fetch(`${process.env.BACKEND_URL}/api/menu?page=${currentPage-1}`);
   //Validar llamada al backend mediante fetch

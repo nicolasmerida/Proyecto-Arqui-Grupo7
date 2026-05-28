@@ -5,7 +5,7 @@ import { HiOutlineLogin } from "react-icons/hi";
 export default function Navbar() {
 
     return (
-        <nav className="fixed top-0 left-0 w-full p-4">
+        <nav className="fixed top-0 left-0 z-auto w-full p-4">
             <div className="flex flex-row justify-between items-center">
                 <Link href="/">Gestion_Restaurante</Link>
                 <div className="hidden md:flex ml-6 space-x-6 justify-center">
