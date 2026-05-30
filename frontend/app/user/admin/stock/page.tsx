@@ -1,4 +1,5 @@
 // app/user/admin/stock/page.tsx
+import TableStock from "@/app/ui/stock/table-stock";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -6,7 +7,14 @@ export const metadata: Metadata = {
 };
 
 export default function Stock() {
+
     return (
-        <div>Stock</div>
+        <>
+        <div className="flex flex-col">
+            <span className="font-serif text-black">Stock</span>
+            <span className="text-gray-400">Inventario de ingredientes e insumos</span>
+        </div>
+        <TableStock />
+        </>
     );
 }
