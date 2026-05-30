@@ -5,7 +5,7 @@ type SearchParams = {
   page?: string; 
 };
 interface AdminProps {
-  searchParams?: SearchParams; 
+  searchParams?: Promise<SearchParams>; 
 };
 
 export default function AdminMenu({ searchParams }: AdminProps) {
