@@ -1,0 +1,2304 @@
+openapi: 3.0.3
+info:
+  title: API del Sistema de Gestión de Restaurante
+  version: 1.0.0
+  description: Contrato de diseño unificado para el backend completo del restaurante. Incluye Mesas, Comandas, Ítems, Platos, Ingredientes, Recetas, Categorías, Movimientos de Stock y Usuarios.
+
+servers:
+  - url: http://localhost:8080
+    description: Servidor Local de Desarrollo (Spring Boot)
+
+tags:
+  - name: Mesas
+    description: Gestión de mesas, estados y aperturas
+  - name: Comanda
+    description: Operaciones relacionadas con la gestión de comandas del salón
+  - name: Ítems Pedido
+    description: Gestión de platos asociados a comandas (Cocina y Mozos)
+  - name: Platos
+    description: Catálogo de platos del menú
+  - name: Categorias
+    description: Gestión del catálogo de categorías del menú
+  - name: Recetas
+    description: Relación entre platos e ingredientes
+  - name: Ingredientes
+    description: Gestión del inventario
+  - name: MovimientosStock
+    description: Auditoría de altas y bajas de stock
+  - name: Usuarios
+    description: Gestión del personal del restaurante
+
+paths:
+  # ─── MÓDULO: MESAS ───────────────────────────────────────────────────
+  /mesas:
+    get:
+      tags: [Mesas]
+      summary: Obtener todas las mesas
+      description: Retorna el listado completo de mesas.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Mesa'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    post:
+      tags: [Mesas]
+      summary: Crear una mesa
+      description: Crea una nueva mesa.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Mesa'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Mesa'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /mesas/{numero}:
+    get:
+      tags: [Mesas]
+      summary: Obtener una mesa por número
+      description: Retorna una mesa según su número identificador.
+      parameters:
+        - name: numero
+          in: path
+          required: true
+          description: Número identificador de la mesa.
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Mesa'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    delete:
+      tags: [Mesas]
+      summary: Eliminar una mesa
+      description: Elimina una mesa según su número identificador.
+      parameters:
+        - name: numero
+          in: path
+          required: true
+          description: Número identificador de la mesa.
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /mesas/estado/{estado}:
+    get:
+      tags: [Mesas]
+      summary: Obtener mesas por estado
+      description: Retorna el listado de mesas filtradas por estado.
+      parameters:
+        - name: estado
+          in: path
+          required: true
+          description: Estado de la mesa.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Mesa'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /mesas/{numero}/abrir:
+    put:
+      tags: [Mesas]
+      summary: Abrir una mesa
+      description: Abre una mesa indicando la cantidad de comensales.
+      parameters:
+        - name: numero
+          in: path
+          required: true
+          description: Número identificador de la mesa.
+          schema:
+            type: integer
+            format: int32
+        - name: numeroComensales
+          in: query
+          required: true
+          description: Cantidad de comensales para abrir la mesa.
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Mesa'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /mesas/{numero}/cerrar:
+    put:
+      tags: [Mesas]
+      summary: Cerrar una mesa
+      description: Cierra una mesa según su número identificador.
+      parameters:
+        - name: numero
+          in: path
+          required: true
+          description: Número identificador de la mesa.
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Mesa'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  # ─── MÓDULO: COMANDAS ────────────────────────────────────────────────
+  /comandas:
+    get:
+      tags: [Comanda]
+      summary: Obtener todas las comandas
+      description: Retorna el listado completo de comandas registradas.
+      responses:
+        '200':
+          description: Listado de comandas devuelto con éxito
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Comanda'
+        '401':
+          description: No autorizado o token inválido
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    post:
+      tags: [Comanda]
+      summary: Crear una nueva comanda
+      description: Registra una nueva comanda en una mesa asignada.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ComandaRequest'
+      responses:
+        '201':
+          description: Comanda creada correctamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Comanda'
+        '400':
+          description: Datos de entrada inválidos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /comandas/{id}:
+    get:
+      tags: [Comanda]
+      summary: Obtener una comanda por ID
+      description: Retorna una comanda según su número identificador.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Número identificador de la comanda.
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: Comanda encontrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Comanda'
+        '404':
+          description: La comanda especificada no existe
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    delete:
+      tags: [Comanda]
+      summary: Eliminar una comanda
+      description: Elimina una comanda del sistema según su número identificador.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Número identificador de la comanda.
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '204':
+          description: Comanda eliminada con éxito (sin cuerpo)
+        '404':
+          description: Comanda no encontrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /comandas/mesa/{numeroMesa}:
+    get:
+      tags: [Comanda]
+      summary: Obtener comanda activa por mesa
+      description: Retorna la comanda asociada a un número de mesa específico.
+      parameters:
+        - name: numeroMesa
+          in: path
+          required: true
+          description: Número identificador de la mesa.
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: Comanda de la mesa devuelta con éxito
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Comanda'
+        '404':
+          description: No hay comanda activa para la mesa indicada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /comandas/estado/{estado}:
+    get:
+      tags: [Comanda]
+      summary: Obtener comandas por estado
+      description: Retorna el listado de comandas filtradas por su estado actual.
+      parameters:
+        - name: estado
+          in: path
+          required: true
+          description: Estado de la comanda.
+          schema:
+            type: string
+            enum: [ABIERTA, CERRADA, EN_PROCESO]
+      responses:
+        '200':
+          description: Listado filtrado devuelto con éxito
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Comanda'
+
+  /comandas/{id}/estado:
+    put:
+      tags: [Comanda]
+      summary: Cambiar estado de una comanda
+      description: Actualiza el estado de una comanda existente (ej. pasar a CERRADA).
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Número identificador de la comanda.
+          schema:
+            type: integer
+            format: int32
+        - name: nuevoEstado
+          in: query
+          required: true
+          description: Nuevo estado de la comanda.
+          schema:
+            type: string
+            enum: [ABIERTA, CERRADA, EN_PROCESO]
+      responses:
+        '200':
+          description: Estado de comanda actualizado correctamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Comanda'
+        '404':
+          description: Comanda no encontrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /comandas/{id}/total:
+    get:
+      tags: [Comanda]
+      summary: Obtener el importe total de una comanda
+      description: Retorna la suma total de los precios de los ítems consumidos en la comanda.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Número identificador de la comanda.
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: Importe total calculado con éxito
+          content:
+            application/json:
+              schema:
+                type: number
+                format: double
+                example: 11500.50
+
+  # ─── MÓDULO: ÍTEMS DE PEDIDO ─────────────────────────────────────────
+  /items-pedido:
+    post:
+      tags: [Ítems Pedido]
+      summary: Agregar un nuevo ítem a una comanda (HU-04)
+      description: Asocia un plato y una cantidad a una comanda activa.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ItemPedidoInput'
+      responses:
+        '201':
+          description: Ítem agregado exitosamente a la comanda
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ItemPedidoResponse'
+        '400':
+          description: Validación fallida (campos faltantes o cantidad menor a 1)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: El número de comanda o el ID del plato no existen
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    delete:
+      tags: [Ítems Pedido]
+      summary: Eliminar un ítem específico de una comanda
+      description: Remueve la relación entre un plato y una comanda por ID compuestos recibidos como query parameters.
+      parameters:
+        - in: query
+          name: numeroComanda
+          required: true
+          schema:
+            type: integer
+          example: 101
+        - in: query
+          name: idPlato
+          required: true
+          schema:
+            type: integer
+          example: 45
+      responses:
+        '204':
+          description: Ítem eliminado correctamente de la comanda (sin cuerpo de respuesta)
+        '404':
+          description: No se encontró la combinación de comanda y plato solicitada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /items-pedido/comanda/{numeroComanda}:
+    get:
+      tags: [Ítems Pedido]
+      summary: Listar todos los ítems cargados en una comanda
+      description: Devuelve el listado completo de platos asociados a una comanda dada.
+      parameters:
+        - in: path
+          name: numeroComanda
+          required: true
+          schema:
+            type: integer
+          example: 101
+      responses:
+        '200':
+          description: Lista de ítems pertenecientes a la comanda devuelta con éxito
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ItemPedidoResponse'
+        '404':
+          description: La comanda especificada no existe en el sistema
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /items-pedido/estado/{estado}:
+    get:
+      tags: [Ítems Pedido]
+      summary: Filtrar ítems por estado para vista de Cocina (HU-06)
+      description: Retorna la lista de renglones de pedidos según el estado enviado (ej. PENDIENTE para los cocineros).
+      parameters:
+        - in: path
+          name: estado
+          required: true
+          schema:
+            type: string
+            enum: [PENDIENTE, EN_PREPARACION, LISTO, ENTREGADO]
+          example: PENDIENTE
+      responses:
+        '200':
+          description: Lista de ítems en el estado solicitado devuelta con éxito
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ItemPedidoResponse'
+
+  /items-pedido/estado:
+    put:
+      tags: [Ítems Pedido]
+      summary: Actualizar el estado de un ítem (Cocina / Mozo) (HU-07)
+      description: Permite cambiar el flujo del ítem (ej. Cocina pasa un plato de EN_PREPARACION a LISTO).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EstadoUpdateInput'
+      responses:
+        '200':
+          description: Estado modificado correctamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ItemPedidoResponse'
+        '404':
+          description: Ítem no encontrado para actualizar
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '422':
+          description: Regla de negocio fallida (ej. transición de estado no válida)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  # ─── MÓDULO: PLATOS ──────────────────────────────────────────────────
+  /platos:
+    get:
+      tags: [Platos]
+      summary: Obtener todos los platos
+      description: Retorna el listado completo de platos, incluyendo activos e inactivos.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Plato'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    post:
+      tags: [Platos]
+      summary: Crear un plato
+      description: Crea un nuevo plato.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Plato'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Plato'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /platos/activos:
+    get:
+      tags: [Platos]
+      summary: Obtener platos activos
+      description: Retorna el listado de platos activos.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Plato'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /platos/categoria/{idCategoria}:
+    get:
+      tags: [Platos]
+      summary: Obtener platos por categoría
+      description: Retorna el listado de platos asociados a una categoría.
+      parameters:
+        - name: idCategoria
+          in: path
+          required: true
+          description: Identificador de la categoría.
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Plato'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /platos/{id}:
+    get:
+      tags: [Platos]
+      summary: Obtener un plato por ID
+      description: Retorna un plato según su identificador.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Identificador del plato.
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Plato'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    put:
+      tags: [Platos]
+      summary: Actualizar un plato
+      description: Actualiza los datos de un plato existente.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Identificador del plato.
+          schema:
+            type: integer
+            format: int32
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Plato'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Plato'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    delete:
+      tags: [Platos]
+      summary: Eliminar un plato
+      description: Elimina lógicamente un plato del menú.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Identificador del plato.
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /platos/{id}/toggle-activo:
+    put:
+      tags: [Platos]
+      summary: Alternar estado activo de un plato
+      description: Activa o desactiva un plato según su estado actual.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Identificador del plato.
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Plato'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  # ─── MÓDULO: CATEGORÍAS ──────────────────────────────────────────────
+  /categorias:
+    get:
+      tags: [Categorias]
+      summary: Obtener todas las categorías
+      description: Retorna el listado completo de categorías.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Categoria'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    post:
+      tags: [Categorias]
+      summary: Crear una categoría
+      description: Crea una nueva categoría.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Categoria'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Categoria'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /categorias/{id}:
+    get:
+      tags: [Categorias]
+      summary: Obtener una categoría por ID
+      description: Retorna una categoría según su identificador.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Identificador de la categoría.
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Categoria'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    put:
+      tags: [Categorias]
+      summary: Actualizar una categoría
+      description: Actualiza los datos de una categoría existente.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Identificador de la categoría.
+          schema:
+            type: integer
+            format: int32
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Categoria'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Categoria'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    delete:
+      tags: [Categorias]
+      summary: Eliminar una categoría
+      description: Elimina una categoría según su identificador.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Identificador de la categoría.
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  # ─── MÓDULO: RECETAS ─────────────────────────────────────────────────
+  /recetas/plato/{idPlato}:
+    get:
+      tags: [Recetas]
+      summary: Obtener recetas por plato
+      description: Retorna el listado de ingredientes y cantidades requeridas para un plato.
+      parameters:
+        - name: idPlato
+          in: path
+          required: true
+          description: Identificador del plato.
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Receta'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /recetas:
+    post:
+      tags: [Recetas]
+      summary: Crear una receta
+      description: Crea una relación entre un plato y un ingrediente con la cantidad requerida.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Receta'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Receta'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    delete:
+      tags: [Recetas]
+      summary: Eliminar una receta
+      description: Elimina una relación entre un plato y un ingrediente usando parámetros query.
+      parameters:
+        - in: query
+          name: idPlato
+          required: true
+          description: Identificador del plato.
+          schema:
+            type: integer
+            format: int32
+        - in: query
+          name: idIngrediente
+          required: true
+          description: Identificador del ingrediente.
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  # ─── MÓDULO: INGREDIENTES ─────────────────────────────────────────────
+  /ingredientes:
+    get:
+      tags: [Ingredientes]
+      summary: Obtener todos los ingredientes
+      description: Retorna el listado completo de ingredientes del inventario.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Ingrediente'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    post:
+      tags: [Ingredientes]
+      summary: Crear un ingrediente
+      description: Crea un nuevo ingrediente en el inventario.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Ingrediente'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ingrediente'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /ingredientes/bajo-stock:
+    get:
+      tags: [Ingredientes]
+      summary: Obtener ingredientes con bajo stock
+      description: Retorna el listado de ingredientes cuyo stock se encuentra por debajo del stock mínimo.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Ingrediente'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /ingredientes/{id}:
+    get:
+      tags: [Ingredientes]
+      summary: Obtener un ingrediente por ID
+      description: Retorna un ingrediente según su identificador.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Identificador del ingrediente.
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ingrediente'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    delete:
+      tags: [Ingredientes]
+      summary: Eliminar un ingrediente
+      description: Elimina un ingrediente según su identificador.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Identificador del ingrediente.
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /ingredientes/{id}/stock:
+    put:
+      tags: [Ingredientes]
+      summary: Actualizar stock de un ingrediente
+      description: Registra un movimiento de stock para un ingrediente y retorna el ingrediente actualizado.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Identificador del ingrediente.
+          schema:
+            type: integer
+            format: int32
+        - name: cantidad
+          in: query
+          required: true
+          description: Cantidad a registrar en el stock (puede ser positivo o negativo).
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ingrediente'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  # ─── MÓDULO: MOVIMIENTOS DE STOCK ────────────────────────────────────
+  /movimientos-stock/ingrediente/{idIngrediente}:
+    get:
+      tags: [MovimientosStock]
+      summary: Obtener movimientos de stock por ingrediente
+      description: Retorna el listado de movimientos de stock asociados a un ingrediente.
+      parameters:
+        - name: idIngrediente
+          in: path
+          required: true
+          description: Identificador del ingrediente.
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MovStock'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /movimientos-stock/usuario/{idUsuario}:
+    get:
+      tags: [MovimientosStock]
+      summary: Obtener movimientos de stock por usuario
+      description: Retorna el listado de movimientos de stock asociados a un usuario.
+      parameters:
+        - name: idUsuario
+          in: path
+          required: true
+          description: Identificador del usuario.
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MovStock'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /movimientos-stock:
+    post:
+      tags: [MovimientosStock]
+      summary: Registrar un movimiento de stock
+      description: Registra un movimiento manual de stock y retorna el ingrediente actualizado.
+      parameters:
+        - name: idIngrediente
+          in: query
+          required: true
+          description: Identificador del ingrediente.
+          schema:
+            type: integer
+            format: int32
+        - name: cantidad
+          in: query
+          required: true
+          description: Cantidad del movimiento de stock.
+          schema:
+            type: integer
+            format: int32
+        - name: idUsuario
+          in: query
+          required: true
+          description: Identificador del usuario que registra el movimiento.
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ingrediente'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  # ─── MÓDULO: USUARIOS ────────────────────────────────────────────────
+  /usuarios:
+    get:
+      tags: [Usuarios]
+      summary: Obtener todos los usuarios
+      description: Retorna el listado completo de usuarios.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Usuario'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    post:
+      tags: [Usuarios]
+      summary: Crear un usuario
+      description: Crea un nuevo usuario.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Usuario'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Usuario'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /usuarios/{id}:
+    get:
+      tags: [Usuarios]
+      summary: Obtener un usuario por ID
+      description: Retorna un usuario según su identificador.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Identificador del usuario.
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Usuario'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    put:
+      tags: [Usuarios]
+      summary: Actualizar un usuario
+      description: Actualiza los datos de un usuario existente.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Identificador del usuario.
+          schema:
+            type: integer
+            format: int32
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Usuario'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Usuario'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    delete:
+      tags: [Usuarios]
+      summary: Eliminar un usuario
+      description: Elimina un usuario según su identificador.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Identificador del usuario.
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+# ─── COMPONENTES REUTILIZABLES (MOLDES / ENTIDADES) ───────────────────
+components:
+  schemas:
+    Mesa:
+      type: object
+      required:
+        - capacidad
+        - sector
+        - estadoMesa
+      properties:
+        numeroMesa:
+          type: integer
+          format: int32
+          example: 5
+        capacidad:
+          type: integer
+          format: int32
+          example: 4
+        sector:
+          type: string
+          example: "Patio"
+        estadoMesa:
+          type: string
+          example: "LIBRE"
+        horaDeApertura:
+          type: string
+          format: date-time
+          example: "2026-05-29T19:30:00Z"
+
+    Comanda:
+      type: object
+      properties:
+        numeroComanda:
+          type: integer
+          format: int32
+          example: 101
+        fecha:
+          type: string
+          format: date-time
+          example: "2026-05-29T15:30:00Z"
+        estadoComanda:
+          type: string
+          enum: [ABIERTA, CERRADA, EN_PROCESO]
+          example: ABIERTA
+        mesa:
+          $ref: '#/components/schemas/Mesa'
+        mozos:
+          type: array
+          items:
+            $ref: '#/components/schemas/Usuario'
+
+    ComandaRequest:
+      type: object
+      required:
+        - estadoComanda
+        - mesa
+      properties:
+        numeroComanda:
+          type: integer
+          format: int32
+          readOnly: true
+        fecha:
+          type: string
+          format: date-time
+          example: "2026-05-29T15:30:00Z"
+        estadoComanda:
+          type: string
+          enum: [ABIERTA, CERRADA, EN_PROCESO]
+          example: ABIERTA
+        mesa:
+          $ref: '#/components/schemas/Mesa'
+        mozos:
+          type: array
+          items:
+            $ref: '#/components/schemas/Usuario'
+
+    ItemPedidoInput:
+      type: object
+      required: [numeroComanda, idPlato, cantidad]
+      properties:
+        numeroComanda:
+          type: integer
+          description: ID de la comanda vinculada
+          example: 101
+        idPlato:
+          type: integer
+          description: ID del plato solicitado
+          example: 45
+        cantidad:
+          type: integer
+          minimum: 1
+          example: 2
+        notas:
+          type: string
+          description: Observaciones de cocina
+          example: "Sin cebolla y las papas fritas bien crocantes"
+
+    ItemPedidoResponse:
+      type: object
+      properties:
+        numeroComanda:
+          type: integer
+          example: 101
+        idPlato:
+          type: integer
+          example: 45
+        cantidad:
+          type: integer
+          example: 2
+        notas:
+          type: string
+          example: "Sin cebolla y las papas fritas bien crocantes"
+        estadoItem:
+          type: string
+          enum: [PENDIENTE, EN_PREPARACION, LISTO, ENTREGADO]
+          example: PENDIENTE
+
+    EstadoUpdateInput:
+      type: object
+      required: [numeroComanda, idPlato, nuevoEstado]
+      properties:
+        numeroComanda:
+          type: integer
+          example: 101
+        idPlato:
+          type: integer
+          example: 45
+        nuevoEstado:
+          type: string
+          enum: [PENDIENTE, EN_PREPARACION, LISTO, ENTREGADO]
+          example: EN_PREPARACION
+
+    Categoria:
+      type: object
+      required:
+        - nombre
+      properties:
+        idCategoria:
+          type: integer
+          format: int32
+          example: 1
+        nombre:
+          type: string
+          example: "Bebidas sin alcohol"
+
+    Plato:
+      type: object
+      required:
+        - nombre
+        - precio
+        - descripcion
+        - activo
+        - categoria
+      properties:
+        idPlato:
+          type: integer
+          format: int32
+          example: 45
+        nombre:
+          type: string
+          example: "Milanesa a la Napolitana con fritas"
+        precio:
+          type: number
+          format: double
+          example: 8500.50
+        descripcion:
+          type: string
+          example: "Milanesa de ternera XL con salsa fileto, jamón y muzzarella."
+        activo:
+          type: boolean
+          example: true
+        categoria:
+          $ref: '#/components/schemas/Categoria'
+
+    Ingrediente:
+      type: object
+      required:
+        - nombre
+        - stock
+        - stockMinimo
+        - unidad
+      properties:
+        idIngrediente:
+          type: integer
+          format: int32
+          example: 10
+        nombre:
+          type: string
+          example: "Tomate Perita"
+        stock:
+          type: integer
+          format: int32
+          example: 50
+        stockMinimo:
+          type: integer
+          format: int32
+          example: 15
+        unidad:
+          type: string
+          example: "kg"
+
+    RecetaId:
+      type: object
+      required:
+        - idPlato
+        - idIngrediente
+      properties:
+        idPlato:
+          type: integer
+          format: int32
+          example: 45
+        idIngrediente:
+          type: integer
+          format: int32
+          example: 10
+
+    Receta:
+      type: object
+      required:
+        - id
+        - plato
+        - ingrediente
+        - cantidad
+      properties:
+        id:
+          $ref: '#/components/schemas/RecetaId'
+        plato:
+          $ref: '#/components/schemas/Plato'
+        ingrediente:
+          $ref: '#/components/schemas/Ingrediente'
+        amount:
+          type: integer
+          format: int32
+          example: 200
+
+    MovStock:
+      type: object
+      required:
+        - cantidad
+        - ingrediente
+        - usuario
+      properties:
+        idMov:
+          type: integer
+          format: int32
+          example: 1
+        fecha:
+          type: string
+          format: date-time
+          example: "2026-05-29T10:00:00Z"
+        cantidad:
+          type: integer
+          format: int32
+          example: -5
+        ingrediente:
+          $ref: '#/components/schemas/Ingrediente'
+        usuario:
+          $ref: '#/components/schemas/Usuario'
+
+    Usuario:
+      type: object
+      required:
+        - nombre
+        - email
+        - password
+        - rol
+      properties:
+        idUsuario:
+          type: integer
+          format: int32
+          example: 4
+        nombre:
+          type: string
+          example: "Juan Pérez"
+        email:
+          type: string
+          format: email
+          example: "juan.perez@restaurante.com"
+        password:
+          type: string
+          format: password
+          example: "12345678"
+        rol:
+          type: string
+          example: "MOZO"
+
+    Error:
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            code:
+              type: string
+              example: "RECURSO_NO_ENCONTRADO"
+            message:
+              type: string
+              example: El recurso solicitado no existe en el sistema.
+            details:
+              type: string
+              example: "Más detalles del error acá"
