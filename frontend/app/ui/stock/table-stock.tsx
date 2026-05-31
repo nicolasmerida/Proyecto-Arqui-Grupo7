@@ -1,20 +1,25 @@
 // app/ui/stock/table-stock.tsx
 'use client';
 import { Ingrediente } from "@/app/lib/definitions";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { HiOutlinePlusSm } from "react-icons/hi";
+import AddStock from "@/app/ui/stock/AddStock";
+
+type Condition = "todos" | "regla" | "advertencia" | "bajo";
 
 export default function TableStock() {
-    //Consultar ingredientes al backend
+    //Consultar ingredientes al backend al inicio con useEffect
     const [ingredientes, setIngredientes] = useState<Ingrediente[]>([]);
-    const [condicion, setCondicion] = useState("todo");
-    var ingFiltrados = ingredientes.filter((ingrediente) => {
+    const [condicion, setCondicion] = useState<Condition>("todos");
+    const [showDetail, setShowDetail] = useState(false);
+    const [selectedIng, setSelected] = useState<Ingrediente>();
+    var ingFiltrados = ingredientes.filter((ingrediente) =>
         (condicion === "regla") ? (ingrediente.stock > ingrediente.stock_mininmo) :
         (condicion === "bajo") ? (ingrediente.stock < ingrediente.stock_mininmo) :
         (condicion === "advertencia") ? (ingrediente.stock === ingrediente.stock_mininmo) :
         true //Para no filtrar y mantener todos los ingredientes
-        }
     );
+
     //Considerar el caso en que se cambie el filtro o cambien los ingredientes totales (useEffect) y testear
     const getCondicion = (ingrediente: Ingrediente) => {
         if (ingrediente.stock > ingrediente.stock_mininmo) return "regla";
@@ -22,8 +27,19 @@ export default function TableStock() {
         if (ingrediente.stock === ingrediente.stock_mininmo) return "advertencia";
     };
 
-    const handleIngreso = (ingrediente: Ingrediente) => {
-        // Invocar la función registrar aumento stock de ingrediente
+    //Abrir componente para modificar el stock
+    const handleAddStock = (ingrediente: Ingrediente) => {
+        setShowDetail(!showDetail);
+        setSelected(ingrediente);
+    };
+
+    //Actualizar el stock del ingrediente seleccionado
+    const handleStockUpdate = (updatedIng: Ingrediente) => {
+        setIngredientes((prev) => 
+            prev.map((ing) =>
+                (ing.id === updatedIng.id) ? updatedIng : ing
+            )
+        );
     };
 
     return(
@@ -69,7 +85,7 @@ export default function TableStock() {
                                 {condTexto}
                             </td>
                             <td>
-                                <button className="rounded-xl" onClick={() => handleIngreso(ingrediente)}>
+                                <button className="rounded-xl" onClick={() => handleAddStock(ingrediente)}>
                                     <HiOutlinePlusSm />Ingreso
                                 </button>
                             </td>
@@ -86,6 +102,7 @@ export default function TableStock() {
                 </tbody>
             </table>
         </div>
+        <AddStock show={showDetail} onClose={() => setShowDetail(false)} onStockUpdate={handleStockUpdate} ingredient={selectedIng} />
         </>
     );
 }
