@@ -5,6 +5,11 @@ export enum Rol {
   Mozo = "Mozo"
 };
 
+export enum EstadoUsuario {
+  Activo = "activo",
+  Suspendido = "Suspendido"
+};
+
 export enum EstadoMesa {
   Libre = "libre",
   Ocupada = "ocupada"
@@ -92,12 +97,13 @@ export type Usuario = {
   email: string;
   contraseña: string;
   rol: Rol;
+  estado: EstadoUsuario;
 };
 
 export type Mov_Stock = {
   id: number;
   cant: number;
   fecha: Date;
-  idIngrediente: number;
-  idUsuario: number;
+  ingrediente: Ingrediente;
+  usuario: Usuario;
 };
