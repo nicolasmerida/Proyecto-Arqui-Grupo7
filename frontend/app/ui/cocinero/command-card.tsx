@@ -25,7 +25,7 @@ export default function CommandCard({command, state} : CommandProps) {
         <div className="flex flex-col rounded-md">
             <div className="flex flex-row justify-between">
                 <div className="flex flex-row gap-1">
-                    <h1 className="items-center"><strong>Mesa {command?.mesa.numero}</strong></h1>
+                    <h1 className="items-center"><strong>Mesa {command?.numero_mesa}</strong></h1>
                     <span className="items-start">#{command?.numero_comanda}</span>
                 </div>
                 <div>
@@ -34,7 +34,7 @@ export default function CommandCard({command, state} : CommandProps) {
                 </div>
             </div>
             <div className="text-gray-500">
-                Mozo: {command?.mozos[0].nombre}
+                Mozo: {command?.mozo.nombre}
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 rounded-md gap-12">
                 {
