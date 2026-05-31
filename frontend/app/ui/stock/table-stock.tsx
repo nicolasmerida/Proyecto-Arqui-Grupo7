@@ -21,10 +21,10 @@ export default function TableStock() {
     );
 
     //Considerar el caso en que se cambie el filtro o cambien los ingredientes totales (useEffect) y testear
-    const getCondicion = (ingrediente: Ingrediente) => {
+    const getCondicion = (ingrediente: Ingrediente): Condition => {
         if (ingrediente.stock > ingrediente.stock_mininmo) return "regla";
         if (ingrediente.stock < ingrediente.stock_mininmo) return "bajo";
-        if (ingrediente.stock === ingrediente.stock_mininmo) return "advertencia";
+        return "advertencia";
     };
 
     //Abrir componente para modificar el stock
@@ -35,14 +35,12 @@ export default function TableStock() {
 
     //Actualizar el stock del ingrediente seleccionado
     const handleStockUpdate = (updatedIng: Ingrediente) => {
-        setIngredientes((prev) => 
-            prev.map((ing) =>
-                (ing.id === updatedIng.id) ? updatedIng : ing
-            )
+        setIngredientes((prev) =>
+            prev.map((ing) => (ing.id === updatedIng.id ? updatedIng : ing))
         );
     };
 
-    return(
+    return (
         <>
         <div className="grid grid-cols-3 rounded-md p-2">
             <button onClick={() => setCondicion("todos")}>Todos</button>
@@ -51,7 +49,7 @@ export default function TableStock() {
             <button onClick={() => setCondicion("bajo")}>Bajo</button>
         </div>
         <div className="overflow-hidden rounded-xl border">
-            <table className="w-full">
+            <table className="w-full p-2">
                 <thead>
                     <tr className="text-left text-sm uppercase">
                         <th>Ingrediente</th>
@@ -73,7 +71,7 @@ export default function TableStock() {
                                             "text-black bg-gray-500 border-black";
 
                         return (
-                        <tr key={ingrediente.id}>
+                        <tr key={ingrediente.id} className="m-2">
                             <td className="font-medium">
                                 {ingrediente.nombre}
                             </td>
