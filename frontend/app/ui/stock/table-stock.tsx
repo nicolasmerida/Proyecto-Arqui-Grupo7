@@ -42,7 +42,7 @@ export default function TableStock() {
 
     return (
         <>
-        <div className="grid grid-cols-3 rounded-md p-2">
+        <div className="grid grid-cols-4 rounded-md p-2">
             <button onClick={() => setCondicion("todos")}>Todos</button>
             <button onClick={() => setCondicion("regla")}>En regla</button>
             <button onClick={() => setCondicion("advertencia")}>Advertencia</button>

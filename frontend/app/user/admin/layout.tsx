@@ -1,4 +1,5 @@
 // app/user/admin/layout.tsx
+import FunctionsPanel from "@/app/ui/admin/FunctionsPanel";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -11,8 +12,11 @@ export const metadata: Metadata = {
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
 
     return (
-        <main>
+        <div className="min-h-screen">
+          <FunctionsPanel />
+          <main className="pl-28 pt-10">
             {children}
-        </main>
+          </main>
+        </div>
     );
 }

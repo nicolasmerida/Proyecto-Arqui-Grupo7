@@ -34,7 +34,7 @@ export default async function Menu({ searchParams, editable=false, selectionable
 
   return (
     <main>  {/* Agregar margen superior segun Navbar */}
-      <h1 className="flex flex-1 items-center">
+      <h1 className="flex flex-1 items-center m-5">
         Bienvenido al menú de nuestro restaurante 🍽️
       </h1>
       <div className="flex flex-row">

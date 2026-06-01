@@ -10,11 +10,13 @@ export default function Movements() {
 
     return (
         <>
-        <div className="flex flex-col justify-start items-center m-2">
+        <div className="flex flex-col justify-start m-2">
             <span className="text-xl text-black font-serif">Movimientos de stock</span>
             <span className="text-sm text-gray-400">Historial de ingresos y consumos</span>
         </div>
-        <TableMovements />
+        <div className="m-2">
+            <TableMovements />
+        </div>
         </>
     );
 }

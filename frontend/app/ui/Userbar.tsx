@@ -4,7 +4,7 @@ import { HiOutlineLogout } from "react-icons/hi";
 export default function Userbar() {
 
     return (
-        <nav className="fixed top-0 left-0 w-full z-auto shadow-sm">    {/* Agregar margen superior segun Navbar */}
+        <nav className="fixed top-0 left-0 w-full z-auto shadow-sm m-8">    {/* Agregar margen superior segun Navbar */}
             <div className="flex items-center justify-between text-gray-500 px-6 py-3">
                 <div>
                     Hola, usuario{/* Obtener nombre o rol del usuario */}

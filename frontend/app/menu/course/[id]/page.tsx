@@ -23,7 +23,7 @@ export default async function CourseInfo({ course, select, edit, addItem } : Cou
   }
 
   return (
-    <div> {/* Agregar margen superior segun Navbar */}
+    <div className="m-5"> {/* Agregar margen superior segun Navbar */}
       {/*Detalles del plato */}
       <CourseDetail isVisible={showDetail} course={course} onClose={handleCloseDetail} selectionable={select} editable={edit} addItem={addItem} />
     </div>
