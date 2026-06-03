@@ -4,6 +4,8 @@ import com.uns.sistemarestaurantebackend.model.Categoria;
 import com.uns.sistemarestaurantebackend.model.Plato;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -21,4 +23,6 @@ public interface PlatoRepository extends JpaRepository<Plato, Integer> {
 
     // Buscar por id de categoria sin necesitar el objeto Categoria
     List<Plato> findByCategoriaIdCategoria(Integer idCategoria);
+
+    Page<Plato> findByActivoTrue(Pageable pageable);
 }
