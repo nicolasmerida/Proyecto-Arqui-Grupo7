@@ -4,10 +4,13 @@ import com.uns.sistemarestaurantebackend.model.enums.EstadoMesa;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDateTime;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties; // <-- Agregar este import
 
 // HU-01: ver estado del salon / HU-02: abrir mesa / HU-03: cerrar mesa
 @Entity
 @Table(name = "mesa")
+// Esta es la etiqueta mágica que ignora a los fantasmas de Hibernate
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 @Getter
 @Setter
 @NoArgsConstructor

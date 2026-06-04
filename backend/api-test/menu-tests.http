@@ -1,2 +1,0 @@
-###Obtener todas las mesas
-GET http://localhost:8080/api/mesas

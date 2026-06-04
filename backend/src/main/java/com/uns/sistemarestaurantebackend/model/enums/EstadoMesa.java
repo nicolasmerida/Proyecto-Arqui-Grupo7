@@ -1,5 +1,7 @@
 package com.uns.sistemarestaurantebackend.model.enums;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+
 public enum EstadoMesa {
     LIBRE("Libre"),
     OCUPADA("Ocupada"),
@@ -11,9 +13,12 @@ public enum EstadoMesa {
 
     public String getValor() { return valor; }
 
+    @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
     public static EstadoMesa fromValor(String valor) {
         for (EstadoMesa e : values()) {
-            if (e.valor.equals(valor)) return e;
+            if (e.valor.equalsIgnoreCase(valor) || e.name().equalsIgnoreCase(valor)) {
+                return e;
+            }
         }
         throw new IllegalArgumentException("EstadoMesa desconocido: " + valor);
     }

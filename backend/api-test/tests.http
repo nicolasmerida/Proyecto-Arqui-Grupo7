@@ -1,0 +1,482 @@
+### ============================================================
+### BASE
+### Como tenés server.servlet.context-path=/api,
+### todas las URLs empiezan con:
+### http://localhost:8080/api
+### ============================================================
+
+
+### ============================================================
+### 1) CATEGORÍAS
+### ============================================================
+
+### Crear una categoría nueva.
+### Sirve para después asociar platos a una categoría.
+POST http://localhost:8080/api/categorias
+Content-Type: application/json
+
+{
+  "nombre": "Minutas"
+}
+
+###
+
+### Obtener todas las categorías cargadas.
+GET http://localhost:8080/api/categorias
+
+###
+
+### Obtener una categoría específica por ID.
+### Si da 404, no existe una categoría con ese ID.
+GET http://localhost:8080/api/categorias/1
+
+###
+
+### Actualizar una categoría existente.
+### Cambia los datos de la categoría con ID 1.
+PUT http://localhost:8080/api/categorias/1
+Content-Type: application/json
+
+{
+  "nombre": "Pastas"
+}
+
+###
+
+### Eliminar una categoría por ID.
+### Puede fallar si tiene platos asociados.
+DELETE http://localhost:8080/api/categorias/1
+
+
+### ============================================================
+### 2) MESAS
+### ============================================================
+
+### Crear una mesa nueva.
+### Importante: estadoMesa debe ser LIBRE para poder abrirla después.
+POST http://localhost:8080/api/mesas
+Content-Type: application/json
+
+{
+  "capacidad": 4,
+  "sector": "SALON",
+  "estadoMesa": "libre"
+}
+
+###
+
+### Obtener todas las mesas del restaurante.
+### Si devuelve [], no hay mesas cargadas.
+GET http://localhost:8080/api/mesas
+
+###
+
+### Obtener una mesa específica por número.
+### Si da 404, no existe una mesa con numeroMesa = 1.
+GET http://localhost:8080/api/mesas/1
+
+###
+
+### Obtener mesas filtradas por estado.
+### Ejemplos posibles: LIBRE, OCUPADA, RESERVADA.
+GET http://localhost:8080/api/mesas/estado/LIBRE
+
+###
+
+### Abrir una mesa.
+### Cambia la mesa de LIBRE a OCUPADA.
+### También crea automáticamente una comanda activa para esa mesa.
+### Puede fallar si:
+### - la mesa no existe;
+### - la mesa no está LIBRE;
+### - numeroComensales supera la capacidad.
+PUT http://localhost:8080/api/mesas/1/abrir?numeroComensales=2
+
+###
+PUT http://localhost:8080/api/mesas/2/abrir?numeroComensales=2
+###
+### Cerrar una mesa.
+### Para que funcione, la mesa debe tener una comanda activa
+### y esa comanda debe estar en estado ENTREGADA.
+### Si no hay comanda activa, devuelve error.
+PUT http://localhost:8080/api/mesas/1/cerrar
+
+###
+PUT http://localhost:8080/api/mesas/2/cerrar
+
+###
+### Eliminar una mesa por número.
+### Puede fallar si existen relaciones con comandas.
+DELETE http://localhost:8080/api/mesas/1
+
+
+### ============================================================
+### 3) USUARIOS
+### ============================================================
+
+### Crear un usuario nuevo.
+### Sirve para probar movimientos de stock asociados a un usuario.
+POST http://localhost:8080/api/usuarios
+Content-Type: application/json
+
+{
+  "nombre": "Lionel",
+  "email": "lionel.cocina@restaurante.com",
+  "password": "hash_super_seguro_123",
+  "rol": "COCINERO"
+}
+
+###
+
+### Obtener todos los usuarios.
+GET http://localhost:8080/api/usuarios
+
+###
+
+### Obtener un usuario específico por ID.
+### Si da 404, no existe un usuario con idUsuario = 1.
+GET http://localhost:8080/api/usuarios/1
+
+###
+
+### Actualizar un usuario existente.
+PUT http://localhost:8080/api/usuarios/1
+Content-Type: application/json
+
+{
+  "nombre": "Juan",
+  "apellido": "Perez",
+  "rol": "ADMIN"
+}
+
+###
+
+### Eliminar un usuario por ID.
+### Puede fallar si está relacionado con movimientos de stock u otras entidades.
+DELETE http://localhost:8080/api/usuarios/1
+
+
+### ============================================================
+### 4) INGREDIENTES
+### ============================================================
+
+### Crear un ingrediente nuevo.
+### Sirve para recetas y movimientos de stock.
+POST http://localhost:8080/api/ingredientes
+Content-Type: application/json
+
+{
+  "nombre": "Harina",
+  "stockActual": 20,
+  "stockMinimo": 5,
+  "unidadMedida": "KG"
+}
+
+###
+
+### Obtener todos los ingredientes.
+GET http://localhost:8080/api/ingredientes
+
+###
+
+### Obtener un ingrediente específico por ID.
+### Si da 404, no existe un ingrediente con idIngrediente = 1.
+GET http://localhost:8080/api/ingredientes/1
+
+###
+
+### Obtener ingredientes con bajo stock.
+### Devuelve ingredientes cuyo stock actual está por debajo del mínimo.
+GET http://localhost:8080/api/ingredientes/bajo-stock
+
+###
+
+### Actualizar stock de un ingrediente.
+### Registra un movimiento de stock usando usuario 1 por defecto.
+### cantidad positiva suma stock; cantidad negativa descuenta stock.
+PUT http://localhost:8080/api/ingredientes/1/stock?cantidad=10
+
+###
+
+### Eliminar un ingrediente por ID.
+### Puede fallar si está usado en recetas o movimientos.
+DELETE http://localhost:8080/api/ingredientes/1
+
+
+### ============================================================
+### 5) PLATOS
+### ============================================================
+
+### Crear un plato nuevo.
+### Para que aparezca en el menú, activo debe ser true.
+### La categoría con idCategoria = 1 debe existir.
+POST http://localhost:8080/api/platos
+Content-Type: application/json
+
+{
+  "nombre": "Milanesa con papas",
+  "descripcion": "Milanesa de carne con papas fritas",
+  "precio": 8500,
+  "activo": true,
+  "categoria": {
+    "idCategoria": 1
+  }
+}
+
+###
+
+### Obtener todos los platos, activos e inactivos.
+GET http://localhost:8080/api/platos
+
+###
+
+### Obtener solo platos activos.
+GET http://localhost:8080/api/platos/activos
+
+###
+
+### Obtener un plato específico por ID.
+### Si da 404, no existe un plato con idPlato = 1.
+GET http://localhost:8080/api/platos/1
+
+###
+
+### Obtener platos filtrados por categoría.
+### Usa el ID de la categoría.
+GET http://localhost:8080/api/platos/categoria/1
+
+###
+
+### Actualizar un plato existente.
+### Reemplaza los datos del plato con idPlato = 1.
+PUT http://localhost:8080/api/platos/1
+Content-Type: application/json
+
+{
+  "nombre": "Milanesa napolitana",
+  "descripcion": "Milanesa con jamón, queso y salsa",
+  "precio": 9500,
+  "activo": true,
+  "categoria": {
+    "idCategoria": 1
+  }
+}
+
+###
+
+### Activar o desactivar un plato.
+### Si está activo, lo desactiva.
+### Si está inactivo, lo activa.
+PUT http://localhost:8080/api/platos/1/toggle-activo
+
+###
+
+### Eliminar un plato.
+### En este sistema probablemente lo desactiva o hace baja lógica.
+### Puede fallar si tiene pedidos pendientes o en preparación.
+DELETE http://localhost:8080/api/platos/1
+
+
+### ============================================================
+### 6) MENÚ
+### ============================================================
+
+### Obtener menú paginado.
+### Devuelve solo platos activos.
+### page empieza en 0.
+### size indica cuántos platos traer por página.
+GET http://localhost:8080/api/menu?page=0&size=8
+
+###
+
+### Si el endpoint anterior da 404 y MenuController todavía tiene /api/menu,
+### probá este porque puede haber quedado /api duplicado.
+GET http://localhost:8080/api/api/menu?page=0&size=8
+
+### ============================================================
+### 7) COMANDAS
+### ============================================================
+
+### Obtener la comanda asociada a la mesa 1 (Para ver qué ID tiene realmente)
+GET http://localhost:8080/api/comandas/mesa/1
+
+###
+
+### PASO A: Cambiar la comanda a En preparacion
+PUT http://localhost:8080/api/comandas/1/estado?nuevoEstado=En preparacion
+
+###
+PUT http://localhost:8080/api/comandas/2/estado?nuevoEstado=En preparacion
+
+###
+
+### PASO B: Cambiar la comanda a Lista (¡Este es el que le faltaba a IntelliJ!)
+PUT http://localhost:8080/api/comandas/1/estado?nuevoEstado=Lista
+
+###
+
+PUT http://localhost:8080/api/comandas/2/estado?nuevoEstado=Lista
+
+###
+
+### PASO C: Cambiar la comanda a Entregada
+PUT http://localhost:8080/api/comandas/1/estado?nuevoEstado=Entregada
+
+###
+PUT http://localhost:8080/api/comandas/2/estado?nuevoEstado=Entregada
+
+###
+### PASO D: Calcular total de la comanda antes de cerrar
+GET http://localhost:8080/api/comandas/1/total
+
+### ============================================================
+### 8) ITEMS PEDIDO
+### ============================================================
+
+### Crear un ítem de pedido.
+### Necesita que exista:
+### - comanda con numeroComanda = 1;
+### - plato con idPlato = 1.
+POST http://localhost:8080/api/items-pedido
+Content-Type: application/json
+
+{
+  "id": {
+    "numeroComanda": 1,
+    "idPlato": 1
+  },
+  "comanda": {
+    "numeroComanda": 1
+  },
+  "plato": {
+    "idPlato": 1
+  },
+  "cantidad": 2,
+  "estadoItem": "PENDIENTE"
+}
+
+###
+
+### Obtener ítems de una comanda.
+### Usa el número/ID de comanda.
+GET http://localhost:8080/api/items-pedido/comanda/1
+
+###
+
+### Obtener ítems filtrados por estado.
+### Ejemplos posibles: PENDIENTE, EN_PREPARACION, LISTO, ENTREGADO.
+GET http://localhost:8080/api/items-pedido/estado/PENDIENTE
+
+###
+
+### Cambiar estado de un ítem de pedido.
+### El body identifica el ítem compuesto por comanda + plato.
+### Puede fallar si la transición no es válida.
+PUT http://localhost:8080/api/items-pedido/estado?nuevoEstado=EN_PREPARACION
+Content-Type: application/json
+
+{
+  "numeroComanda": 1,
+  "idPlato": 1
+}
+
+###
+
+### Cambiar ítem a LISTO.
+PUT http://localhost:8080/api/items-pedido/estado?nuevoEstado=LISTO
+Content-Type: application/json
+
+{
+  "numeroComanda": 1,
+  "idPlato": 1
+}
+
+###
+
+### Cambiar ítem a ENTREGADO.
+PUT http://localhost:8080/api/items-pedido/estado?nuevoEstado=ENTREGADO
+Content-Type: application/json
+
+{
+  "numeroComanda": 1,
+  "idPlato": 1
+}
+
+###
+
+### Eliminar un ítem de pedido.
+### El body identifica el ítem compuesto por comanda + plato.
+DELETE http://localhost:8080/api/items-pedido
+Content-Type: application/json
+
+{
+  "numeroComanda": 1,
+  "idPlato": 1
+}
+
+
+### ============================================================
+### 9) RECETAS
+### ============================================================
+
+### Crear una receta.
+### Relaciona un plato con un ingrediente e indica cantidad necesaria.
+### Necesita que exista:
+### - plato con idPlato = 1;
+### - ingrediente con idIngrediente = 1.
+POST http://localhost:8080/api/recetas
+Content-Type: application/json
+
+{
+  "id": {
+    "idPlato": 1,
+    "idIngrediente": 1
+  },
+  "plato": {
+    "idPlato": 1
+  },
+  "ingrediente": {
+    "idIngrediente": 1
+  },
+  "cantidadNecesaria": 1
+}
+
+###
+
+### Obtener receta de un plato.
+### Devuelve los ingredientes necesarios para ese plato.
+GET http://localhost:8080/api/recetas/plato/1
+
+###
+
+### Eliminar una receta.
+### El body identifica la relación plato + ingrediente.
+DELETE http://localhost:8080/api/recetas
+Content-Type: application/json
+
+{
+  "idPlato": 1,
+  "idIngrediente": 1
+}
+
+
+### ============================================================
+### 10) MOVIMIENTOS STOCK
+### ============================================================
+
+### Registrar movimiento manual de stock.
+### Necesita que existan:
+### - ingrediente con idIngrediente = 1;
+### - usuario con idUsuario = 1.
+### cantidad positiva suma stock; cantidad negativa descuenta stock.
+POST http://localhost:8080/api/movimientos-stock?idIngrediente=1&cantidad=5&idUsuario=1
+
+###
+
+### Obtener movimientos de stock de un ingrediente.
+GET http://localhost:8080/api/movimientos-stock/ingrediente/1
+
+###
+
+### Obtener movimientos de stock hechos por un usuario.
+GET http://localhost:8080/api/movimientos-stock/usuario/1
