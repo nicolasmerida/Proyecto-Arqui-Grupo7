@@ -1,42 +1,43 @@
 // app/lib/definitions.ts
 export enum Rol {
-  Administrador = "Administrador",
-  Cocinero = "Cocinero",
-  Mozo = "Mozo"
+  Administrador = "ADMINISTRADOR",
+  Cocinero = "COCINERO",
+  Mozo = "MOZO"
 };
 
 export enum EstadoUsuario {
-  Activo = "activo",
-  Suspendido = "Suspendido"
+  Activo = "ACTIVO",
+  Suspendido = "SUSPENDIDO"
 };
 
 export enum EstadoMesa {
-  Libre = "libre",
-  Ocupada = "ocupada"
+  Libre = "LIBRE",
+  Ocupada = "OCUPADA"
 };
 
 export enum EstadoComanda {
-  Pendiente = "pendiente",
-  Preparacion = "en preparacion",
-  Lista = "lista",
-  Entregada = "entregada",
-  Cerrada = "cerrada",
-  Cancelada = "cancelada"
+  Pendiente = "PENDIENTE",
+  Preparacion = "EN_PREPARACION",
+  Lista = "LISTA",
+  Entregada = "ENTREGADA",
+  Cerrada = "CERRADA",
+  Cancelada = "CANCELADA"
 };
 
 export enum EstadoItem {
-  Pendiente = "pendiente",
-  Preparacion = "en preparacion",
-  Listo = "listo",
-  Entregado = "entregado",
-  Cancelado = "cancelado"
+  Pendiente = "PENDIENTE",
+  Preparacion = "EN_PREPARACION",
+  Listo = "LISTO",
+  Entregado = "ENTREGADO",
+  Cerrado = "CERRADO",
+  Cancelado = "CANCELADO"
 };
 
 export enum Category {
-  Entrada = "entrada",
-  Principal = "principal",
-  Postre = "postre",
-  Bebida = "bebida"
+  Entrada = "ENTRADA",
+  Principal = "PRINCIPAL",
+  Postre = "POSTRE",
+  Bebida = "BEBIDA"
 }
 
 export type Mesa = {

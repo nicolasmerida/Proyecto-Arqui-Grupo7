@@ -10,12 +10,15 @@ export default function CatalogError({ error, reset }: { error: Error; reset: ()
             Algo salió mal.
         </h1>
         <p className="text-lg sm:text-xl text-white/80 max-w-xl text-center mb-10">
-            No pudimos cargar el producto en este momento. Por favor, intentá de nuevo o volvé más tarde.
+            {error.message}
+        </p>
+        <p className="text-xs text-gray-400 max-w-xl text-center font-mono mb-4">
+            Ref: {String(error.cause)}
         </p>
         <img
         src="https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExZWpqcW90cHhyNHphYm54NGNrNjZxNTY0YTN2NHJ6czc4cHBjM2YxYiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/PkVpoRawXYW5i/giphy.gif"
         alt="error gif"
-        className="w-180 h-auto rounded shadow-lg mb-10"
+        className="w-180 h-auto rounded shadow-lg mb-4"
         />
         <button
             onClick={() => reset()}
