@@ -64,6 +64,16 @@ Content-Type: application/json
 }
 
 ###
+POST http://localhost:8080/api/mesas
+Content-Type: application/json
+
+{
+  "capacidad": 3,
+  "sector": "SALON",
+  "estadoMesa": "libre"
+}
+
+###
 
 ### Obtener todas las mesas del restaurante.
 ### Si devuelve [], no hay mesas cargadas.
@@ -94,6 +104,8 @@ PUT http://localhost:8080/api/mesas/1/abrir?numeroComensales=2
 
 ###
 PUT http://localhost:8080/api/mesas/2/abrir?numeroComensales=2
+###
+PUT http://localhost:8080/api/mesas/4/abrir?numeroComensales=5
 ###
 ### Cerrar una mesa.
 ### Para que funcione, la mesa debe tener una comanda activa
