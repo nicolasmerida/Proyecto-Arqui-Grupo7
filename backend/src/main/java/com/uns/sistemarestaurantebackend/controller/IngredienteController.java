@@ -3,41 +3,43 @@ package com.uns.sistemarestaurantebackend.controller;
 import com.uns.sistemarestaurantebackend.model.Ingrediente;
 import com.uns.sistemarestaurantebackend.service.GestorStockFacade;
 import com.uns.sistemarestaurantebackend.service.IngredienteService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
 
 @RestController
 @RequestMapping("/ingredientes")
 public class IngredienteController {
 
-    @Autowired
-    private IngredienteService ingredienteService;
+    // Inyección por constructor doble
+    private final IngredienteService ingredienteService;
+    private final GestorStockFacade gestorStockFacade;
 
-    @Autowired
-    private GestorStockFacade gestorStockFacade;
+    public IngredienteController(IngredienteService ingredienteService, GestorStockFacade gestorStockFacade) {
+        this.ingredienteService = ingredienteService;
+        this.gestorStockFacade = gestorStockFacade;
+    }
 
     @GetMapping
-    public List<Ingrediente> obtenerTodos() {
-        return ingredienteService.obtenerTodos();
+    public ResponseEntity<List<Ingrediente>> obtenerTodos() {
+        return ResponseEntity.ok(ingredienteService.obtenerTodos());
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<Ingrediente> obtenerPorId(@PathVariable Integer id) {
-        return ingredienteService.obtenerPorId(id)
-            .map(ResponseEntity::ok)
-            .orElse(ResponseEntity.notFound().build());
+        // Super limpio: el Controller solo llama al Service
+        return ResponseEntity.ok(ingredienteService.obtenerPorId(id));
     }
 
     @GetMapping("/bajo-stock")
-    public List<Ingrediente> obtenerBajoStock() {
-        return ingredienteService.obtenerBajoStock();
+    public ResponseEntity<List<Ingrediente>> obtenerBajoStock() {
+        return ResponseEntity.ok(ingredienteService.obtenerBajoStock());
     }
 
     @PostMapping
-    public Ingrediente crear(@RequestBody Ingrediente ingrediente) {
-        return ingredienteService.guardar(ingrediente);
+    public ResponseEntity<Ingrediente> crear(@RequestBody Ingrediente ingrediente) {
+        return ResponseEntity.ok(ingredienteService.guardar(ingrediente));
     }
 
     @PutMapping("/{id}/stock")

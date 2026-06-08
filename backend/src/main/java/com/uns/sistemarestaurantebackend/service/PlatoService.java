@@ -1,26 +1,29 @@
 package com.uns.sistemarestaurantebackend.service;
 
+import com.uns.sistemarestaurantebackend.exception.NegocioException;
+import com.uns.sistemarestaurantebackend.exception.RecursoNoEncontradoException;
 import com.uns.sistemarestaurantebackend.model.Plato;
 import com.uns.sistemarestaurantebackend.model.enums.EstadoComanda;
 import com.uns.sistemarestaurantebackend.model.enums.EstadoItem;
 import com.uns.sistemarestaurantebackend.repository.ItemPedidoRepository;
 import com.uns.sistemarestaurantebackend.repository.PlatoRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class PlatoService {
 
-    @Autowired
-    private PlatoRepository platoRepository;
+    // Inyección inmutable por constructor
+    private final PlatoRepository platoRepository;
+    private final ItemPedidoRepository itemPedidoRepository;
 
-    @Autowired
-    private ItemPedidoRepository itemPedidoRepository;
+    public PlatoService(PlatoRepository platoRepository, ItemPedidoRepository itemPedidoRepository) {
+        this.platoRepository = platoRepository;
+        this.itemPedidoRepository = itemPedidoRepository;
+    }
 
     public List<Plato> obtenerTodos() {
         return platoRepository.findAll();
@@ -34,8 +37,13 @@ public class PlatoService {
         return platoRepository.findByCategoriaIdCategoria(idCategoria);
     }
 
-    public Optional<Plato> obtenerPorId(Integer id) {
-        return platoRepository.findById(id);
+    // Centralizamos la búsqueda y el error 404 acá
+    public Plato obtenerPorId(Integer id) {
+        return platoRepository.findById(id)
+                .orElseThrow(() -> new RecursoNoEncontradoException(
+                        "PLATO_NO_ENCONTRADO",
+                        "El plato con ID " + id + " no existe en el menú."
+                ));
     }
 
     public Page<Plato> obtenerMenuPaginado(Pageable pageable) {
@@ -46,9 +54,17 @@ public class PlatoService {
         return platoRepository.save(plato);
     }
 
+    // Mudamos la lógica de actualizar desde el Controller hacia acá
+    public Plato actualizar(Integer id, Plato platoActualizado) {
+        obtenerPorId(id); // Reutilizamos: si no existe, corta acá y tira 404
+
+        platoActualizado.setIdPlato(id);
+        return platoRepository.save(platoActualizado);
+    }
+
     public Plato toggleActivo(Integer id) {
-        Plato plato = platoRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Plato no encontrado"));
+        // Reutilizamos el método para no repetir el orElseThrow
+        Plato plato = obtenerPorId(id);
 
         boolean seQuiereDesactivar = Boolean.TRUE.equals(plato.getActivo());
 
@@ -61,20 +77,21 @@ public class PlatoService {
                     );
 
             if (tienePedidosEnCurso) {
-                throw new RuntimeException(
-                        "No se puede desactivar el plato porque tiene pedidos pendientes o en preparación"
+                // Usamos nuestra excepción con código SNAKE_CASE
+                throw new NegocioException(
+                        "PLATO_CON_PEDIDOS_ACTIVOS",
+                        "No se puede desactivar el plato porque tiene pedidos pendientes o en preparación."
                 );
             }
         }
 
         plato.setActivo(!Boolean.TRUE.equals(plato.getActivo()));
-
         return platoRepository.save(plato);
     }
 
     public void eliminar(Integer id) {
-        Plato plato = platoRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Plato no encontrado"));
+        // Reutilizamos el método
+        Plato plato = obtenerPorId(id);
 
         boolean tienePedidosEnCurso =
                 itemPedidoRepository.existsByPlatoIdPlatoAndEstadoItemInAndComandaEstadoComandaIn(
@@ -84,11 +101,13 @@ public class PlatoService {
                 );
 
         if (tienePedidosEnCurso) {
-            throw new RuntimeException(
-                    "No se puede eliminar del menú el plato porque tiene pedidos pendientes o en preparación"
+            throw new NegocioException(
+                    "PLATO_CON_PEDIDOS_ACTIVOS",
+                    "No se puede eliminar del menú el plato porque tiene pedidos pendientes o en preparación."
             );
         }
 
+        // Borrado lógico excelente
         plato.setActivo(false);
         platoRepository.save(plato);
     }

@@ -1,25 +1,31 @@
 package com.uns.sistemarestaurantebackend.service;
 
+import com.uns.sistemarestaurantebackend.exception.NegocioException;
+import com.uns.sistemarestaurantebackend.exception.RecursoNoEncontradoException;
 import com.uns.sistemarestaurantebackend.model.ItemPedido;
 import com.uns.sistemarestaurantebackend.model.Receta;
 import com.uns.sistemarestaurantebackend.model.enums.EstadoItem;
 import com.uns.sistemarestaurantebackend.repository.ItemPedidoRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import java.util.List;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 public class ItemPedidoService {
 
-    @Autowired
-    private ItemPedidoRepository itemPedidoRepository;
+    // Inyección limpia y moderna por constructor (Inmutable)
+    private final ItemPedidoRepository itemPedidoRepository;
+    private final RecetaService recetaService;
+    private final GestorStockFacade gestorStockFacade;
 
-    @Autowired
-    private RecetaService recetaService;
-
-    @Autowired
-    private GestorStockFacade gestorStockFacade;
+    public ItemPedidoService(ItemPedidoRepository itemPedidoRepository,
+                             RecetaService recetaService,
+                             GestorStockFacade gestorStockFacade) {
+        this.itemPedidoRepository = itemPedidoRepository;
+        this.recetaService = recetaService;
+        this.gestorStockFacade = gestorStockFacade;
+    }
 
     public List<ItemPedido> obtenerPorComanda(Integer numeroComanda) {
         return itemPedidoRepository.findByComandaNumeroComanda(numeroComanda);
@@ -33,25 +39,28 @@ public class ItemPedidoService {
         return itemPedidoRepository.save(itemPedido);
     }
 
-    @Transactional // para un futuro lo use websockets
+    @Transactional
     public ItemPedido cambiarEstado(ItemPedido.ItemPedidoId id, String nuevoEstado) {
+        // Si la clave compuesta no existe, devolvemos un 404 estructurado
         ItemPedido item = itemPedidoRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Item no encontrado"));
+                .orElseThrow(() -> new RecursoNoEncontradoException(
+                        "ITEM_PEDIDO_NO_ENCONTRADO",
+                        "El ítem de pedido solicitado no existe en el sistema."
+                ));
 
         EstadoItem estadoActual = item.getEstadoItem();
         EstadoItem estadoNuevo = EstadoItem.fromValor(nuevoEstado);
 
+        // Valida la máquina de estados de cocina
         validarTransicionItem(estadoActual, estadoNuevo);
 
-        // HU-14: si se cancela el item, devolver el stock que se habia descontado al
-        // pedirlo
+        // HU-14: si se cancela el item, devolver el stock que se habia descontado al pedirlo
         if (estadoNuevo == EstadoItem.CANCELADO) {
             List<Receta> recetas = recetaService.obtenerPorPlato(item.getPlato().getIdPlato());
             for (Receta receta : recetas) {
                 int cantidadADevolver = receta.getCantidad() * item.getCantidad();
                 // cantidad positiva = sumar al stock (inverso de agregarItemAComanda)
                 // TODO: con Spring Security, reemplazar el 1 por el ID del usuario autenticado
-                // HARDCODEADO: por ahora siempre ID = 1 (igual que agregarItemAComanda)
                 gestorStockFacade.registrarMovimiento(
                         receta.getIngrediente().getIdIngrediente(), cantidadADevolver, 1);
             }
@@ -85,31 +94,44 @@ public class ItemPedidoService {
         }
 
         if (!valida) {
-            throw new IllegalStateException(
-                    "Transición de estado inválida para item: no se puede pasar de "
-                            + actual.name() + " a " + nuevo.name());
+            throw new NegocioException(
+                    "TRANSICION_INVALIDA",
+                    "No se permite cambiar el estado de este plato de " + actual.name() + " a " + nuevo.name() + " (Transición inválida)."
+            );
         }
     }
 
     public void eliminar(ItemPedido.ItemPedidoId id) {
+        // Evitamos que estalle JPA con error 500 usando la clave compuesta reglamentaria
+        if (!itemPedidoRepository.existsById(id)) {
+            throw new RecursoNoEncontradoException(
+                    "ITEM_PEDIDO_NO_ENCONTRADO",
+                    "No se puede eliminar porque el ítem de pedido no existe."
+            );
+        }
         itemPedidoRepository.deleteById(id);
     }
 
-    // En ItemPedidoController debe llamar a agregarItemAComanda en vez de
-    // guardar()
     @Transactional
     public ItemPedido agregarItemAComanda(ItemPedido itemPedido) {
+        // Validación de datos requeridos por contrato antes de romper la base de datos
+        if (itemPedido.getPlato() == null || itemPedido.getPlato().getIdPlato() == null) {
+            throw new NegocioException(
+                    "PLATO_ID_REQUERIDO",
+                    "No se puede agregar el ítem a la comanda porque no se especificó un ID de plato válido."
+            );
+        }
+
         itemPedido.setEstadoItem(EstadoItem.PENDIENTE);
         ItemPedido guardado = itemPedidoRepository.save(itemPedido);
 
         // 2. Obtener la receta del plato pedido
-        // itemPedido.getPlato().getIdPlato() no debe ser nulo
-        if (itemPedido.getPlato().getIdPlato() == null) {
-            throw new IllegalStateException("El plato no tiene un ID");
-        }
         List<Receta> recetas = recetaService.obtenerPorPlato(guardado.getPlato().getIdPlato());
         if (recetas.isEmpty()) {
-            throw new IllegalStateException("El plato no tiene receta");
+            throw new NegocioException(
+                    "PLATO_SIN_RECETA",
+                    "El plato con ID " + guardado.getPlato().getIdPlato() + " no puede ser despachado porque no tiene una receta configurada."
+            );
         }
 
         // 3. Descontar ingredientes de almacén/cocina
@@ -117,10 +139,8 @@ public class ItemPedidoService {
             // cantidad requerida en receta * cantidad de platos pedidos por el cliente
             int cantidadADescontar = receta.getCantidad() * guardado.getCantidad();
 
-            // enviamos la cantidad en negativo para que registrarMovimiento realice la
-            // resta
-            // Por ahora, asumimos usuario ID 1 (ej: un mozo default o admin) hasta que haya
-            // Security
+            // enviamos la cantidad en negativo para que registrarMovimiento realice la resta
+            // Por ahora, asumimos usuario ID 1 hasta implementar Security
             gestorStockFacade.registrarMovimiento(receta.getIngrediente().getIdIngrediente(), -cantidadADescontar, 1);
         }
         // TODO: notificar a cocina vía WebSocket de nuevo pedido pendiente

@@ -2,26 +2,30 @@ package com.uns.sistemarestaurantebackend.controller;
 
 import com.uns.sistemarestaurantebackend.model.Receta;
 import com.uns.sistemarestaurantebackend.service.RecetaService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
 
 @RestController
 @RequestMapping("/recetas")
 public class RecetaController {
 
-    @Autowired
-    private RecetaService recetaService;
+    private final RecetaService recetaService;
+
+    // Inyección por constructor
+    public RecetaController(RecetaService recetaService) {
+        this.recetaService = recetaService;
+    }
 
     @GetMapping("/plato/{idPlato}")
-    public List<Receta> obtenerPorPlato(@PathVariable Integer idPlato) {
-        return recetaService.obtenerPorPlato(idPlato);
+    public ResponseEntity<List<Receta>> obtenerPorPlato(@PathVariable Integer idPlato) {
+        return ResponseEntity.ok(recetaService.obtenerPorPlato(idPlato));
     }
 
     @PostMapping
-    public Receta crear(@RequestBody Receta receta) {
-        return recetaService.guardar(receta);
+    public ResponseEntity<Receta> crear(@RequestBody Receta receta) {
+        return ResponseEntity.ok(recetaService.guardar(receta));
     }
 
     @DeleteMapping

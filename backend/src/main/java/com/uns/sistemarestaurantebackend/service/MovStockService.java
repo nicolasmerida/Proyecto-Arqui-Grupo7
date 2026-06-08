@@ -2,15 +2,19 @@ package com.uns.sistemarestaurantebackend.service;
 
 import com.uns.sistemarestaurantebackend.model.MovStock;
 import com.uns.sistemarestaurantebackend.repository.MovStockRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import java.util.List;
 
 @Service
 public class MovStockService {
 
-    @Autowired
-    private MovStockRepository movStockRepository;
+    // Inyección inmutable por constructor
+    private final MovStockRepository movStockRepository;
+
+    public MovStockService(MovStockRepository movStockRepository) {
+        this.movStockRepository = movStockRepository;
+    }
 
     public List<MovStock> obtenerPorIngrediente(Integer idIngrediente) {
         return movStockRepository.findByIngredienteIdIngrediente(idIngrediente);

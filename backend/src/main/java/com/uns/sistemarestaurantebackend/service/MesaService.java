@@ -1,36 +1,42 @@
 package com.uns.sistemarestaurantebackend.service;
 
+import com.uns.sistemarestaurantebackend.exception.NegocioException;
+import com.uns.sistemarestaurantebackend.exception.RecursoNoEncontradoException;
 import com.uns.sistemarestaurantebackend.model.Comanda;
 import com.uns.sistemarestaurantebackend.model.Mesa;
 import com.uns.sistemarestaurantebackend.model.enums.EstadoComanda;
 import com.uns.sistemarestaurantebackend.model.enums.EstadoMesa;
 import com.uns.sistemarestaurantebackend.repository.MesaRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class MesaService {
 
-    @Autowired
-    private MesaRepository mesaRepository;
+    // Inyección por constructor (Inmutable)
+    private final MesaRepository mesaRepository;
+    private final ComandaService comandaService;
 
-    // NOTA: MesaService inyecta ComandaService. ComandaService NO puede inyectar
-    // MesaService
-    // (dependencia circular -> Spring tira error al arrancar).
-    @Autowired
-    private ComandaService comandaService;
+    // NOTA SOBRE DEPENDENCIA CIRCULAR:
+    // Como ComandaService NO inyecta a MesaService, es 100% seguro usar inyección por constructor acá.
+    public MesaService(MesaRepository mesaRepository, ComandaService comandaService) {
+        this.mesaRepository = mesaRepository;
+        this.comandaService = comandaService;
+    }
 
     public List<Mesa> obtenerTodas() {
         return mesaRepository.findAll();
     }
 
-    public Optional<Mesa> obtenerPorNumero(Integer numeroMesa) {
-        return mesaRepository.findById(numeroMesa);
+    // Ya no devuelve Optional. Centraliza el error 404 para todo el servicio.
+    public Mesa obtenerPorNumero(Integer numeroMesa) {
+        return mesaRepository.findById(numeroMesa)
+                .orElseThrow(() -> new RecursoNoEncontradoException(
+                        "MESA_NO_ENCONTRADA",
+                        "La mesa número " + numeroMesa + " no existe."));
     }
 
     public List<Mesa> obtenerPorEstado(String estado) {
@@ -41,51 +47,49 @@ public class MesaService {
         return mesaRepository.save(mesa);
     }
 
-    @Transactional // para los saves (aca y ComandaService)
+    @Transactional
     public Mesa abrirMesa(Integer numeroMesa, Integer numeroComensales) {
-        Mesa mesa = mesaRepository.findById(numeroMesa)
-                .orElseThrow(() -> new RuntimeException("Mesa no encontrada"));
+        // Reutilizamos el método de arriba para buscar la mesa
+        Mesa mesa = obtenerPorNumero(numeroMesa);
 
         if (EstadoMesa.LIBRE != mesa.getEstadoMesa()) {
-            throw new IllegalStateException(
-                    "No se puede abrir la mesa " + numeroMesa +
-                            " porque su estado actual es: " + mesa.getEstadoMesa().getValor());
+            throw new NegocioException(
+                    "MESA_NO_LIBRE",
+                    "No se puede abrir la mesa " + numeroMesa + " porque su estado actual es: " + mesa.getEstadoMesa().getValor());
         }
 
         if (numeroComensales > mesa.getCapacidad()) {
-            throw new IllegalStateException(
-                    "No se puede abrir la mesa " + numeroMesa +
-                            " porque la cantidad de comensales es mayor a su capacidad.");
+            throw new NegocioException(
+                    "MESA_SIN_CAPACIDAD",
+                    "No se puede abrir la mesa " + numeroMesa + " porque la cantidad de comensales es mayor a su capacidad.");
         }
 
         mesa.setEstadoMesa(EstadoMesa.OCUPADA);
         mesa.setHoraDeApertura(LocalDateTime.now());
         Mesa mesaGuardada = mesaRepository.save(mesa);
 
-        // HU-02: Al abrir la mesa creamos automáticamente la comanda activa
-        // (en vez de contruir la comanda aca, se construyo en clase comanda)
         comandaService.crearComandaParaMesa(mesaGuardada);
-
         // TODO: notificarCambioSalon(mesaGuardada) via WebSocket
 
         return mesaGuardada;
     }
 
-    @Transactional // protege los dos saves
+    @Transactional
     public Mesa cerrarMesa(Integer numeroMesa) {
-        Mesa mesa = mesaRepository.findById(numeroMesa)
-                .orElseThrow(() -> new RuntimeException("Mesa no encontrada"));
+        // Reutilizamos el método de arriba
+        Mesa mesa = obtenerPorNumero(numeroMesa);
 
         Comanda comanda = comandaService.obtenerPorMesa(numeroMesa)
-                .orElseThrow(() -> new RuntimeException("No hay comanda activa para esa mesa"));
+                .orElseThrow(() -> new RecursoNoEncontradoException(
+                        "COMANDA_ACTIVA_NO_ENCONTRADA",
+                        "No hay una comanda activa para la mesa " + numeroMesa));
 
         if (EstadoComanda.ENTREGADA != comanda.getEstadoComanda()) {
-            throw new IllegalStateException(
-                    "La mesa " + numeroMesa +
-                            " no puede ser cerrada porque todavia no se han entregado todos los items.");
+            throw new NegocioException(
+                    "ITEMS_NO_ENTREGADOS",
+                    "La mesa " + numeroMesa + " no puede ser cerrada porque todavia no se han entregado todos los items.");
         }
 
-        // Cierra la comanda — queda como historial asociada a la mesa (no se desliga)
         comanda.setEstadoComanda(EstadoComanda.CERRADA);
         comandaService.guardar(comanda);
 
@@ -97,6 +101,11 @@ public class MesaService {
     }
 
     public void eliminar(Integer numeroMesa) {
+        if (!mesaRepository.existsById(numeroMesa)) {
+            throw new RecursoNoEncontradoException(
+                    "MESA_NO_ENCONTRADA",
+                    "No se puede eliminar la mesa porque el número " + numeroMesa + " no existe.");
+        }
         mesaRepository.deleteById(numeroMesa);
     }
 }
