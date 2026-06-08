@@ -22,6 +22,9 @@ public class ComandaService {
     @Autowired
     private ItemPedidoRepository itemPedidoRepository;
 
+    @Autowired
+    private WebSocketNotificacionService wsNotificacionService;
+
     public List<Comanda> obtenerTodas() {
         return comandaRepository.findAll();
     }
@@ -55,8 +58,8 @@ public class ComandaService {
 
         Comanda comandaActualizada = comandaRepository.save(comanda);
 
-        // TODO: notificar via WebSocket al cambiar estado
-        // ejemplo: notificarWebSocket(comandaActualizada);
+    
+        wsNotificacionService.notificarCambioEstadoComanda(id, nuevoEstado); //Notificamos al websocket
 
         return comandaActualizada;
     }
