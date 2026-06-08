@@ -25,7 +25,9 @@ export function AddUserForm() {
         action={formAction}
         className="w-full max-w-md p-8 bg-white/10 backdrop-blur-xl rounded-3xl shadow-[0_10px_30px_rgba(0,0,0,0.3)] text-white transition-all duration-300"
       >
-        <h1 className="text-3xl font-semibold  font-sans text-center mb-8 tracking-tight">Registrar usuario</h1>
+        <h1 className="text-3xl font-semibold  font-sans text-center mb-8 tracking-tight">
+          Registrar usuario
+        </h1>
 
         {/* Nombre */}
         <div className="mb-6">
