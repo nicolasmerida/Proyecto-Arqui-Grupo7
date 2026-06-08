@@ -1,7 +1,6 @@
 package com.uns.sistemarestaurantebackend.controller;
 
 import com.uns.sistemarestaurantebackend.model.Plato;
-import com.uns.sistemarestaurantebackend.service.ItemPedidoService;
 import com.uns.sistemarestaurantebackend.service.PlatoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
