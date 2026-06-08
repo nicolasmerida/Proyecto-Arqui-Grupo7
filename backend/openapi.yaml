@@ -2,213 +2,235 @@ openapi: 3.0.3
 info:
   title: API del Sistema de Gestión de Restaurante
   version: 1.0.0
-  description: Contrato de diseño unificado para el backend completo del restaurante. Incluye Mesas, Comandas, Ítems, Platos, Ingredientes, Recetas, Categorías, Movimientos de Stock y Usuarios.
+  description: >
+    Contrato de diseño unificado para el backend del restaurante — Grupo 7.
+    Cubre Mesas, Comandas, Ítems de Pedido, Platos, Categorías, Recetas,
+    Ingredientes, Movimientos de Stock y Usuarios.
+
 
 servers:
   - url: http://localhost:8080
-    description: Servidor Local de Desarrollo (Spring Boot)
+    description: Servidor local de desarrollo (Spring Boot)
+
 
 tags:
   - name: Mesas
-    description: Gestión de mesas, estados y aperturas
-  - name: Comanda
-    description: Operaciones relacionadas con la gestión de comandas del salón
-  - name: Ítems Pedido
-    description: Gestión de platos asociados a comandas (Cocina y Mozos)
+    description: Gestión de mesas, estados y aperturas (HU-01, HU-02, HU-03)
+  - name: Comandas
+    description: Ciclo de vida de una comanda — apertura, estados, cierre y cuenta (HU-02, HU-03)
+  - name: Items Pedido
+    description: Ítems asociados a una comanda — cocina y mozos (HU-04, HU-06, HU-07, HU-14)
   - name: Platos
-    description: Catálogo de platos del menú
+    description: Catálogo de platos del menú (HU-04, HU-13)
   - name: Categorias
-    description: Gestión del catálogo de categorías del menú
+    description: Agrupación de platos por tipo
   - name: Recetas
-    description: Relación entre platos e ingredientes
+    description: Relación entre platos e ingredientes con cantidad requerida (HU-11)
   - name: Ingredientes
-    description: Gestión del inventario
+    description: Inventario de ingredientes y alertas de stock (HU-09, HU-12)
   - name: MovimientosStock
-    description: Auditoría de altas y bajas de stock
+    description: Auditoría de altas y bajas de stock (HU-10, HU-17)
   - name: Usuarios
-    description: Gestión del personal del restaurante
+    description: Gestión del personal del restaurante (HU-16)
+  - name: Menu
+    description: Menú público paginado para el frontend
+
+
+# ─── SEGURIDAD ────────────────────────────────────────────────────────────────
+# NOTA: La autenticación JWT está pendiente de implementar (Spring Security).
+# Los endpoints marcados con security: bearerAuth quedarán protegidos una vez implementada.
+
 
 paths:
-  # ─── MÓDULO: MESAS ───────────────────────────────────────────────────
+
+
+  # ─── MÓDULO: MESAS ────────────────────────────────────────────────────────
   /mesas:
     get:
       tags: [Mesas]
-      summary: Obtener todas las mesas
-      description: Retorna el listado completo de mesas.
+      summary: Listar todas las mesas del salón
+      description: Retorna el estado actual de todas las mesas (HU-01 — vista del salón).
+      security:
+        - bearerAuth: []
       responses:
         '200':
-          description: OK
+          description: Listado de mesas devuelto con éxito
           content:
             application/json:
               schema:
                 type: array
                 items:
                   $ref: '#/components/schemas/Mesa'
-        '400':
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
         '401':
-          description: Unauthorized
+          description: Token no enviado o inválido
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-        '404':
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '409':
-          description: Conflict
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+              example:
+                error:
+                  code: NO_AUTORIZADO
+                  message: Token no enviado o inválido
+                  details: null
+
+
     post:
       tags: [Mesas]
-      summary: Crear una mesa
-      description: Crea una nueva mesa.
+      summary: Registrar una nueva mesa
+      description: Crea una mesa con capacidad, sector y estado inicial Libre.
+      security:
+        - bearerAuth: []
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Mesa'
+              $ref: '#/components/schemas/MesaInput'
       responses:
         '201':
-          description: Created
+          description: Mesa creada exitosamente
+          headers:
+            Location:
+              description: URL de la mesa recién creada
+              schema:
+                type: string
+                example: /mesas/5
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Mesa'
         '400':
-          description: Bad Request
+          description: Datos inválidos (campo faltante o tipo incorrecto)
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+              example:
+                error:
+                  code: DATOS_INVALIDOS
+                  message: Datos inválidos (campo faltante o tipo incorrecto)
+                  details: null
         '401':
-          description: Unauthorized
+          description: Token no enviado o inválido
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-        '404':
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '409':
-          description: Conflict
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+              example:
+                error:
+                  code: NO_AUTORIZADO
+                  message: Token no enviado o inválido
+                  details: null
+
 
   /mesas/{numero}:
     get:
       tags: [Mesas]
       summary: Obtener una mesa por número
-      description: Retorna una mesa según su número identificador.
+      description: Retorna los datos y estado actual de una mesa específica.
+      security:
+        - bearerAuth: []
       parameters:
         - name: numero
           in: path
           required: true
-          description: Número identificador de la mesa.
+          description: Número identificador de la mesa
           schema:
             type: integer
             format: int32
+            example: 3
       responses:
         '200':
-          description: OK
+          description: Mesa encontrada
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Mesa'
-        '400':
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
         '401':
-          description: Unauthorized
+          description: Token no enviado o inválido
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+              example:
+                error:
+                  code: NO_AUTORIZADO
+                  message: Token no enviado o inválido
+                  details: null
         '404':
-          description: Not Found
+          description: La mesa con ese número no existe
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-        '409':
-          description: Conflict
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+              example:
+                error:
+                  code: MESA_NO_ENCONTRADA
+                  message: La mesa con ese número no existe
+                  details: null
+
+
     delete:
       tags: [Mesas]
       summary: Eliminar una mesa
-      description: Elimina una mesa según su número identificador.
+      description: Elimina una mesa del sistema. Solo aplicable si no tiene comandas activas.
+      security:
+        - bearerAuth: []
       parameters:
         - name: numero
           in: path
           required: true
-          description: Número identificador de la mesa.
+          description: Número identificador de la mesa
           schema:
             type: integer
             format: int32
+            example: 3
       responses:
         '204':
-          description: No Content
-        '400':
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+          description: Mesa eliminada exitosamente (sin cuerpo)
         '401':
-          description: Unauthorized
+          description: Token no enviado o inválido
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+              example:
+                error:
+                  code: NO_AUTORIZADO
+                  message: Token no enviado o inválido
+                  details: null
         '404':
-          description: Not Found
+          description: La mesa con ese número no existe
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-        '409':
-          description: Conflict
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+              example:
+                error:
+                  code: MESA_NO_ENCONTRADA
+                  message: La mesa con ese número no existe
+                  details: null
+
 
   /mesas/estado/{estado}:
     get:
       tags: [Mesas]
-      summary: Obtener mesas por estado
-      description: Retorna el listado de mesas filtradas por estado.
+      summary: Filtrar mesas por estado
+      description: Retorna todas las mesas que se encuentran en el estado indicado.
+      security:
+        - bearerAuth: []
       parameters:
         - name: estado
           in: path
           required: true
-          description: Estado de la mesa.
+          description: Estado de la mesa a filtrar
           schema:
             type: string
+            enum: [Libre, Ocupada, Reservada]
+            example: Libre
       responses:
         '200':
-          description: OK
+          description: Listado de mesas en el estado solicitado
           content:
             application/json:
               schema:
@@ -216,133 +238,116 @@ paths:
                 items:
                   $ref: '#/components/schemas/Mesa'
         '400':
-          description: Bad Request
+          description: El estado enviado no es un valor válido (Libre, Ocupada, Reservada)
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+              example:
+                error:
+                  code: ESTADO_INVALIDO
+                  message: El estado enviado no es un valor válido (Libre, Ocupada, Reservada)
+                  details: null
         '401':
-          description: Unauthorized
+          description: Token no enviado o inválido
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-        '404':
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '409':
-          description: Conflict
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+              example:
+                error:
+                  code: NO_AUTORIZADO
+                  message: Token no enviado o inválido
+                  details: null
 
-  /mesas/{numero}/abrir:
+
+  /mesas/{numero}/estado:
     put:
       tags: [Mesas]
-      summary: Abrir una mesa
-      description: Abre una mesa indicando la cantidad de comensales.
+      summary: Actualizar el estado de una mesa (Abrir HU-02 / Cerrar HU-03)
+      description: >
+        Unifica las acciones de abrir y cerrar mesa.
+        Si se envía 'Ocupada': crea automáticamente una comanda asociada. Valida que la mesa esté Libre y que los comensales no superen la capacidad.
+        Si se envía 'Libre': cierra la mesa y la comanda asociada. Solo es posible si todos los ítems de la comanda fueron entregados. Consultar GET /comandas/{id}/total antes de cobrar.
+      security:
+        - bearerAuth: []
       parameters:
         - name: numero
           in: path
           required: true
-          description: Número identificador de la mesa.
+          description: Número identificador de la mesa
           schema:
             type: integer
             format: int32
-        - name: numeroComensales
-          in: query
-          required: true
-          description: Cantidad de comensales para abrir la mesa.
-          schema:
-            type: integer
-            format: int32
+            example: 3
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [estadoMesa]
+              properties:
+                estadoMesa:
+                  type: string
+                  enum: [Libre, Ocupada]
+                numeroComensales:
+                  type: integer
+                  description: Cantidad de comensales que ocuparán la mesa (Requerido solo si estadoMesa es Ocupada)
+                  format: int32
+                  minimum: 1
+                  example: 4
       responses:
         '200':
-          description: OK
+          description: Mesa actualizada exitosamente (abierta o cerrada)
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Mesa'
         '400':
-          description: Bad Request
+          description: >
+            Reglas de negocio fallidas al abrir: la mesa ya está Ocupada o Reservada,
+            o la cantidad de comensales supera la capacidad.
+            Reglas de negocio fallidas al cerrar: hay ítems pendientes de entrega o no se puede cerrar aún.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+              example:
+                error:
+                  code: REGLA_NEGOCIO_FALLIDA
+                  message: Reglas de negocio fallidas al abrir la mesa ya está Ocupada o Reservada, o la cantidad de comensales supera la capacidad. Reglas de negocio fallidas al cerrar hay ítems pendientes de entrega o no se puede cerrar aún.
+                  details: null
         '401':
-          description: Unauthorized
+          description: Token no enviado o inválido
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+              example:
+                error:
+                  code: NO_AUTORIZADO
+                  message: Token no enviado o inválido
+                  details: null
         '404':
-          description: Not Found
+          description: La mesa con ese número no existe
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-        '409':
-          description: Conflict
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+              example:
+                error:
+                  code: MESA_NO_ENCONTRADA
+                  message: La mesa con ese número no existe
+                  details: null
 
-  /mesas/{numero}/cerrar:
-    put:
-      tags: [Mesas]
-      summary: Cerrar una mesa
-      description: Cierra una mesa según su número identificador.
-      parameters:
-        - name: numero
-          in: path
-          required: true
-          description: Número identificador de la mesa.
-          schema:
-            type: integer
-            format: int32
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Mesa'
-        '400':
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '401':
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '404':
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '409':
-          description: Conflict
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-
-  # ─── MÓDULO: COMANDAS ────────────────────────────────────────────────
   /comandas:
     get:
-      tags: [Comanda]
-      summary: Obtener todas las comandas
-      description: Retorna el listado completo de comandas registradas.
+      tags: [Comandas]
+      summary: Listar todas las comandas
+      description: Retorna el historial completo de comandas registradas en el sistema.
+      security:
+        - bearerAuth: []
       responses:
         '200':
           description: Listado de comandas devuelto con éxito
@@ -353,48 +358,84 @@ paths:
                 items:
                   $ref: '#/components/schemas/Comanda'
         '401':
-          description: No autorizado o token inválido
+          description: Token no enviado o inválido
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+              example:
+                error:
+                  code: NO_AUTORIZADO
+                  message: Token no enviado o inválido
+                  details: null
+
+
     post:
-      tags: [Comanda]
-      summary: Crear una nueva comanda
-      description: Registra una nueva comanda en una mesa asignada.
+      tags: [Comandas]
+      summary: Crear una comanda manualmente
+      description: >
+        Registra una nueva comanda directamente. En el flujo normal,
+        la comanda se crea automáticamente al abrir una mesa (PUT /mesas/{numero}/abrir).
+      security:
+        - bearerAuth: []
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ComandaRequest'
+              $ref: '#/components/schemas/ComandaInput'
       responses:
         '201':
-          description: Comanda creada correctamente
+          description: Comanda creada exitosamente
+          headers:
+            Location:
+              description: URL de la comanda recién creada
+              schema:
+                type: string
+                example: /comandas/101
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Comanda'
         '400':
-          description: Datos de entrada inválidos
+          description: Datos inválidos (mesa o estado faltante)
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+              example:
+                error:
+                  code: ESTADO_INVALIDO
+                  message: Datos inválidos (mesa o estado faltante)
+                  details: null
+        '401':
+          description: Token no enviado o inválido
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                error:
+                  code: NO_AUTORIZADO
+                  message: Token no enviado o inválido
+                  details: null
+
 
   /comandas/{id}:
     get:
-      tags: [Comanda]
+      tags: [Comandas]
       summary: Obtener una comanda por ID
-      description: Retorna una comanda según su número identificador.
+      security:
+        - bearerAuth: []
       parameters:
         - name: id
           in: path
           required: true
-          description: Número identificador de la comanda.
+          description: Número identificador de la comanda
           schema:
             type: integer
             format: int32
+            example: 101
       responses:
         '200':
           description: Comanda encontrada
@@ -402,147 +443,300 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Comanda'
-        '404':
-          description: La comanda especificada no existe
+        '401':
+          description: Token no enviado o inválido
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+              example:
+                error:
+                  code: NO_AUTORIZADO
+                  message: Token no enviado o inválido
+                  details: null
+        '404':
+          description: La comanda con ese ID no existe
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                error:
+                  code: COMANDA_NO_ENCONTRADA
+                  message: La comanda con ese ID no existe
+                  details: null
+
+
     delete:
-      tags: [Comanda]
+      tags: [Comandas]
       summary: Eliminar una comanda
-      description: Elimina una comanda del sistema según su número identificador.
+      security:
+        - bearerAuth: []
       parameters:
         - name: id
           in: path
           required: true
-          description: Número identificador de la comanda.
+          description: Número identificador de la comanda
           schema:
             type: integer
             format: int32
+            example: 101
       responses:
         '204':
-          description: Comanda eliminada con éxito (sin cuerpo)
-        '404':
-          description: Comanda no encontrada
+          description: Comanda eliminada exitosamente (sin cuerpo)
+        '401':
+          description: Token no enviado o inválido
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+              example:
+                error:
+                  code: NO_AUTORIZADO
+                  message: Token no enviado o inválido
+                  details: null
+        '404':
+          description: La comanda con ese ID no existe
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                error:
+                  code: COMANDA_NO_ENCONTRADA
+                  message: La comanda con ese ID no existe
+                  details: null
+
 
   /comandas/mesa/{numeroMesa}:
     get:
-      tags: [Comanda]
-      summary: Obtener comanda activa por mesa
-      description: Retorna la comanda asociada a un número de mesa específico.
+      tags: [Comandas]
+      summary: Obtener la comanda activa de una mesa
+      description: Retorna la comanda que no está Cerrada ni Cancelada para la mesa indicada.
+      security:
+        - bearerAuth: []
       parameters:
         - name: numeroMesa
           in: path
           required: true
-          description: Número identificador de la mesa.
+          description: Número identificador de la mesa
           schema:
             type: integer
             format: int32
+            example: 3
       responses:
         '200':
-          description: Comanda de la mesa devuelta con éxito
+          description: Comanda activa de la mesa devuelta con éxito
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Comanda'
+        '401':
+          description: Token no enviado o inválido
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                error:
+                  code: NO_AUTORIZADO
+                  message: Token no enviado o inválido
+                  details: null
         '404':
           description: No hay comanda activa para la mesa indicada
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+              example:
+                error:
+                  code: MESA_NO_ENCONTRADA
+                  message: No hay comanda activa para la mesa indicada
+                  details: null
+
 
   /comandas/estado/{estado}:
     get:
-      tags: [Comanda]
-      summary: Obtener comandas por estado
-      description: Retorna el listado de comandas filtradas por su estado actual.
+      tags: [Comandas]
+      summary: Filtrar comandas por estado
+      security:
+        - bearerAuth: []
       parameters:
         - name: estado
           in: path
           required: true
-          description: Estado de la comanda.
+          description: Estado de la comanda a filtrar
           schema:
             type: string
-            enum: [ABIERTA, CERRADA, EN_PROCESO]
+            enum: [Abierta, Cancelada, "En preparacion", Lista, Entregada, Cerrada]
+            example: Abierta
       responses:
         '200':
-          description: Listado filtrado devuelto con éxito
+          description: Listado de comandas en el estado solicitado
           content:
             application/json:
               schema:
                 type: array
                 items:
                   $ref: '#/components/schemas/Comanda'
-
-  /comandas/{id}/estado:
-    put:
-      tags: [Comanda]
-      summary: Cambiar estado de una comanda
-      description: Actualiza el estado de una comanda existente (ej. pasar a CERRADA).
-      parameters:
-        - name: id
-          in: path
-          required: true
-          description: Número identificador de la comanda.
-          schema:
-            type: integer
-            format: int32
-        - name: nuevoEstado
-          in: query
-          required: true
-          description: Nuevo estado de la comanda.
-          schema:
-            type: string
-            enum: [ABIERTA, CERRADA, EN_PROCESO]
-      responses:
-        '200':
-          description: Estado de comanda actualizado correctamente
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Comanda'
-        '404':
-          description: Comanda no encontrada
+        '400':
+          description: El estado enviado no es un valor válido
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+              example:
+                error:
+                  code: ESTADO_INVALIDO
+                  message: El estado enviado no es un valor válido
+                  details: null
+        '401':
+          description: Token no enviado o inválido
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                error:
+                  code: NO_AUTORIZADO
+                  message: Token no enviado o inválido
+                  details: null
 
-  /comandas/{id}/total:
-    get:
-      tags: [Comanda]
-      summary: Obtener el importe total de una comanda
-      description: Retorna la suma total de los precios de los ítems consumidos en la comanda.
+
+  /comandas/{id}/estado:
+    put:
+      tags: [Comandas]
+      summary: Cambiar el estado de una comanda
+      description: >
+        Avanza la comanda en su ciclo de vida.
+        Transiciones válidas: Abierta→En preparacion, Abierta→Cancelada,
+        En preparacion→Lista, Lista→Entregada, Entregada→Cerrada.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [nuevoEstado]
+              properties:
+                nuevoEstado:
+                  type: string
+                  enum: [Abierta, Cancelada, "En preparacion", Lista, Entregada, Cerrada]
+                  example: "En preparacion"
       parameters:
         - name: id
           in: path
           required: true
-          description: Número identificador de la comanda.
+          description: Número identificador de la comanda
           schema:
             type: integer
             format: int32
+            example: 101
       responses:
         '200':
-          description: Importe total calculado con éxito
+          description: Estado actualizado correctamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Comanda'
+        '400':
+          description: Transición de estado inválida según la máquina de estados
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                error:
+                  code: TRANSICION_INVALIDA
+                  message: Transición de estado inválida según la máquina de estados
+                  details: null
+        '401':
+          description: Token no enviado o inválido
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                error:
+                  code: NO_AUTORIZADO
+                  message: Token no enviado o inválido
+                  details: null
+        '404':
+          description: La comanda con ese ID no existe
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                error:
+                  code: COMANDA_NO_ENCONTRADA
+                  message: La comanda con ese ID no existe
+                  details: null
+
+
+  /comandas/{id}/total:
+    get:
+      tags: [Comandas]
+      summary: Calcular el total a cobrar de una comanda (HU-03)
+      description: >
+        Suma precio × cantidad de cada ítem no cancelado.
+        Se llama antes de cerrar la mesa para informar al cliente el monto final.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Número identificador de la comanda
+          schema:
+            type: integer
+            format: int32
+            example: 101
+      responses:
+        '200':
+          description: Total calculado exitosamente
           content:
             application/json:
               schema:
                 type: number
                 format: double
                 example: 11500.50
+        '401':
+          description: Token no enviado o inválido
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                error:
+                  code: NO_AUTORIZADO
+                  message: Token no enviado o inválido
+                  details: null
+        '404':
+          description: La comanda con ese ID no existe
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                error:
+                  code: COMANDA_NO_ENCONTRADA
+                  message: La comanda con ese ID no existe
+                  details: null
 
-  # ─── MÓDULO: ÍTEMS DE PEDIDO ─────────────────────────────────────────
+
+  # ─── MÓDULO: ÍTEMS DE PEDIDO ──────────────────────────────────────────────
   /items-pedido:
     post:
-      tags: [Ítems Pedido]
-      summary: Agregar un nuevo ítem a una comanda (HU-04)
-      description: Asocia un plato y una cantidad a una comanda activa.
+      tags: [Items Pedido]
+      summary: Agregar un ítem a una comanda (HU-04)
+      description: >
+        Asocia un plato y una cantidad a una comanda activa.
+        Descuenta automáticamente los ingredientes del stock según la receta del plato.
+      security:
+        - bearerAuth: []
       requestBody:
         required: true
         content:
@@ -551,175 +745,324 @@ paths:
               $ref: '#/components/schemas/ItemPedidoInput'
       responses:
         '201':
-          description: Ítem agregado exitosamente a la comanda
+          description: Ítem agregado exitosamente — stock descontado automáticamente
+          headers:
+            Location:
+              description: URI del recurso recién creado
+              schema:
+                type: string
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ItemPedidoResponse'
         '400':
-          description: Validación fallida (campos faltantes o cantidad menor a 1)
+          description: >
+            Datos inválidos (cantidad menor a 1, campos faltantes)
+            o stock insuficiente para preparar el plato
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+              example:
+                error:
+                  code: DATOS_INVALIDOS
+                  message: Datos inválidos (cantidad menor a 1, campos faltantes)
+                  details: null
+        '401':
+          description: Token no enviado o inválido
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                error:
+                  code: NO_AUTORIZADO
+                  message: Token no enviado o inválido
+                  details: null
         '404':
           description: El número de comanda o el ID del plato no existen
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+              example:
+                error:
+                  code: COMANDA_NO_ENCONTRADA
+                  message: El número de comanda o el ID del plato no existen
+                  details: null
+
+
     delete:
-      tags: [Ítems Pedido]
-      summary: Eliminar un ítem específico de una comanda
-      description: Remueve la relación entre un plato y una comanda por ID compuestos recibidos como query parameters.
+      tags: [Items Pedido]
+      summary: Eliminar un ítem de una comanda
+      description: Remueve un ítem usando la clave compuesta (numeroComanda + idPlato) como query parameters.
+      security:
+        - bearerAuth: []
       parameters:
         - in: query
           name: numeroComanda
           required: true
           schema:
             type: integer
-          example: 101
+            example: 101
         - in: query
           name: idPlato
           required: true
           schema:
             type: integer
-          example: 45
+            example: 45
       responses:
         '204':
-          description: Ítem eliminado correctamente de la comanda (sin cuerpo de respuesta)
-        '404':
-          description: No se encontró la combinación de comanda y plato solicitada
+          description: Ítem eliminado correctamente (sin cuerpo)
+        '401':
+          description: Token no enviado o inválido
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+              example:
+                error:
+                  code: NO_AUTORIZADO
+                  message: Token no enviado o inválido
+                  details: null
+        '404':
+          description: No existe un ítem con esa combinación de comanda y plato
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                error:
+                  code: COMANDA_NO_ENCONTRADA
+                  message: No existe un ítem con esa combinación de comanda y plato
+                  details: null
+
 
   /items-pedido/comanda/{numeroComanda}:
     get:
-      tags: [Ítems Pedido]
-      summary: Listar todos los ítems cargados en una comanda
-      description: Devuelve el listado completo de platos asociados a una comanda dada.
+      tags: [Items Pedido]
+      summary: Listar ítems de una comanda
+      description: Devuelve todos los platos asociados a una comanda con sus estados actuales.
+      security:
+        - bearerAuth: []
       parameters:
         - in: path
           name: numeroComanda
           required: true
           schema:
             type: integer
-          example: 101
+            example: 101
       responses:
         '200':
-          description: Lista de ítems pertenecientes a la comanda devuelta con éxito
+          description: Listado de ítems de la comanda
           content:
             application/json:
               schema:
                 type: array
                 items:
                   $ref: '#/components/schemas/ItemPedidoResponse'
-        '404':
-          description: La comanda especificada no existe en el sistema
+        '401':
+          description: Token no enviado o inválido
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+              example:
+                error:
+                  code: NO_AUTORIZADO
+                  message: Token no enviado o inválido
+                  details: null
+        '404':
+          description: La comanda con ese número no existe
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                error:
+                  code: COMANDA_NO_ENCONTRADA
+                  message: La comanda con ese número no existe
+                  details: null
+
 
   /items-pedido/estado/{estado}:
     get:
-      tags: [Ítems Pedido]
-      summary: Filtrar ítems por estado para vista de Cocina (HU-06)
-      description: Retorna la lista de renglones de pedidos según el estado enviado (ej. PENDIENTE para los cocineros).
+      tags: [Items Pedido]
+      summary: Filtrar ítems por estado — pantalla de cocina (HU-06)
+      description: >
+        Retorna los ítems en el estado indicado, ordenados por fecha de comanda.
+        La cocina consulta este endpoint para ver los pedidos Pendientes y En preparacion.
+      security:
+        - bearerAuth: []
       parameters:
         - in: path
           name: estado
           required: true
           schema:
             type: string
-            enum: [PENDIENTE, EN_PREPARACION, LISTO, ENTREGADO]
-          example: PENDIENTE
+            enum: [Pendiente, "En preparacion", Listo, Entregado, Cancelado]
+            example: Pendiente
       responses:
         '200':
-          description: Lista de ítems en el estado solicitado devuelta con éxito
+          description: Listado de ítems en el estado solicitado
           content:
             application/json:
               schema:
                 type: array
                 items:
                   $ref: '#/components/schemas/ItemPedidoResponse'
+        '400':
+          description: El estado enviado no es un valor válido
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                error:
+                  code: ESTADO_INVALIDO
+                  message: El estado enviado no es un valor válido
+                  details: null
+        '401':
+          description: Token no enviado o inválido
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                error:
+                  code: NO_AUTORIZADO
+                  message: Token no enviado o inválido
+                  details: null
+
 
   /items-pedido/estado:
     put:
-      tags: [Ítems Pedido]
-      summary: Actualizar el estado de un ítem (Cocina / Mozo) (HU-07)
-      description: Permite cambiar el flujo del ítem (ej. Cocina pasa un plato de EN_PREPARACION a LISTO).
+      tags: [Items Pedido]
+      summary: Actualizar el estado de un ítem (HU-07)
+      description: >
+        Avanza el ítem en su ciclo de vida.
+        Transiciones válidas: Pendiente→En preparacion, Pendiente→Cancelado,
+        En preparacion→Listo, Listo→Entregado.
+        Al cancelar, devuelve automáticamente los ingredientes al stock (HU-14).
+      security:
+        - bearerAuth: []
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/EstadoUpdateInput'
+              $ref: '#/components/schemas/EstadoItemInput'
       responses:
         '200':
-          description: Estado modificado correctamente
+          description: Estado del ítem actualizado correctamente
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ItemPedidoResponse'
+        '400':
+          description: Transición de estado inválida (ej. intentar cancelar un ítem En preparacion)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                error:
+                  code: TRANSICION_INVALIDA
+                  message: Transición de estado inválida (ej. intentar cancelar un ítem En preparacion)
+                  details: null
+        '401':
+          description: Token no enviado o inválido
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                error:
+                  code: NO_AUTORIZADO
+                  message: Token no enviado o inválido
+                  details: null
         '404':
-          description: Ítem no encontrado para actualizar
+          description: El ítem con esa combinación de comanda y plato no existe
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-        '422':
-          description: Regla de negocio fallida (ej. transición de estado no válida)
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+              example:
+                error:
+                  code: COMANDA_NO_ENCONTRADA
+                  message: El ítem con esa combinación de comanda y plato no existe
+                  details: null
 
-  # ─── MÓDULO: PLATOS ──────────────────────────────────────────────────
+
+  # ─── MÓDULO: MENÚ PÚBLICO ─────────────────────────────────────────────────
+  /api/menu:
+    get:
+      tags: [Menu]
+      summary: Obtener el menú paginado (público)
+      description: >
+        Retorna los platos activos paginados. Endpoint público — no requiere autenticación.
+        Usado por el frontend para mostrar el menú a los clientes.
+      parameters:
+        - in: query
+          name: page
+          required: false
+          description: Número de página (base 0)
+          schema:
+            type: integer
+            default: 0
+            example: 0
+        - in: query
+          name: size
+          required: false
+          description: Cantidad de platos por página
+          schema:
+            type: integer
+            default: 8
+            example: 8
+      responses:
+        '200':
+          description: Página de platos activos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginaPlatos'
+
+
+  # ─── MÓDULO: PLATOS ───────────────────────────────────────────────────────
   /platos:
     get:
       tags: [Platos]
-      summary: Obtener todos los platos
-      description: Retorna el listado completo de platos, incluyendo activos e inactivos.
+      summary: Listar todos los platos (activos e inactivos)
+      description: Vista de administrador — incluye platos desactivados.
+      security:
+        - bearerAuth: []
       responses:
         '200':
-          description: OK
+          description: Listado completo de platos
           content:
             application/json:
               schema:
                 type: array
                 items:
                   $ref: '#/components/schemas/Plato'
-        '400':
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
         '401':
-          description: Unauthorized
+          description: Token no enviado o inválido
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-        '404':
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '409':
-          description: Conflict
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+              example:
+                error:
+                  code: NO_AUTORIZADO
+                  message: Token no enviado o inválido
+                  details: null
+
+
     post:
       tags: [Platos]
-      summary: Crear un plato
-      description: Crea un nuevo plato.
+      summary: Crear un nuevo plato
+      security:
+        - bearerAuth: []
       requestBody:
         required: true
         content:
@@ -728,180 +1071,178 @@ paths:
               $ref: '#/components/schemas/Plato'
       responses:
         '201':
-          description: Created
+          description: Plato creado exitosamente
+          headers:
+            Location:
+              description: URL del plato recién creado
+              schema:
+                type: string
+                example: /platos/45
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Plato'
         '400':
-          description: Bad Request
+          description: Datos inválidos (nombre faltante, precio negativo, categoría inexistente)
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+              example:
+                error:
+                  code: DATOS_INVALIDOS
+                  message: Datos inválidos (nombre faltante, precio negativo, categoría inexistente)
+                  details: null
         '401':
-          description: Unauthorized
+          description: Token no enviado o inválido
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-        '404':
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '409':
-          description: Conflict
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+              example:
+                error:
+                  code: NO_AUTORIZADO
+                  message: Token no enviado o inválido
+                  details: null
+
 
   /platos/activos:
     get:
       tags: [Platos]
-      summary: Obtener platos activos
-      description: Retorna el listado de platos activos.
+      summary: Listar platos activos del menú (HU-04)
+      description: Retorna solo los platos disponibles para pedir. Usado por el mozo al tomar el pedido.
+      security:
+        - bearerAuth: []
       responses:
         '200':
-          description: OK
+          description: Listado de platos activos
           content:
             application/json:
               schema:
                 type: array
                 items:
                   $ref: '#/components/schemas/Plato'
-        '400':
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
         '401':
-          description: Unauthorized
+          description: Token no enviado o inválido
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-        '404':
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '409':
-          description: Conflict
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+              example:
+                error:
+                  code: NO_AUTORIZADO
+                  message: Token no enviado o inválido
+                  details: null
+
 
   /platos/categoria/{idCategoria}:
     get:
       tags: [Platos]
-      summary: Obtener platos por categoría
-      description: Retorna el listado de platos asociados a una categoría.
+      summary: Filtrar platos por categoría
+      security:
+        - bearerAuth: []
       parameters:
         - name: idCategoria
           in: path
           required: true
-          description: Identificador de la categoría.
+          description: Identificador de la categoría
           schema:
             type: integer
             format: int32
+            example: 2
       responses:
         '200':
-          description: OK
+          description: Platos de la categoría indicada
           content:
             application/json:
               schema:
                 type: array
                 items:
                   $ref: '#/components/schemas/Plato'
-        '400':
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Error'
         '401':
-          description: Unauthorized
+          description: Token no enviado o inválido
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+              example:
+                error:
+                  code: NO_AUTORIZADO
+                  message: Token no enviado o inválido
+                  details: null
         '404':
-          description: Not Found
+          description: La categoría con ese ID no existe
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-        '409':
-          description: Conflict
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+              example:
+                error:
+                  code: CATEGORIA_NO_ENCONTRADA
+                  message: La categoría con ese ID no existe
+                  details: null
+
 
   /platos/{id}:
     get:
       tags: [Platos]
       summary: Obtener un plato por ID
-      description: Retorna un plato según su identificador.
+      security:
+        - bearerAuth: []
       parameters:
         - name: id
           in: path
           required: true
-          description: Identificador del plato.
+          description: Identificador del plato
           schema:
             type: integer
             format: int32
+            example: 45
       responses:
         '200':
-          description: OK
+          description: Plato encontrado
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Plato'
-        '400':
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
         '401':
-          description: Unauthorized
+          description: Token no enviado o inválido
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+              example:
+                error:
+                  code: NO_AUTORIZADO
+                  message: Token no enviado o inválido
+                  details: null
         '404':
-          description: Not Found
+          description: El plato con ese ID no existe en el menú
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-        '409':
-          description: Conflict
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+              example:
+                error:
+                  code: PLATO_NO_ENCONTRADO
+                  message: El plato con ese ID no existe en el menú
+                  details: null
+
+
     put:
       tags: [Platos]
       summary: Actualizar un plato
-      description: Actualiza los datos de un plato existente.
+      security:
+        - bearerAuth: []
       parameters:
         - name: id
           in: path
           required: true
-          description: Identificador del plato.
+          description: Identificador del plato
           schema:
             type: integer
             format: int32
+            example: 45
       requestBody:
         required: true
         content:
@@ -910,163 +1251,204 @@ paths:
               $ref: '#/components/schemas/Plato'
       responses:
         '200':
-          description: OK
+          description: Plato actualizado exitosamente
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Plato'
         '400':
-          description: Bad Request
+          description: Datos inválidos
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+              example:
+                error:
+                  code: DATOS_INVALIDOS
+                  message: Datos inválidos
+                  details: null
         '401':
-          description: Unauthorized
+          description: Token no enviado o inválido
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+              example:
+                error:
+                  code: NO_AUTORIZADO
+                  message: Token no enviado o inválido
+                  details: null
         '404':
-          description: Not Found
+          description: El plato con ese ID no existe
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-        '409':
-          description: Conflict
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+              example:
+                error:
+                  code: PLATO_NO_ENCONTRADO
+                  message: El plato con ese ID no existe
+                  details: null
+
+
     delete:
       tags: [Platos]
-      summary: Eliminar un plato
-      description: Elimina lógicamente un plato del menú.
+      summary: Desactivar un plato del menú (HU-13)
+      description: Borrado lógico — el plato pasa a inactivo pero no se elimina de la base de datos.
+      security:
+        - bearerAuth: []
       parameters:
         - name: id
           in: path
           required: true
-          description: Identificador del plato.
+          description: Identificador del plato
           schema:
             type: integer
             format: int32
+            example: 45
       responses:
         '204':
-          description: No Content
+          description: Plato desactivado exitosamente (sin cuerpo)
         '400':
-          description: Bad Request
+          description: El plato tiene pedidos Pendientes o En preparacion — no se puede desactivar
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+              example:
+                error:
+                  code: PLATO_CON_PEDIDOS
+                  message: El plato tiene pedidos Pendientes o En preparacion — no se puede desactivar
+                  details: null
         '401':
-          description: Unauthorized
+          description: Token no enviado o inválido
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+              example:
+                error:
+                  code: NO_AUTORIZADO
+                  message: Token no enviado o inválido
+                  details: null
         '404':
-          description: Not Found
+          description: El plato con ese ID no existe
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-        '409':
-          description: Conflict
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+              example:
+                error:
+                  code: PLATO_NO_ENCONTRADO
+                  message: El plato con ese ID no existe
+                  details: null
 
-  /platos/{id}/toggle-activo:
+
+  /platos/{id}/activo:
     put:
       tags: [Platos]
-      summary: Alternar estado activo de un plato
-      description: Activa o desactiva un plato según su estado actual.
+      summary: Activar o desactivar un plato (HU-13)
+      description: >
+        Alterna el estado activo del plato. Si estaba activo lo desactiva y viceversa.
+        No permite desactivar si el plato tiene pedidos Pendientes o En preparacion.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [activo]
+              properties:
+                activo:
+                  type: boolean
+                  example: true
       parameters:
         - name: id
           in: path
           required: true
-          description: Identificador del plato.
+          description: Identificador del plato
           schema:
             type: integer
             format: int32
+            example: 45
       responses:
         '200':
-          description: OK
+          description: Estado activo del plato alternado exitosamente
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Plato'
         '400':
-          description: Bad Request
+          description: No se puede desactivar — el plato tiene pedidos activos
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+              example:
+                error:
+                  code: PLATO_CON_PEDIDOS
+                  message: No se puede desactivar — el plato tiene pedidos activos
+                  details: null
         '401':
-          description: Unauthorized
+          description: Token no enviado o inválido
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+              example:
+                error:
+                  code: NO_AUTORIZADO
+                  message: Token no enviado o inválido
+                  details: null
         '404':
-          description: Not Found
+          description: El plato con ese ID no existe
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-        '409':
-          description: Conflict
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+              example:
+                error:
+                  code: PLATO_NO_ENCONTRADO
+                  message: El plato con ese ID no existe
+                  details: null
 
-  # ─── MÓDULO: CATEGORÍAS ──────────────────────────────────────────────
+
+  # ─── MÓDULO: CATEGORÍAS ───────────────────────────────────────────────────
   /categorias:
     get:
       tags: [Categorias]
-      summary: Obtener todas las categorías
-      description: Retorna el listado completo de categorías.
+      summary: Listar todas las categorías
+      security:
+        - bearerAuth: []
       responses:
         '200':
-          description: OK
+          description: Listado de categorías
           content:
             application/json:
               schema:
                 type: array
                 items:
                   $ref: '#/components/schemas/Categoria'
-        '400':
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
         '401':
-          description: Unauthorized
+          description: Token no enviado o inválido
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-        '404':
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '409':
-          description: Conflict
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+              example:
+                error:
+                  code: NO_AUTORIZADO
+                  message: Token no enviado o inválido
+                  details: null
+
+
     post:
       tags: [Categorias]
       summary: Crear una categoría
-      description: Crea una nueva categoría.
+      security:
+        - bearerAuth: []
       requestBody:
         required: true
         content:
@@ -1075,92 +1457,99 @@ paths:
               $ref: '#/components/schemas/Categoria'
       responses:
         '201':
-          description: Created
+          description: Categoría creada exitosamente
+          headers:
+            Location:
+              description: URL de la categoría recién creada
+              schema:
+                type: string
+                example: /categorias/3
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Categoria'
         '400':
-          description: Bad Request
+          description: Nombre faltante o inválido
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+              example:
+                error:
+                  code: DATOS_INVALIDOS
+                  message: Nombre faltante o inválido
+                  details: null
         '401':
-          description: Unauthorized
+          description: Token no enviado o inválido
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-        '404':
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '409':
-          description: Conflict
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+              example:
+                error:
+                  code: NO_AUTORIZADO
+                  message: Token no enviado o inválido
+                  details: null
+
 
   /categorias/{id}:
     get:
       tags: [Categorias]
       summary: Obtener una categoría por ID
-      description: Retorna una categoría según su identificador.
+      security:
+        - bearerAuth: []
       parameters:
         - name: id
           in: path
           required: true
-          description: Identificador de la categoría.
           schema:
             type: integer
             format: int32
+            example: 1
       responses:
         '200':
-          description: OK
+          description: Categoría encontrada
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Categoria'
-        '400':
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
         '401':
-          description: Unauthorized
+          description: Token no enviado o inválido
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+              example:
+                error:
+                  code: NO_AUTORIZADO
+                  message: Token no enviado o inválido
+                  details: null
         '404':
-          description: Not Found
+          description: La categoría con ese ID no existe
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-        '409':
-          description: Conflict
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+              example:
+                error:
+                  code: CATEGORIA_NO_ENCONTRADA
+                  message: La categoría con ese ID no existe
+                  details: null
+
+
     put:
       tags: [Categorias]
       summary: Actualizar una categoría
-      description: Actualiza los datos de una categoría existente.
+      security:
+        - bearerAuth: []
       parameters:
         - name: id
           in: path
           required: true
-          description: Identificador de la categoría.
           schema:
             type: integer
             format: int32
+            example: 1
       requestBody:
         required: true
         content:
@@ -1169,130 +1558,143 @@ paths:
               $ref: '#/components/schemas/Categoria'
       responses:
         '200':
-          description: OK
+          description: Categoría actualizada exitosamente
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Categoria'
         '400':
-          description: Bad Request
+          description: Datos inválidos
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+              example:
+                error:
+                  code: DATOS_INVALIDOS
+                  message: Datos inválidos
+                  details: null
         '401':
-          description: Unauthorized
+          description: Token no enviado o inválido
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+              example:
+                error:
+                  code: NO_AUTORIZADO
+                  message: Token no enviado o inválido
+                  details: null
         '404':
-          description: Not Found
+          description: La categoría con ese ID no existe
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-        '409':
-          description: Conflict
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+              example:
+                error:
+                  code: CATEGORIA_NO_ENCONTRADA
+                  message: La categoría con ese ID no existe
+                  details: null
+
+
     delete:
       tags: [Categorias]
       summary: Eliminar una categoría
-      description: Elimina una categoría según su identificador.
+      security:
+        - bearerAuth: []
       parameters:
         - name: id
           in: path
           required: true
-          description: Identificador de la categoría.
           schema:
             type: integer
             format: int32
+            example: 1
       responses:
         '204':
-          description: No Content
-        '400':
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+          description: Categoría eliminada exitosamente (sin cuerpo)
         '401':
-          description: Unauthorized
+          description: Token no enviado o inválido
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+              example:
+                error:
+                  code: NO_AUTORIZADO
+                  message: Token no enviado o inválido
+                  details: null
         '404':
-          description: Not Found
+          description: La categoría con ese ID no existe
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-        '409':
-          description: Conflict
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+              example:
+                error:
+                  code: CATEGORIA_NO_ENCONTRADA
+                  message: La categoría con ese ID no existe
+                  details: null
 
-  # ─── MÓDULO: RECETAS ─────────────────────────────────────────────────
+
+  # ─── MÓDULO: RECETAS ──────────────────────────────────────────────────────
   /recetas/plato/{idPlato}:
     get:
       tags: [Recetas]
-      summary: Obtener recetas por plato
-      description: Retorna el listado de ingredientes y cantidades requeridas para un plato.
+      summary: Obtener la receta de un plato (HU-11)
+      description: Retorna los ingredientes y cantidades necesarias para preparar el plato.
+      security:
+        - bearerAuth: []
       parameters:
         - name: idPlato
           in: path
           required: true
-          description: Identificador del plato.
+          description: Identificador del plato
           schema:
             type: integer
             format: int32
+            example: 45
       responses:
         '200':
-          description: OK
+          description: Receta del plato con ingredientes y cantidades
           content:
             application/json:
               schema:
                 type: array
                 items:
                   $ref: '#/components/schemas/Receta'
-        '400':
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Error'
         '401':
-          description: Unauthorized
+          description: Token no enviado o inválido
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+              example:
+                error:
+                  code: NO_AUTORIZADO
+                  message: Token no enviado o inválido
+                  details: null
         '404':
-          description: Not Found
+          description: El plato con ese ID no existe
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-        '409':
-          description: Conflict
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+              example:
+                error:
+                  code: PLATO_NO_ENCONTRADO
+                  message: El plato con ese ID no existe
+                  details: null
+
 
   /recetas:
     post:
       tags: [Recetas]
-      summary: Crear una receta
-      description: Crea una relación entre un plato y un ingrediente con la cantidad requerida.
+      summary: Crear una entrada de receta
+      description: Asocia un ingrediente a un plato con la cantidad requerida para prepararlo.
+      security:
+        - bearerAuth: []
       requestBody:
         required: true
         content:
@@ -1301,125 +1703,133 @@ paths:
               $ref: '#/components/schemas/Receta'
       responses:
         '201':
-          description: Created
+          description: Entrada de receta creada exitosamente
+          headers:
+            Location:
+              description: URI del recurso recién creado
+              schema:
+                type: string
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Receta'
         '400':
-          description: Bad Request
+          description: Datos inválidos o la relación plato-ingrediente ya existe
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+              example:
+                error:
+                  code: DATOS_INVALIDOS
+                  message: Datos inválidos o la relación plato-ingrediente ya existe
+                  details: null
         '401':
-          description: Unauthorized
+          description: Token no enviado o inválido
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+              example:
+                error:
+                  code: NO_AUTORIZADO
+                  message: Token no enviado o inválido
+                  details: null
         '404':
-          description: Not Found
+          description: El plato o el ingrediente indicado no existen
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-        '409':
-          description: Conflict
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+              example:
+                error:
+                  code: PLATO_NO_ENCONTRADO
+                  message: El plato o el ingrediente indicado no existen
+                  details: null
+
+
     delete:
       tags: [Recetas]
-      summary: Eliminar una receta
-      description: Elimina una relación entre un plato y un ingrediente usando parámetros query.
+      summary: Eliminar una entrada de receta
+      description: Elimina la relación entre un plato y un ingrediente usando query parameters.
+      security:
+        - bearerAuth: []
       parameters:
         - in: query
           name: idPlato
           required: true
-          description: Identificador del plato.
           schema:
             type: integer
             format: int32
+            example: 45
         - in: query
           name: idIngrediente
           required: true
-          description: Identificador del ingrediente.
           schema:
             type: integer
             format: int32
+            example: 10
       responses:
         '204':
-          description: No Content
-        '400':
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+          description: Entrada de receta eliminada (sin cuerpo)
         '401':
-          description: Unauthorized
+          description: Token no enviado o inválido
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+              example:
+                error:
+                  code: NO_AUTORIZADO
+                  message: Token no enviado o inválido
+                  details: null
         '404':
-          description: Not Found
+          description: No existe esa relación plato-ingrediente en la receta
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-        '409':
-          description: Conflict
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+              example:
+                error:
+                  code: PLATO_NO_ENCONTRADO
+                  message: No existe esa relación plato-ingrediente en la receta
+                  details: null
 
-  # ─── MÓDULO: INGREDIENTES ─────────────────────────────────────────────
+
+  # ─── MÓDULO: INGREDIENTES ─────────────────────────────────────────────────
   /ingredientes:
     get:
       tags: [Ingredientes]
-      summary: Obtener todos los ingredientes
-      description: Retorna el listado completo de ingredientes del inventario.
+      summary: Listar todos los ingredientes del inventario (HU-09)
+      security:
+        - bearerAuth: []
       responses:
         '200':
-          description: OK
+          description: Listado completo de ingredientes con stock actual
           content:
             application/json:
               schema:
                 type: array
                 items:
                   $ref: '#/components/schemas/Ingrediente'
-        '400':
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
         '401':
-          description: Unauthorized
+          description: Token no enviado o inválido
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-        '404':
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '409':
-          description: Conflict
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+              example:
+                error:
+                  code: NO_AUTORIZADO
+                  message: Token no enviado o inválido
+                  details: null
+
+
     post:
       tags: [Ingredientes]
       summary: Crear un ingrediente
-      description: Crea un nuevo ingrediente en el inventario.
+      security:
+        - bearerAuth: []
       requestBody:
         required: true
         content:
@@ -1428,408 +1838,433 @@ paths:
               $ref: '#/components/schemas/Ingrediente'
       responses:
         '201':
-          description: Created
+          description: Ingrediente creado exitosamente
+          headers:
+            Location:
+              description: URL del ingrediente recién creado
+              schema:
+                type: string
+                example: /ingredientes/10
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Ingrediente'
         '400':
-          description: Bad Request
+          description: Datos inválidos (nombre faltante, stock negativo)
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+              example:
+                error:
+                  code: DATOS_INVALIDOS
+                  message: Datos inválidos (nombre faltante, stock negativo)
+                  details: null
         '401':
-          description: Unauthorized
+          description: Token no enviado o inválido
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-        '404':
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '409':
-          description: Conflict
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+              example:
+                error:
+                  code: NO_AUTORIZADO
+                  message: Token no enviado o inválido
+                  details: null
+
 
   /ingredientes/bajo-stock:
     get:
       tags: [Ingredientes]
-      summary: Obtener ingredientes con bajo stock
-      description: Retorna el listado de ingredientes cuyo stock se encuentra por debajo del stock mínimo.
+      summary: Listar ingredientes bajo el stock mínimo (HU-12)
+      description: Retorna los ingredientes cuyo stock actual es menor al stock mínimo configurado.
+      security:
+        - bearerAuth: []
       responses:
         '200':
-          description: OK
+          description: Ingredientes con stock crítico
           content:
             application/json:
               schema:
                 type: array
                 items:
                   $ref: '#/components/schemas/Ingrediente'
-        '400':
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
         '401':
-          description: Unauthorized
+          description: Token no enviado o inválido
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-        '404':
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '409':
-          description: Conflict
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+              example:
+                error:
+                  code: NO_AUTORIZADO
+                  message: Token no enviado o inválido
+                  details: null
+
 
   /ingredientes/{id}:
     get:
       tags: [Ingredientes]
       summary: Obtener un ingrediente por ID
-      description: Retorna un ingrediente según su identificador.
+      security:
+        - bearerAuth: []
       parameters:
         - name: id
           in: path
           required: true
-          description: Identificador del ingrediente.
           schema:
             type: integer
             format: int32
+            example: 10
       responses:
         '200':
-          description: OK
+          description: Ingrediente encontrado
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Ingrediente'
-        '400':
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
         '401':
-          description: Unauthorized
+          description: Token no enviado o inválido
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+              example:
+                error:
+                  code: NO_AUTORIZADO
+                  message: Token no enviado o inválido
+                  details: null
         '404':
-          description: Not Found
+          description: El ingrediente con ese ID no existe
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-        '409':
-          description: Conflict
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+              example:
+                error:
+                  code: INGREDIENTE_NO_ENCONTRADO
+                  message: El ingrediente con ese ID no existe
+                  details: null
+
+
     delete:
       tags: [Ingredientes]
       summary: Eliminar un ingrediente
-      description: Elimina un ingrediente según su identificador.
+      security:
+        - bearerAuth: []
       parameters:
         - name: id
           in: path
           required: true
-          description: Identificador del ingrediente.
           schema:
             type: integer
             format: int32
+            example: 10
       responses:
         '204':
-          description: No Content
-        '400':
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+          description: Ingrediente eliminado exitosamente (sin cuerpo)
         '401':
-          description: Unauthorized
+          description: Token no enviado o inválido
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+              example:
+                error:
+                  code: NO_AUTORIZADO
+                  message: Token no enviado o inválido
+                  details: null
         '404':
-          description: Not Found
+          description: El ingrediente con ese ID no existe
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-        '409':
-          description: Conflict
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+              example:
+                error:
+                  code: INGREDIENTE_NO_ENCONTRADO
+                  message: El ingrediente con ese ID no existe
+                  details: null
+
 
   /ingredientes/{id}/stock:
     put:
       tags: [Ingredientes]
-      summary: Actualizar stock de un ingrediente
-      description: Registra un movimiento de stock para un ingrediente y retorna el ingrediente actualizado.
+      summary: Ajustar stock de un ingrediente (HU-10)
+      description: >
+        Registra un movimiento manual de stock y actualiza la cantidad disponible.
+        Positivo = ingreso de mercadería. Negativo = descuento manual.
+        Genera automáticamente un registro en MovimientosStock.
+      security:
+        - bearerAuth: []
       parameters:
         - name: id
           in: path
           required: true
-          description: Identificador del ingrediente.
           schema:
             type: integer
             format: int32
+            example: 10
         - name: cantidad
           in: query
           required: true
-          description: Cantidad a registrar en el stock (puede ser positivo o negativo).
+          description: Cantidad a ajustar (positivo=ingreso, negativo=descuento)
           schema:
             type: integer
             format: int32
+            example: 50
       responses:
         '200':
-          description: OK
+          description: Stock actualizado y movimiento registrado
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Ingrediente'
         '400':
-          description: Bad Request
+          description: El ajuste dejaría el stock en negativo
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+              example:
+                error:
+                  code: STOCK_INVALIDO
+                  message: El ajuste dejaría el stock en negativo
+                  details: null
         '401':
-          description: Unauthorized
+          description: Token no enviado o inválido
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+              example:
+                error:
+                  code: NO_AUTORIZADO
+                  message: Token no enviado o inválido
+                  details: null
         '404':
-          description: Not Found
+          description: El ingrediente con ese ID no existe
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-        '409':
-          description: Conflict
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+              example:
+                error:
+                  code: INGREDIENTE_NO_ENCONTRADO
+                  message: El ingrediente con ese ID no existe
+                  details: null
 
-  # ─── MÓDULO: MOVIMIENTOS DE STOCK ────────────────────────────────────
+
+  # ─── MÓDULO: MOVIMIENTOS DE STOCK ─────────────────────────────────────────
   /movimientos-stock/ingrediente/{idIngrediente}:
     get:
       tags: [MovimientosStock]
-      summary: Obtener movimientos de stock por ingrediente
-      description: Retorna el listado de movimientos de stock asociados a un ingrediente.
+      summary: Historial de movimientos de un ingrediente (HU-17)
+      description: Retorna todos los movimientos de stock del ingrediente, del más reciente al más antiguo.
+      security:
+        - bearerAuth: []
       parameters:
         - name: idIngrediente
           in: path
           required: true
-          description: Identificador del ingrediente.
           schema:
             type: integer
             format: int32
+            example: 10
       responses:
         '200':
-          description: OK
+          description: Historial de movimientos del ingrediente
           content:
             application/json:
               schema:
                 type: array
                 items:
                   $ref: '#/components/schemas/MovStock'
-        '400':
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
         '401':
-          description: Unauthorized
+          description: Token no enviado o inválido
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+              example:
+                error:
+                  code: NO_AUTORIZADO
+                  message: Token no enviado o inválido
+                  details: null
         '404':
-          description: Not Found
+          description: El ingrediente con ese ID no existe
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-        '409':
-          description: Conflict
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+              example:
+                error:
+                  code: INGREDIENTE_NO_ENCONTRADO
+                  message: El ingrediente con ese ID no existe
+                  details: null
+
 
   /movimientos-stock/usuario/{idUsuario}:
     get:
       tags: [MovimientosStock]
-      summary: Obtener movimientos de stock por usuario
-      description: Retorna el listado de movimientos de stock asociados a un usuario.
+      summary: Historial de movimientos realizados por un usuario (HU-17)
+      security:
+        - bearerAuth: []
       parameters:
         - name: idUsuario
           in: path
           required: true
-          description: Identificador del usuario.
           schema:
             type: integer
             format: int32
+            example: 4
       responses:
         '200':
-          description: OK
+          description: Historial de movimientos del usuario
           content:
             application/json:
               schema:
                 type: array
                 items:
                   $ref: '#/components/schemas/MovStock'
-        '400':
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
         '401':
-          description: Unauthorized
+          description: Token no enviado o inválido
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+              example:
+                error:
+                  code: NO_AUTORIZADO
+                  message: Token no enviado o inválido
+                  details: null
         '404':
-          description: Not Found
+          description: El usuario con ese ID no existe
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-        '409':
-          description: Conflict
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+              example:
+                error:
+                  code: USUARIO_NO_ENCONTRADO
+                  message: El usuario con ese ID no existe
+                  details: null
+
 
   /movimientos-stock:
     post:
       tags: [MovimientosStock]
-      summary: Registrar un movimiento de stock
-      description: Registra un movimiento manual de stock y retorna el ingrediente actualizado.
+      summary: Registrar un movimiento de stock manual (HU-10)
+      description: >
+        Registra un movimiento de stock y actualiza el inventario del ingrediente.
+        Delega en GestorStockFacade para garantizar auditoría y bloqueo pesimista.
+      security:
+        - bearerAuth: []
       parameters:
         - name: idIngrediente
           in: query
           required: true
-          description: Identificador del ingrediente.
           schema:
             type: integer
             format: int32
+            example: 10
         - name: cantidad
           in: query
           required: true
-          description: Cantidad del movimiento de stock.
+          description: Positivo para ingreso, negativo para descuento
           schema:
             type: integer
             format: int32
+            example: 30
         - name: idUsuario
           in: query
           required: true
-          description: Identificador del usuario que registra el movimiento.
+          description: ID del usuario que realiza el movimiento (pendiente de reemplazar por token JWT)
           schema:
             type: integer
             format: int32
+            example: 1
       responses:
         '201':
-          description: Created
+          description: Movimiento registrado e inventario actualizado
+          headers:
+            Location:
+              description: URI del recurso recién creado
+              schema:
+                type: string
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Ingrediente'
         '400':
-          description: Bad Request
+          description: El movimiento dejaría el stock en negativo
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+              example:
+                error:
+                  code: STOCK_INVALIDO
+                  message: El movimiento dejaría el stock en negativo
+                  details: null
         '401':
-          description: Unauthorized
+          description: Token no enviado o inválido
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+              example:
+                error:
+                  code: NO_AUTORIZADO
+                  message: Token no enviado o inválido
+                  details: null
         '404':
-          description: Not Found
+          description: El ingrediente o el usuario indicado no existen
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-        '409':
-          description: Conflict
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+              example:
+                error:
+                  code: INGREDIENTE_NO_ENCONTRADO
+                  message: El ingrediente o el usuario indicado no existen
+                  details: null
 
-  # ─── MÓDULO: USUARIOS ────────────────────────────────────────────────
+
+  # ─── MÓDULO: USUARIOS ─────────────────────────────────────────────────────
   /usuarios:
     get:
       tags: [Usuarios]
-      summary: Obtener todos los usuarios
-      description: Retorna el listado completo de usuarios.
+      summary: Listar todos los usuarios (HU-16)
+      security:
+        - bearerAuth: []
       responses:
         '200':
-          description: OK
+          description: Listado del personal del restaurante
           content:
             application/json:
               schema:
                 type: array
                 items:
                   $ref: '#/components/schemas/Usuario'
-        '400':
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
         '401':
-          description: Unauthorized
+          description: Token no enviado o inválido
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-        '404':
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '409':
-          description: Conflict
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+              example:
+                error:
+                  code: NO_AUTORIZADO
+                  message: Token no enviado o inválido
+                  details: null
+
+
     post:
       tags: [Usuarios]
       summary: Crear un usuario
-      description: Crea un nuevo usuario.
+      security:
+        - bearerAuth: []
       requestBody:
         required: true
         content:
@@ -1838,92 +2273,110 @@ paths:
               $ref: '#/components/schemas/Usuario'
       responses:
         '201':
-          description: Created
+          description: Usuario creado exitosamente
+          headers:
+            Location:
+              description: URL del usuario recién creado
+              schema:
+                type: string
+                example: /usuarios/4
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Usuario'
         '400':
-          description: Bad Request
+          description: Datos inválidos (email mal formado, rol desconocido)
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+              example:
+                error:
+                  code: DATOS_INVALIDOS
+                  message: Datos inválidos (email mal formado, rol desconocido)
+                  details: null
         '401':
-          description: Unauthorized
+          description: Token no enviado o inválido
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-        '404':
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+              example:
+                error:
+                  code: NO_AUTORIZADO
+                  message: Token no enviado o inválido
+                  details: null
         '409':
-          description: Conflict
+          description: El email ya está registrado para otro usuario
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+              example:
+                error:
+                  code: RECURSO_DUPLICADO
+                  message: El email ya está registrado para otro usuario
+                  details: null
+
 
   /usuarios/{id}:
     get:
       tags: [Usuarios]
       summary: Obtener un usuario por ID
-      description: Retorna un usuario según su identificador.
+      security:
+        - bearerAuth: []
       parameters:
         - name: id
           in: path
           required: true
-          description: Identificador del usuario.
           schema:
             type: integer
             format: int32
+            example: 4
       responses:
         '200':
-          description: OK
+          description: Usuario encontrado
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Usuario'
-        '400':
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
         '401':
-          description: Unauthorized
+          description: Token no enviado o inválido
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+              example:
+                error:
+                  code: NO_AUTORIZADO
+                  message: Token no enviado o inválido
+                  details: null
         '404':
-          description: Not Found
+          description: El usuario con ese ID no existe
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-        '409':
-          description: Conflict
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+              example:
+                error:
+                  code: USUARIO_NO_ENCONTRADO
+                  message: El usuario con ese ID no existe
+                  details: null
+
+
     put:
       tags: [Usuarios]
       summary: Actualizar un usuario
-      description: Actualiza los datos de un usuario existente.
+      security:
+        - bearerAuth: []
       parameters:
         - name: id
           in: path
           required: true
-          description: Identificador del usuario.
           schema:
             type: integer
             format: int32
+            example: 4
       requestBody:
         required: true
         content:
@@ -1932,103 +2385,145 @@ paths:
               $ref: '#/components/schemas/Usuario'
       responses:
         '200':
-          description: OK
+          description: Usuario actualizado exitosamente
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Usuario'
         '400':
-          description: Bad Request
+          description: Datos inválidos
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+              example:
+                error:
+                  code: DATOS_INVALIDOS
+                  message: Datos inválidos
+                  details: null
         '401':
-          description: Unauthorized
+          description: Token no enviado o inválido
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+              example:
+                error:
+                  code: NO_AUTORIZADO
+                  message: Token no enviado o inválido
+                  details: null
         '404':
-          description: Not Found
+          description: El usuario con ese ID no existe
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-        '409':
-          description: Conflict
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+              example:
+                error:
+                  code: USUARIO_NO_ENCONTRADO
+                  message: El usuario con ese ID no existe
+                  details: null
+
+
     delete:
       tags: [Usuarios]
       summary: Eliminar un usuario
-      description: Elimina un usuario según su identificador.
+      security:
+        - bearerAuth: []
       parameters:
         - name: id
           in: path
           required: true
-          description: Identificador del usuario.
           schema:
             type: integer
             format: int32
+            example: 4
       responses:
         '204':
-          description: No Content
-        '400':
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+          description: Usuario eliminado exitosamente (sin cuerpo)
         '401':
-          description: Unauthorized
+          description: Token no enviado o inválido
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+              example:
+                error:
+                  code: NO_AUTORIZADO
+                  message: Token no enviado o inválido
+                  details: null
         '404':
-          description: Not Found
+          description: El usuario con ese ID no existe
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-        '409':
-          description: Conflict
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+              example:
+                error:
+                  code: USUARIO_NO_ENCONTRADO
+                  message: El usuario con ese ID no existe
+                  details: null
 
-# ─── COMPONENTES REUTILIZABLES (MOLDES / ENTIDADES) ───────────────────
+
+# ─── COMPONENTES REUTILIZABLES ────────────────────────────────────────────────
 components:
+
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: >
+        Token JWT obtenido en el login. Pendiente de implementar con Spring Security.
+        Incluir en el header: Authorization: Bearer <token>
+
+
   schemas:
+
+
     Mesa:
       type: object
-      required:
-        - capacidad
-        - sector
-        - estadoMesa
       properties:
         numeroMesa:
           type: integer
           format: int32
-          example: 5
+          example: 3
         capacidad:
           type: integer
           format: int32
           example: 4
         sector:
           type: string
-          example: "Patio"
+          example: Patio
         estadoMesa:
           type: string
-          example: "LIBRE"
+          enum: [Libre, Ocupada, Reservada]
+          example: Libre
         horaDeApertura:
           type: string
           format: date-time
-          example: "2026-05-29T19:30:00Z"
+          nullable: true
+          example: "2026-06-03T19:30:00Z"
+
+
+    MesaInput:
+      type: object
+      required: [capacidad, sector, estadoMesa]
+      properties:
+        capacidad:
+          type: integer
+          format: int32
+          minimum: 1
+          example: 4
+        sector:
+          type: string
+          example: Patio
+        estadoMesa:
+          type: string
+          enum: [Libre, Ocupada, Reservada]
+          example: Libre
+
 
     Comanda:
       type: object
@@ -2040,11 +2535,11 @@ components:
         fecha:
           type: string
           format: date-time
-          example: "2026-05-29T15:30:00Z"
+          example: "2026-06-03T15:30:00Z"
         estadoComanda:
           type: string
-          enum: [ABIERTA, CERRADA, EN_PROCESO]
-          example: ABIERTA
+          enum: [Abierta, Cancelada, "En preparacion", Lista, Entregada, Cerrada]
+          example: Abierta
         mesa:
           $ref: '#/components/schemas/Mesa'
         mozos:
@@ -2052,30 +2547,18 @@ components:
           items:
             $ref: '#/components/schemas/Usuario'
 
-    ComandaRequest:
+
+    ComandaInput:
       type: object
-      required:
-        - estadoComanda
-        - mesa
+      required: [estadoComanda, mesa]
       properties:
-        numeroComanda:
-          type: integer
-          format: int32
-          readOnly: true
-        fecha:
-          type: string
-          format: date-time
-          example: "2026-05-29T15:30:00Z"
         estadoComanda:
           type: string
-          enum: [ABIERTA, CERRADA, EN_PROCESO]
-          example: ABIERTA
+          enum: [Abierta, Cancelada, "En preparacion", Lista, Entregada, Cerrada]
+          example: Abierta
         mesa:
           $ref: '#/components/schemas/Mesa'
-        mozos:
-          type: array
-          items:
-            $ref: '#/components/schemas/Usuario'
+
 
     ItemPedidoInput:
       type: object
@@ -2083,7 +2566,7 @@ components:
       properties:
         numeroComanda:
           type: integer
-          description: ID de la comanda vinculada
+          description: ID de la comanda a la que pertenece el ítem
           example: 101
         idPlato:
           type: integer
@@ -2095,8 +2578,10 @@ components:
           example: 2
         notas:
           type: string
-          description: Observaciones de cocina
-          example: "Sin cebolla y las papas fritas bien crocantes"
+          nullable: true
+          description: Observaciones opcionales para la cocina
+          example: Sin cebolla
+
 
     ItemPedidoResponse:
       type: object
@@ -2112,13 +2597,15 @@ components:
           example: 2
         notas:
           type: string
-          example: "Sin cebolla y las papas fritas bien crocantes"
+          nullable: true
+          example: Sin cebolla
         estadoItem:
           type: string
-          enum: [PENDIENTE, EN_PREPARACION, LISTO, ENTREGADO]
-          example: PENDIENTE
+          enum: [Pendiente, "En preparacion", Listo, Entregado, Cancelado]
+          example: Pendiente
 
-    EstadoUpdateInput:
+
+    EstadoItemInput:
       type: object
       required: [numeroComanda, idPlato, nuevoEstado]
       properties:
@@ -2130,13 +2617,13 @@ components:
           example: 45
         nuevoEstado:
           type: string
-          enum: [PENDIENTE, EN_PREPARACION, LISTO, ENTREGADO]
-          example: EN_PREPARACION
+          enum: [Pendiente, "En preparacion", Listo, Entregado, Cancelado]
+          example: "En preparacion"
+
 
     Categoria:
       type: object
-      required:
-        - nombre
+      required: [nombre]
       properties:
         idCategoria:
           type: integer
@@ -2144,16 +2631,12 @@ components:
           example: 1
         nombre:
           type: string
-          example: "Bebidas sin alcohol"
+          example: Principales
+
 
     Plato:
       type: object
-      required:
-        - nombre
-        - precio
-        - descripcion
-        - activo
-        - categoria
+      required: [nombre, precio, descripcion, categoria]
       properties:
         idPlato:
           type: integer
@@ -2161,27 +2644,24 @@ components:
           example: 45
         nombre:
           type: string
-          example: "Milanesa a la Napolitana con fritas"
+          example: Milanesa a la Napolitana con fritas
         precio:
           type: number
           format: double
           example: 8500.50
         descripcion:
           type: string
-          example: "Milanesa de ternera XL con salsa fileto, jamón y muzzarella."
+          example: Milanesa de ternera con salsa fileto, jamón y muzzarella
         activo:
           type: boolean
           example: true
         categoria:
           $ref: '#/components/schemas/Categoria'
 
+
     Ingrediente:
       type: object
-      required:
-        - nombre
-        - stock
-        - stockMinimo
-        - unidad
+      required: [nombre, stock, stockMinimo, unidad]
       properties:
         idIngrediente:
           type: integer
@@ -2189,7 +2669,7 @@ components:
           example: 10
         nombre:
           type: string
-          example: "Tomate Perita"
+          example: Tomate Perita
         stock:
           type: integer
           format: int32
@@ -2200,48 +2680,37 @@ components:
           example: 15
         unidad:
           type: string
-          example: "kg"
+          example: kg
 
-    RecetaId:
-      type: object
-      required:
-        - idPlato
-        - idIngrediente
-      properties:
-        idPlato:
-          type: integer
-          format: int32
-          example: 45
-        idIngrediente:
-          type: integer
-          format: int32
-          example: 10
 
     Receta:
       type: object
-      required:
-        - id
-        - plato
-        - ingrediente
-        - cantidad
+      required: [plato, ingrediente, cantidad]
       properties:
         id:
-          $ref: '#/components/schemas/RecetaId'
+          type: object
+          properties:
+            idPlato:
+              type: integer
+              format: int32
+              example: 45
+            idIngrediente:
+              type: integer
+              format: int32
+              example: 10
         plato:
           $ref: '#/components/schemas/Plato'
         ingrediente:
           $ref: '#/components/schemas/Ingrediente'
-        amount:
+        cantidad:
           type: integer
           format: int32
+          description: Cantidad del ingrediente necesaria para preparar una unidad del plato
           example: 200
+
 
     MovStock:
       type: object
-      required:
-        - cantidad
-        - ingrediente
-        - usuario
       properties:
         idMov:
           type: integer
@@ -2250,23 +2719,21 @@ components:
         fecha:
           type: string
           format: date-time
-          example: "2026-05-29T10:00:00Z"
+          example: "2026-06-03T10:00:00Z"
         cantidad:
           type: integer
           format: int32
+          description: Positivo = ingreso, Negativo = consumo o descuento
           example: -5
         ingrediente:
           $ref: '#/components/schemas/Ingrediente'
         usuario:
           $ref: '#/components/schemas/Usuario'
 
+
     Usuario:
       type: object
-      required:
-        - nombre
-        - email
-        - password
-        - rol
+      required: [nombre, email, password, rol]
       properties:
         idUsuario:
           type: integer
@@ -2274,31 +2741,64 @@ components:
           example: 4
         nombre:
           type: string
-          example: "Juan Pérez"
+          example: Juan Pérez
         email:
           type: string
           format: email
-          example: "juan.perez@restaurante.com"
+          example: juan.perez@restaurante.com
         password:
           type: string
           format: password
+          description: Se almacena hasheada — no se devuelve en GET
           example: "12345678"
         rol:
           type: string
-          example: "MOZO"
+          enum: [administrador, mozo, cocinero]
+          example: mozo
+
+
+    PaginaPlatos:
+      type: object
+      description: Respuesta paginada del endpoint GET /api/menu
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/Plato'
+        pagination:
+          type: object
+          properties:
+            page:
+              type: integer
+              example: 0
+            size:
+              type: integer
+              example: 8
+            totalElements:
+              type: integer
+              example: 24
+            totalPages:
+              type: integer
+              example: 3
+
 
     Error:
       type: object
+      description: Formato unificado de error devuelto por GlobalExceptionHandler
       properties:
         error:
           type: object
           properties:
             code:
               type: string
-              example: "RECURSO_NO_ENCONTRADO"
+              description: Identificador del error en SNAKE_UPPER_CASE
+              example: RECURSO_NO_ENCONTRADO
             message:
               type: string
-              example: El recurso solicitado no existe en el sistema.
+              description: Descripción legible del error
+              example: La mesa número 5 no existe
             details:
               type: string
-              example: "Más detalles del error acá"
+              nullable: true
+              description: Información adicional opcional
+              example: null
