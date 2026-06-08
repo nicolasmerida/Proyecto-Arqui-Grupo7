@@ -1,33 +1,23 @@
 // app/ui/menu/CourseDetail.tsx
 'use client';
 
-import { Category, Plato } from "@/app/lib/definitions";
-import { useEffect, useRef, useState } from "react";
-import { HiOutlinePlus } from "react-icons/hi";
+import { Plato } from "@/app/lib/definitions";
+import { useEffect, useRef } from "react";
+import { HiOutlineX } from "react-icons/hi";
 
 interface CourseDetailProps {
-    isVisible?: boolean;
+    isVisible: boolean;
     course: Plato;
+    notes: string;
+    onNotesChange: (notes: string) => void;
+    onAddToCommand?: () => void; // Opcional: si no se proporciona, no muestra el botón de agregar
     onClose: () => void;
-    selectionable: boolean;
-    editable: boolean;
-    addItem: (plato: Plato, notas?: string) => void;
 }
 
-const CAT_OPTIONS = Object.values(Category) as Category[];
-
-export default function CourseDetail({isVisible, course, onClose, selectionable, editable, addItem} : CourseDetailProps) {
-    const [precio, setPrecio] = useState<number>(course.precio);
-    const [descripcion, setDescripcion] = useState<string>(course.descripcion);
-    const [categoria, setCategoria] = useState<Category>(course.categoria.nombre);
-    const inputRef = useRef<HTMLInputElement>(null);
+export default function CourseDetail({ isVisible, course, notes, onNotesChange, onAddToCommand, onClose }: CourseDetailProps) {
     const modalRef = useRef<HTMLDivElement>(null);
     
     useEffect(() => {
-        if (isVisible && inputRef.current) {
-            inputRef.current.focus();
-        }
-
         const handleKeyDown = (event: KeyboardEvent) => {
             if (event.key === 'Escape') {
                 onClose();
@@ -49,11 +39,8 @@ export default function CourseDetail({isVisible, course, onClose, selectionable,
         };
     }, [isVisible, onClose]);
 
-    const backdropClasses = `
-    fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm z-40 
-    flex justify-center items-start pt-20 transition-opacity duration-300 ease-in-out
-    ${isVisible ? 'opacity-100 visible' : 'opacity-0 invisible pointer-events-none'}
-    `;
+    if (!isVisible)
+        return null;
 
     const handleOverlayClick = (e: React.MouseEvent<HTMLDivElement>) => {
         if (e.target === e.currentTarget) {
@@ -61,71 +48,89 @@ export default function CourseDetail({isVisible, course, onClose, selectionable,
         }
     };
 
+    const backdropClasses = `
+        fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm z-40 
+        flex justify-center items-center transition-opacity duration-300 ease-in-out
+    `;
+
     return (
         <div className={backdropClasses} onClick={handleOverlayClick}>
-            <div className="" ref={modalRef} onClick={(e) => e.stopPropagation()}>
-                <div className="flex flex-rox rounded-md text-white">
-                    <div className="justify-center text-lg">
-                        <strong>{course.nombre}</strong>
+            <div
+                ref={modalRef}
+                onClick={(e) => e.stopPropagation()}
+                className="bg-white rounded-lg shadow-xl w-full max-w-md p-6 max-h-[90vh] overflow-y-auto"
+            >
+                {/* Header */}
+                <div className="flex justify-between items-start mb-4">
+                    <div className="flex flex-col justify-start">
+                        <h2 className="text-2xl font-bold text-slate-900">{course.nombre}</h2>
+                        <p className="text-sm text-slate-500 mt-1">
+                            {course.categoria.nombre}
+                        </p>
                     </div>
-                    <div className="flex flex-row justify-start gap-1 text-base">
-                        <strong>Descripcion: </strong>
-                        {(editable) ?
-                            <input
-                                id="descripcion"
-                                name="descripcion"
-                                type="text"
-                                placeholder="Descripción del plato"
-                                value={descripcion}
-                                onChange={(e) => setDescripcion(e.target.value)}
-                                required
-                            /> :
-                            (course.descripcion)
-                        }
-                    </div>
-                    <div className="flex flex-row justify-start gap-1 text-base">
-                        <strong>Categoria: </strong>
-                        {(editable) ?
-                            <div className="flex gap-6 mb-6">
-                                {CAT_OPTIONS.map(cat => (
-                                    <label key={cat} className="flex items-center gap-2 text-white/80 cursor-pointer">
-                                        <input
-                                        type="radio"
-                                        name="role"
-                                        value={cat}
-                                        checked={categoria === cat}
-                                        onChange={() => setCategoria(cat)}
-                                        className="h-4 w-4 bg-white/10 border-white/30 focus:ring-white/60 transition"
-                                        required
-                                        />
-                                        <span className="text-sm capitalize">{cat}</span>
-                                    </label>
-                                ))}
-                            </div> :
-                            (course.categoria.nombre)
-                        }
-                    </div>
-                    <div className="flex flex-row justify-start gap-1 text-base">
-                        <strong>Precio: $</strong>
-                        {(editable) ?
-                            <input
-                                id="precio"
-                                name="precio"
-                                type="number"
-                                placeholder="Precio del plato"
-                                value={precio}
-                                onChange={(e) => setPrecio(Number(e.target.value))}
-                                required
-                            /> :
-                            (course.precio)
-                        }
-                    </div>
-                    {selectionable && (
-                        <button className="justify-center mt-4" onClick={() => addItem(course)}>
-                            <HiOutlinePlus />
-                        </button>
-                    )}
+                    <button
+                        onClick={onClose}
+                        className="text-slate-400 hover:text-slate-600 transition"
+                        aria-label="Cerrar"
+                    >
+                        <HiOutlineX size={24} />
+                    </button>
                 </div>
+
+                {/* Descripción */}
+                <div className="mb-4 pb-4 border-b border-slate-200">
+                    <p className="text-slate-700">{course.descripcion}</p>
+                </div>
+
+                {/* Precio */}
+                <div className="mb-6 flex items-center justify-between bg-slate-50 p-3 rounded-lg">
+                    <span className="text-slate-600 font-medium">Precio:</span>
+                    <span className="text-2xl font-bold text-slate-900">${course.precio}</span>
+                </div>
+
+                {/* Notas */}
+                {onAddToCommand && (
+                    <div className="mb-6">
+                        <label htmlFor="notas" className="block text-sm font-medium text-slate-900 mb-2">
+                            Notas de la comanda (opcional)
+                        </label>
+                        <textarea
+                            id="notas"
+                            value={notes}
+                            onChange={(e) => onNotesChange(e.target.value)}
+                            placeholder="Notas del plato para la preparación"
+                            className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent resize-none"
+                            rows={3}
+                        />
+                    </div>
+                )}
+
+                {/* Acciones */}
+                {onAddToCommand ? (
+                    <div className="flex gap-3">
+                        <button
+                            onClick={onAddToCommand}
+                            className="flex-1 px-4 py-2 bg-green-500 text-white font-medium rounded-lg hover:bg-green-600 transition"
+                        >
+                            Agregar a comanda
+                        </button>
+                        <button
+                            onClick={onClose}
+                            className="flex-1 px-4 py-2 border border-slate-300 text-slate-700 font-medium rounded-lg hover:bg-slate-50 transition"
+                        >
+                            Cancelar
+                        </button>
+                    </div>
+                ) : (
+                    <div className="flex gap-3">
+                        <button
+                            onClick={onClose}
+                            className="w-full px-4 py-2 bg-slate-600 text-white font-medium rounded-lg hover:bg-slate-700 transition"
+                        >
+                            Cerrar
+                        </button>
+                    </div>
+                )}
             </div>
         </div>
     );

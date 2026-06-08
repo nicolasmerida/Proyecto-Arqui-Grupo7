@@ -1,6 +1,5 @@
 // app/user/mozo/menu/page.tsx
 'use client';
-
 import { EstadoItem, Item_Pedido, Plato } from "@/app/lib/definitions";
 import Menu from "@/app/menu/page";
 import CommandDetail from "@/app/ui/commands/CommandDetail";
@@ -43,7 +42,7 @@ export default async function MozoMenu({ searchParams }: MozoProps) {
 
     return (
         <div className="flex flex-row"> {/* Agregar margen superior segun Userbar */}
-            <Menu searchParams={searchParams} editable={false} selectionable={true} addItem={agregarItem} />
+            <Menu searchParams={searchParams} addItem={agregarItem} />
             <CommandDetail items={itemsComanda} />
         </div>
     );

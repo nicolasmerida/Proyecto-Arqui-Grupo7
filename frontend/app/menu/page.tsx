@@ -1,8 +1,7 @@
 // app/menu/page.tsx
-import CourseInfo from "@/app/menu/course/[id]/page";
+import MenuList from "@/app/ui/menu/MenuList";
 import Pagination from "@/app/ui/menu/pagination";
 import { Plato } from "@/app/lib/definitions";
-import Link from "next/link";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -14,12 +13,10 @@ type SearchParams = {
 }
 interface MenuProps {
   searchParams?: Promise<SearchParams>;
-  editable?: boolean;
-  selectionable?: boolean;
   addItem?: (plato: Plato, notas?: string) => void;
 };
 
-export default async function Menu({ searchParams, editable=false, selectionable=false, addItem=(_plato: Plato, _notas?: string) => {} } : MenuProps) {
+export default async function Menu({ searchParams, addItem }: MenuProps) {
   const resolvedParams = await searchParams;
   const currentPage = Number(resolvedParams?.page) || 1;
   const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/menu?page=${currentPage-1}`);
@@ -53,19 +50,8 @@ export default async function Menu({ searchParams, editable=false, selectionable
       <h1 className="flex flex-1 items-center m-5">
         Bienvenido al menú de nuestro restaurante 🍽️
       </h1>
-      <div className="flex flex-row">
-        {/* Seleccionador de categoria para filtrar el menu */}
-      </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12">
-        {(items.length > 0) ?
-          items.map((item) => (
-            <div key={item.id} className="relative">
-              <Link href={`/menu/course/${item.id}`}>
-                <CourseInfo course={item} select={selectionable} edit={editable} addItem={addItem} />
-              </Link>
-            </div>
-          ))
-        : <p>No hay platos disponibles.</p>} {/* Revisar esta parte */}
+      <div className="px-5">
+        <MenuList items={items} {...(addItem && { addItem })} />
       </div>
       <div className="justify-items-center mt-6">
         <Pagination currentPage={currentPage} totalPages={totalPages} />
