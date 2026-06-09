@@ -4,6 +4,11 @@ package com.uns.sistemarestaurantebackend.service;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
+import com.uns.sistemarestaurantebackend.model.Comanda;
+import com.uns.sistemarestaurantebackend.model.Ingrediente;
+import com.uns.sistemarestaurantebackend.model.ItemPedido;
+import com.uns.sistemarestaurantebackend.model.Mesa;
+
 
 @Service
 public class WebSocketNotificacionService {
@@ -13,13 +18,26 @@ public class WebSocketNotificacionService {
     public WebSocketNotificacionService(SimpMessagingTemplate messagingTemplate) {
         this.messagingTemplate = messagingTemplate;
     }
-
-
+    
     public void notificarCambioEstadoComanda(Integer comandaId, String nuevoEstado) {
         String destino = "/topic/comandas/" + comandaId + "/estado";
         messagingTemplate.convertAndSend(destino, nuevoEstado);
     }
 
-     //TODO: revisar si esta bien implementado y definir correctamente el resto de los topics
+    public void notificarNuevoPedidoCocina(Comanda comanda) {
+        messagingTemplate.convertAndSend("/topic/cocina/nuevo-pedido", comanda);
+    }
+
+    public void notificarItemListo(ItemPedido item) {
+        messagingTemplate.convertAndSend("/topic/items/listo", item);
+    }
+
+    public void notificarCambioSalon(Mesa mesaGuardada) {
+        messagingTemplate.convertAndSend("/topic/salon/actualizacion", mesaGuardada);
+    }
+
+    public void notificarAlertaStock(Ingrediente ingrediente) {
+        messagingTemplate.convertAndSend("/topic/alertas/stock", ingrediente);
+    }
 
 }
