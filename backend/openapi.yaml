@@ -2761,7 +2761,7 @@ components:
       type: object
       description: Respuesta paginada del endpoint GET /api/menu
       properties:
-        content:
+        data:
           type: array
           items:
             $ref: '#/components/schemas/Plato'
@@ -2771,10 +2771,10 @@ components:
             page:
               type: integer
               example: 0
-            size:
+            limit:
               type: integer
               example: 8
-            totalElements:
+            total:
               type: integer
               example: 24
             totalPages:
