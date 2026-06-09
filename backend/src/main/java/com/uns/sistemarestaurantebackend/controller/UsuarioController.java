@@ -1,11 +1,14 @@
 package com.uns.sistemarestaurantebackend.controller;
 
+import com.uns.sistemarestaurantebackend.exception.RecursoNoEncontradoException;
 import com.uns.sistemarestaurantebackend.model.Usuario;
 import com.uns.sistemarestaurantebackend.service.UsuarioService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/usuarios")
@@ -43,5 +46,20 @@ public class UsuarioController {
     public ResponseEntity<Void> eliminar(@PathVariable Integer id) {
         usuarioService.eliminar(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<Usuario> login(@RequestBody Map<String, String> credentials) {
+        String email = credentials.get("email");
+        String password = credentials.get("password");
+        try {
+            Usuario usuario = usuarioService.obtenerPorEmail(email);
+            if (!usuario.getPassword().equals(password)) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            }
+            return ResponseEntity.ok(usuario);
+        } catch (RecursoNoEncontradoException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
     }
 }

@@ -16,6 +16,10 @@ public class MovStockService {
         this.movStockRepository = movStockRepository;
     }
 
+    public List<MovStock> obtenerTodos() {
+        return movStockRepository.findAll();
+    }
+
     public List<MovStock> obtenerPorIngrediente(Integer idIngrediente) {
         return movStockRepository.findByIngredienteIdIngrediente(idIngrediente);
     }

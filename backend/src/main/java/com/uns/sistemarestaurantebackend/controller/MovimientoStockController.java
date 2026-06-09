@@ -22,6 +22,11 @@ public class MovimientoStockController {
         this.gestorStockFacade = gestorStockFacade;
     }
 
+    @GetMapping
+    public ResponseEntity<List<MovStock>> obtenerTodos() {
+        return ResponseEntity.ok(movStockService.obtenerTodos());
+    }
+
     @GetMapping("/ingrediente/{idIngrediente}")
     public ResponseEntity<List<MovStock>> obtenerPorIngrediente(@PathVariable Integer idIngrediente) {
         return ResponseEntity.ok(movStockService.obtenerPorIngrediente(idIngrediente));

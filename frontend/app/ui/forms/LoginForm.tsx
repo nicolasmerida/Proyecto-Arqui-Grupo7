@@ -1,9 +1,9 @@
-// app/ui/forms/LoginForm.tsx
 'use client';
 
 import Link from 'next/link';
-import { useState } from 'react';
+import { useActionState, useState } from 'react';
 import { HiOutlineEye, HiOutlineEyeOff } from 'react-icons/hi';
+import { authenticate } from '@/app/lib/actions';
 
 const navLinkClass =
   "relative text-white text-sm transition-transform duration-300 hover:scale-105";
@@ -15,12 +15,9 @@ const underlineClass = `
 `;
 
 export function LoginForm() {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false); // Nuevo estado para mostrar/ocultar contraseña
-  //const [errorMessage, formAction, isPending] = useActionState(authenticate, undefined); Agregar funcion a invocar
+  const [state, formAction, isPending] = useActionState(authenticate, {});
+  const [showPassword, setShowPassword] = useState(false);
 
-  // Función para alternar la visibilidad de la contraseña
   const handleTogglePassword = () => {
     setShowPassword((prev) => !prev);
   };
@@ -42,9 +39,7 @@ export function LoginForm() {
             type="text"
             name="email"
             className="w-full px-4 py-2 rounded-md bg-white/20 text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-white"
-            placeholder="Ingrese su usuario"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
+            placeholder="Ingrese su email"
             required
           />
         </div>
@@ -56,14 +51,11 @@ export function LoginForm() {
           <div className="relative">
             <input
               id="password"
-              type={showPassword ? 'text' : 'password'} // Cambia el tipo según el estado `showPassword`
+              type={showPassword ? 'text' : 'password'}
               name="password"
-              className="w-full px-4 py-2 rounded-md bg-white/20 text-white placeholder-white/60
-                         focus:outline-none focus:ring-2 focus:ring-white pr-10"
+              className="w-full px-4 py-2 rounded-md bg-white/20 text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-white pr-10"
               placeholder="Ingrese su contraseña"
-              value={password}
               minLength={8}
-              onChange={(e) => setPassword(e.target.value)}
               required
             />
             <button
@@ -73,32 +65,29 @@ export function LoginForm() {
               aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
             >
               {showPassword ? (
-                <HiOutlineEyeOff className="h-5 w-5" /> // Icono de ojo cerrado
+                <HiOutlineEyeOff className="h-5 w-5" />
               ) : (
-                <HiOutlineEye className="h-5 w-5" /> // Icono de ojo abierto
+                <HiOutlineEye className="h-5 w-5" />
               )}
             </button>
           </div>
         </div>
 
-        <input type="hidden" name="redirectTo" value="/" />
-
         <button
           type="submit"
-          aria-disabled={isPending} // Deshabilita el botón mientras la acción está pendiente
-          className="mb-4 w-full py-2 bg-green/80 hover:bg-green text-white font-semibold rounded-md shadow-md transition"
+          aria-disabled={isPending}
+          className="mb-4 w-full py-2 bg-green-700/80 hover:bg-green-700 text-white font-semibold rounded-md shadow-md transition disabled:opacity-50"
         >
           {isPending ? 'Ingresando...' : 'Ingresar'}
         </button>
+
         <Link href="/user" className={`${navLinkClass} ${underlineClass}`}>
           Crear una cuenta
         </Link>
 
         <div className="flex h-8 items-end space-x-1" aria-live="polite" aria-atomic="true">
-          {(errorMessage) && (
-            <>
-              <p className="text-sm text-red-500">{errorMessage}</p>
-            </>
+          {state?.error && (
+            <p className="text-sm text-red-400">{state.error}</p>
           )}
         </div>
       </form>

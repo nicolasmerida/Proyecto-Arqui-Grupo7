@@ -1,12 +1,18 @@
 // app/ui/stock/tabñe-movements.tsx
 'use client';
 import { Mov_Stock } from "@/app/lib/definitions";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { HiOutlineArrowSmDown, HiOutlineArrowSmUp } from "react-icons/hi";
 
 export default function TableMovements() {
-    //Consultar movimientos de stock desde el backend
-    const [movements, setMovements] = useState<Mov_Stock []>([]);
+    const [movements, setMovements] = useState<Mov_Stock[]>([]);
+
+    useEffect(() => {
+        fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/movimientos-stock`)
+            .then(res => res.json())
+            .then(data => setMovements(data))
+            .catch(console.error);
+    }, []);
 
     return (
         <div className="overflow-hidden rounded-xl border">
@@ -23,27 +29,27 @@ export default function TableMovements() {
                 <tbody>
                     {(movements.length > 0) ? (
                         movements.map((mov) => { 
-                            const condEstilo = (mov.cant > 0) ?
+                            const condEstilo = (mov.cantidad > 0) ?
                                                 "text-green-600 bg-green-300" :
                                                 "text-red-600 bg-red-300";
                             
                             return (
-                                <tr key={mov.id} className="m-2">
+                                <tr key={mov.idMov} className="m-2">
                                     <td className="font-medium">
-                                        {mov.fecha.toLocaleDateString()}
+                                        {new Date(mov.fecha).toLocaleDateString()}
                                     </td>
                                     <td>
                                         <span className="font-semibold text-black">{mov.ingrediente.nombre}</span>
                                     </td>
                                     <td className={`font-medium rounded-xl border ${condEstilo}`}>
-                                        {(mov.cant > 0) ? (
+                                        {(mov.cantidad > 0) ? (
                                             <span><HiOutlineArrowSmUp /> Ingreso</span>
                                         ) : (
                                             <span><HiOutlineArrowSmDown /> Consumo</span>
                                         )}
                                     </td>
                                     <td>
-                                        <span className="font-medium">{mov.cant} {mov.ingrediente.unidad}</span>
+                                        <span className="font-medium">{mov.cantidad} {mov.ingrediente.unidad}</span>
                                     </td>
                                     <td>
                                         <span className="font-medium">{mov.usuario.rol}</span>

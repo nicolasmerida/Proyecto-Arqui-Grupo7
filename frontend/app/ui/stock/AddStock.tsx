@@ -13,13 +13,32 @@ interface AddStockProps {
 
 export default function AddStock({ show, onClose, onStockUpdate, ingredient} : AddStockProps) {
     const [newStock, setNewStock] = useState<number>(0);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
     if (!show) return null;
 
     const handleAdd = async () => {
-        //Invocar la funcion para ingresar la cantidad en newStock del ingrediente ingredient
-        onStockUpdate();//El parametro es el ingrediente con stock actualizado
-        setNewStock(0);
-        onClose();
+        if (!ingredient || newStock <= 0) return;
+        setLoading(true);
+        setError(null);
+        try {
+            const response = await fetch(
+                `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/ingredientes/${ingredient.idIngrediente}/stock?cantidad=${newStock}`,
+                { method: 'PUT' }
+            );
+            if (!response.ok) {
+                setError('Error al registrar el ingreso. Intentá de nuevo.');
+                return;
+            }
+            const updatedIng = await response.json();
+            onStockUpdate(updatedIng);
+            setNewStock(0);
+            onClose();
+        } catch {
+            setError('No se pudo conectar con el servidor.');
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
@@ -48,8 +67,13 @@ export default function AddStock({ show, onClose, onStockUpdate, ingredient} : A
                             {(ingredient?.stock ?? 0)} <HiOutlineArrowSmRight /> {(ingredient?.stock ?? 0) + newStock}
                         </span>
                     </div>
+                    {error && (
+                        <div className="text-red-500 text-sm m-1">{error}</div>
+                    )}
                     <div className="flex justify-end m-1">
-                        <button className="text-center rounded-lg" onClick={handleAdd}>Confirmar</button>
+                        <button className="text-center rounded-lg disabled:opacity-50" onClick={handleAdd} disabled={loading || newStock <= 0}>
+                            {loading ? 'Guardando...' : 'Confirmar'}
+                        </button>
                     </div>
                 </div>
             </div>

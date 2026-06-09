@@ -1,29 +1,37 @@
 // app/ui/stock/table-stock.tsx
 'use client';
 import { Ingrediente } from "@/app/lib/definitions";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { HiOutlinePlusSm } from "react-icons/hi";
 import AddStock from "@/app/ui/stock/AddStock";
+import CreateIngrediente from "@/app/ui/stock/CreateIngrediente";
 
 type Condition = "todos" | "regla" | "advertencia" | "bajo";
 
 export default function TableStock() {
-    //Consultar ingredientes al backend al inicio con useEffect
     const [ingredientes, setIngredientes] = useState<Ingrediente[]>([]);
+
+    useEffect(() => {
+        fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/ingredientes`)
+            .then(res => res.json())
+            .then(data => setIngredientes(data))
+            .catch(console.error);
+    }, []);
     const [condicion, setCondicion] = useState<Condition>("todos");
     const [showDetail, setShowDetail] = useState(false);
     const [selectedIng, setSelected] = useState<Ingrediente>();
+    const [showCreate, setShowCreate] = useState(false);
     var ingFiltrados = ingredientes.filter((ingrediente) =>
-        (condicion === "regla") ? (ingrediente.stock > ingrediente.stock_mininmo) :
-        (condicion === "bajo") ? (ingrediente.stock < ingrediente.stock_mininmo) :
-        (condicion === "advertencia") ? (ingrediente.stock === ingrediente.stock_mininmo) :
+        (condicion === "regla") ? (ingrediente.stock > ingrediente.stockMinimo) :
+        (condicion === "bajo") ? (ingrediente.stock < ingrediente.stockMinimo) :
+        (condicion === "advertencia") ? (ingrediente.stock === ingrediente.stockMinimo) :
         true //Para no filtrar y mantener todos los ingredientes
     );
 
     //Considerar el caso en que se cambie el filtro o cambien los ingredientes totales (useEffect) y testear
     const getCondicion = (ingrediente: Ingrediente): Condition => {
-        if (ingrediente.stock > ingrediente.stock_mininmo) return "regla";
-        if (ingrediente.stock < ingrediente.stock_mininmo) return "bajo";
+        if (ingrediente.stock > ingrediente.stockMinimo) return "regla";
+        if (ingrediente.stock < ingrediente.stockMinimo) return "bajo";
         return "advertencia";
     };
 
@@ -36,17 +44,25 @@ export default function TableStock() {
     //Actualizar el stock del ingrediente seleccionado
     const handleStockUpdate = (updatedIng: Ingrediente) => {
         setIngredientes((prev) =>
-            prev.map((ing) => (ing.id === updatedIng.id ? updatedIng : ing))
+            prev.map((ing) => (ing.idIngrediente === updatedIng.idIngrediente ? updatedIng : ing))
         );
     };
 
     return (
         <>
-        <div className="grid grid-cols-4 rounded-md p-2">
-            <button onClick={() => setCondicion("todos")}>Todos</button>
-            <button onClick={() => setCondicion("regla")}>En regla</button>
-            <button onClick={() => setCondicion("advertencia")}>Advertencia</button>
-            <button onClick={() => setCondicion("bajo")}>Bajo</button>
+        <div className="flex justify-between items-center mb-2">
+            <div className="grid grid-cols-4 rounded-md p-2 gap-1">
+                <button onClick={() => setCondicion("todos")}>Todos</button>
+                <button onClick={() => setCondicion("regla")}>En regla</button>
+                <button onClick={() => setCondicion("advertencia")}>Advertencia</button>
+                <button onClick={() => setCondicion("bajo")}>Bajo</button>
+            </div>
+            <button
+                onClick={() => setShowCreate(true)}
+                className="flex items-center gap-1 px-3 py-2 rounded-lg bg-black text-white text-sm"
+            >
+                <HiOutlinePlusSm /> Nuevo ingrediente
+            </button>
         </div>
         <div className="overflow-hidden rounded-xl border">
             <table className="w-full p-2">
@@ -71,7 +87,7 @@ export default function TableStock() {
                                             "text-black bg-gray-500 border-black";
 
                         return (
-                        <tr key={ingrediente.id} className="m-2">
+                        <tr key={ingrediente.idIngrediente} className="m-2">
                             <td className="font-medium">
                                 {ingrediente.nombre}
                             </td>
@@ -81,6 +97,9 @@ export default function TableStock() {
                             </td>
                             <td className={`rounded-xl border ${condEstilo}`}>
                                 {condTexto}
+                            </td>
+                            <td>
+                                <span className="font-serif">{ingrediente.stockMinimo} {ingrediente.unidad}</span>
                             </td>
                             <td>
                                 <button className="rounded-xl" onClick={() => handleAddStock(ingrediente)}>
@@ -101,6 +120,11 @@ export default function TableStock() {
             </table>
         </div>
         <AddStock show={showDetail} onClose={() => setShowDetail(false)} onStockUpdate={handleStockUpdate} ingredient={selectedIng} />
+        <CreateIngrediente
+            show={showCreate}
+            onClose={() => setShowCreate(false)}
+            onCreated={(nuevo) => setIngredientes(prev => [...prev, nuevo])}
+        />
         </>
     );
 }

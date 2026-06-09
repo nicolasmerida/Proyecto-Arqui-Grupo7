@@ -1,11 +1,13 @@
 package com.uns.sistemarestaurantebackend.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
 
 // Agrupa platos por tipo: entradas, principales, postres, bebidas (HU-04, HU-13)
 @Entity
 @Table(name = "categoria")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 @Getter
 @Setter
 @NoArgsConstructor

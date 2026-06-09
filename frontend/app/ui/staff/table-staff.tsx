@@ -1,11 +1,17 @@
 // app/ui/staff/table-staff.tsx
 'use client';
 import { EstadoUsuario, Usuario } from "@/app/lib/definitions";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function TableStaff() {
-    //Consultar staff al backend
-    const [staff, setStaff] = useState<Usuario []>([]);
+    const [staff, setStaff] = useState<Usuario[]>([]);
+
+    useEffect(() => {
+        fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/usuarios`)
+            .then(res => res.json())
+            .then(data => setStaff(data))
+            .catch(console.error);
+    }, []);
 
     const handleState = (userId: number) => {
         //Cambiar el estado del usuario
@@ -31,7 +37,7 @@ export default function TableStaff() {
                                             "text-gray-600 bg-gray-300";
 
                         return (
-                            <tr key={user.id} className="m-2">
+                            <tr key={user.idUsuario} className="m-2">
                                 <td className="text-black font-bold">
                                     {user.nombre}
                                 </td>
@@ -47,12 +53,12 @@ export default function TableStaff() {
                                 <td>
                                     {(user.estado === EstadoUsuario.Activo) ? (
                                         <button className="text-black font-semibold border rounded-lg"
-                                                /*onClick={handleState(user.id)}*/>
+                                                /*onClick={handleState(user.idUsuario)}*/>
                                                     Suspender
                                         </button>
                                     ) : (
                                         <button className="text-black font-semibold border rounded-lg"
-                                                /*onClick={handleState(user.id)}*/>
+                                                /*onClick={handleState(user.idUsuario)}*/>
                                                     Activar
                                         </button>
                                     )}

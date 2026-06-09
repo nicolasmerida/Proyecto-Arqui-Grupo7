@@ -16,7 +16,7 @@ export enum EstadoMesa {
 };
 
 export enum EstadoComanda {
-  Pendiente = "PENDIENTE",
+  Abierta = "ABIERTA",
   Preparacion = "EN_PREPARACION",
   Lista = "LISTA",
   Entregada = "ENTREGADA",
@@ -41,23 +41,28 @@ export enum Category {
 }
 
 export type Mesa = {
-  numero: number;
+  numeroMesa: number;
   capacidad: number;
   sector: string;
-  estado: EstadoMesa;
-  hora_apertura: Date | null;
+  estadoMesa: EstadoMesa;
+  horaDeApertura: string | null;
 };
 
 export type Comanda = {
-  numero_comanda: number;
-  estado: EstadoComanda;
-  fecha: Date;
-  numero_mesa: number;
-  mozo: Usuario;
+  numeroComanda: number;
+  estadoComanda: EstadoComanda;
+  fecha: string;
+  mesa: Mesa;
+  mozos: Usuario[];
+};
+
+export type Categoria = {
+  idCategoria: number;
+  nombre: Category;
 };
 
 export type Plato = {
-  id: number;
+  idPlato: number;
   nombre: string;
   precio: number;
   descripcion: string;
@@ -79,32 +84,27 @@ export type Item_Pedido = {
   plato: Plato;
 };
 
-export type Categoria = {
-  id: number;
-  nombre: Category;
-};
-
 export type Ingrediente = {
-  id: number;
+  idIngrediente: number;
   nombre: string;
   stock: number;
-  stock_mininmo: number;
+  stockMinimo: number;
   unidad: string;
 };
 
 export type Usuario = {
-  id: number;
+  idUsuario: number;
   nombre: string;
   email: string;
-  contraseña: string;
+  password: string;
   rol: Rol;
-  estado: EstadoUsuario;
+  estado?: EstadoUsuario;
 };
 
 export type Mov_Stock = {
-  id: number;
-  cant: number;
-  fecha: Date;
+  idMov: number;
+  fecha: string;
+  cantidad: number;
   ingrediente: Ingrediente;
   usuario: Usuario;
 };

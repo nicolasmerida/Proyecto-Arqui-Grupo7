@@ -12,7 +12,7 @@ public enum EstadoItem {
     CANCELADO("Cancelado");
 
     private final String valor;
-
+ 
     EstadoItem(String valor) { this.valor = valor; }
 
     public String getValor() { return valor; }

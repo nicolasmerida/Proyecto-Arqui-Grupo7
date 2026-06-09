@@ -1,5 +1,6 @@
 package com.uns.sistemarestaurantebackend.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.uns.sistemarestaurantebackend.model.enums.RolUsuario;
 import jakarta.persistence.*;
 import lombok.*;
@@ -7,6 +8,7 @@ import lombok.*;
 // Puede ser Mozo, Cocinero o Administrador
 @Entity
 @Table(name = "usuario")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 @Getter
 @Setter
 @NoArgsConstructor

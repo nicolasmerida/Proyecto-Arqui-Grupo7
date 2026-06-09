@@ -11,7 +11,7 @@ const colorByState: Record<EstadoComanda, string> = {
   [EstadoComanda.Cerrada]: "comanda-cerrada",
   [EstadoComanda.Entregada]: "comanda-entregada",
   [EstadoComanda.Lista]: "comanda-lista",
-  [EstadoComanda.Pendiente]: "comanda-pendiente",
+  [EstadoComanda.Abierta]: "comanda-pendiente",
   [EstadoComanda.Preparacion]: "comanda-preparacion",
 }
 
@@ -20,28 +20,22 @@ export default function Mozo() {
 
   // Obtiene las comandas desde el backend
   const fetchComandas = async () => {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/comandas`);
-
-    if (!response.ok) {
-    let errorMessage = `Error ${response.status} inesperado al consultar comandas`;
-    let errorCode = `ERROR_DESCONOCIDO`;
     try {
-      //Intento obtener el mensaje de error desde la API
-      const errorData = await response.json();
-      if (errorData?.error?.message) {
-        errorMessage = errorData.error.message;
-        errorCode = errorData.error.code || errorCode;
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/comandas`);
+      if (!response.ok) {
+        let errorMessage = `Error ${response.status} inesperado al consultar comandas`;
+        try {
+          const errorData = await response.json();
+          if (errorData?.error?.message) errorMessage = errorData.error.message;
+        } catch (e) {}
+        console.error(errorMessage);
+        return;
       }
+      const data = await response.json();
+      setComandas(data);
+    } catch (error) {
+      console.error('Error al obtener comandas:', error);
     }
-    catch (e) {
-      //Se mantiene el mensaje de error por defecto
-    }
-    //Lanzo el error
-    throw new Error(errorMessage, { cause: errorCode });
-  }
-
-    const data = await response.json();
-    setComandas(data);
   }
 
   // Recupera las comandas al comienzo y cada 5 segundos
@@ -70,7 +64,7 @@ export default function Mozo() {
         <div className="flex flex-col py-1">
           {
             comandas.map((comanda) => (
-              <div className={`flex flex-col border-l-4 ${colorByState[comanda.estado]}`}>
+              <div className={`flex flex-col border-l-4 ${colorByState[comanda.estadoComanda]}`}>
                 <CommandDetailCard command={comanda} />
               </div>
             ))
