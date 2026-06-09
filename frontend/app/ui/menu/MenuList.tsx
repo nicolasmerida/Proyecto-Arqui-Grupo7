@@ -57,7 +57,7 @@ export default function MenuList({ items, addItem }: MenuListProps) {
         {(filteredItems.length > 0) ? (
           filteredItems.map((item) => (
             <CourseCard
-              key={item.id}
+              key={item.idPlato}
               course={item}
               onSelect={() => setSelectedCourse(item)}
             />

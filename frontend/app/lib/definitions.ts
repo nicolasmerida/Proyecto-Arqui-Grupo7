@@ -76,12 +76,12 @@ export type Receta = {
 };
 
 export type Item_Pedido = {
-  id: number;
-  cant: number;
-  notas: string;
-  estado: EstadoItem;
-  nComanda: number;
+  id: { numeroComanda: number; idPlato: number };
+  comanda: { numeroComanda: number };
   plato: Plato;
+  cantidad: number;
+  notas: string;
+  estadoItem: EstadoItem;
 };
 
 export type Ingrediente = {
