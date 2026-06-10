@@ -10,6 +10,7 @@ export default function CommandDetail({items} : CommandDetailProps) {
 
     const handlePay = () => {
         //Enviar detalles de comanda y pago al backend
+        //Cerrar mesa
     }
 
     return(

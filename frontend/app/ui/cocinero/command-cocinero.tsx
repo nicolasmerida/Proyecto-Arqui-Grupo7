@@ -1,4 +1,4 @@
-// app/ui/Cocinero/command-car.tsx
+// app/ui/Cocinero/command-cocinero.tsx
 import { Comanda, EstadoComanda, EstadoItem, Item_Pedido } from "@/app/lib/definitions";
 import { HiOutlineArrowSmRight, HiOutlineCheck, HiOutlineClock, HiOutlineX } from "react-icons/hi";
 
@@ -7,7 +7,7 @@ type CommandProps = {
     state?: EstadoComanda;
 }
 
-export default function CommandCard({command, state} : CommandProps) {
+export default function CommandCocinero({command, state} : CommandProps) {
     const items : Item_Pedido[] = []; //Consultar items de la comanda desde el backend
 
     // Cambia el estado de un item de la comanda

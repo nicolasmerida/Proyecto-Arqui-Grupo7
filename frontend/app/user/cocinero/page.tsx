@@ -2,7 +2,7 @@
 'use client';
 
 import { Comanda, EstadoComanda } from "@/app/lib/definitions";
-import CommandCard from "@/app/ui/cocinero/command-card";
+import CommandCard from "@/app/ui/cocinero/command-cocinero";
 import { useEffect, useState } from "react";
 import { HiOutlineBell, HiOutlineCheck, HiOutlineFire } from "react-icons/hi";
 

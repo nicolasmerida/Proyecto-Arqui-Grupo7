@@ -1,8 +1,7 @@
 // app/user/mozo/page.tsx
 'use client';
-
 import { Comanda, EstadoComanda } from "@/app/lib/definitions";
-import CommandDetailCard from "@/app/ui/mozo/command-detail";
+import CommandDetailCard from "@/app/ui/mozo/command-mozo";
 import PlanoSalon from "@/app/ui/mozo/plano-salon";
 import { useEffect, useState } from "react";
 
