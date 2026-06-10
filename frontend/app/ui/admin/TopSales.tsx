@@ -1,11 +1,11 @@
 // app/ui/admin/TopSales.tsx
 'use client';
-import { Plato } from "@/app/lib/definitions";
+import { Item_Pedido, Plato } from "@/app/lib/definitions";
 import { useState } from "react";
 
 export default function TopSales() {
     //Consultar top de ventas y cantidades al backend
-    const [items, setItems] = useState<Plato[]>([]);
+    const [items, setItems] = useState<Item_Pedido[]>([]);
     const max = Math.max(...items.map(p => p.cantidad));
 
     return (
@@ -23,7 +23,7 @@ export default function TopSales() {
                             <div className="flex justify-between">
                                 <div className="gap-1">
                                     <span className="italic text-gray-400">{index+1}.</span>
-                                    <span className="text-black">{item.nombre}</span>
+                                    <span className="text-black">{item.plato.nombre}</span>
                                 </div>
                                 <span>{item.cantidad}</span>
                             </div>
