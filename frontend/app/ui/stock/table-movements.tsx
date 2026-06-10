@@ -1,12 +1,45 @@
-// app/ui/stock/tabñe-movements.tsx
+// app/ui/stock/table-movements.tsx
 'use client';
 import { Mov_Stock } from "@/app/lib/definitions";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { HiOutlineArrowSmDown, HiOutlineArrowSmUp } from "react-icons/hi";
 
 export default function TableMovements() {
-    //Consultar movimientos de stock desde el backend
     const [movements, setMovements] = useState<Mov_Stock []>([]);
+
+    //Consultar movimientos de stock al backend
+    useEffect(() => {
+        const fetchMovements = async () => {
+        try {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/movimientos-stock`)
+            if (!response.ok) {
+                let errorMessage = `Error ${response.status} inesperado al consultar movimientos de stock`;
+                let errorCode = `ERROR_DESCONOCIDO`;
+                try {
+                //Intento obtener el mensaje de error desde la API
+                const errorData = await response.json();
+                if (errorData?.error?.message) {
+                    errorMessage = errorData.error.message;
+                    errorCode = errorData.error.code || errorCode;
+                }
+                }
+                catch (e) {
+                //Se mantiene el mensaje de error por defecto
+                }
+                //Lanzo el error
+                throw new Error(errorMessage, { cause: errorCode });
+            }
+
+            const data = await response.json();
+            setMovements(data);
+        }
+        catch (error) {
+            console.error("Error al obtener los movimientos de stock:", error);
+        }
+        };
+
+        fetchMovements();
+    }, [])
 
     return (
         <div className="overflow-hidden rounded-xl border">
@@ -23,27 +56,27 @@ export default function TableMovements() {
                 <tbody>
                     {(movements.length > 0) ? (
                         movements.map((mov) => { 
-                            const condEstilo = (mov.cant > 0) ?
+                            const condEstilo = (mov.cantidad > 0) ?
                                                 "text-green-600 bg-green-300" :
                                                 "text-red-600 bg-red-300";
                             
                             return (
-                                <tr key={mov.id} className="m-2">
+                                <tr key={mov.idMov} className="m-2">
                                     <td className="font-medium">
-                                        {mov.fecha.toLocaleDateString()}
+                                        {mov.fecha}
                                     </td>
                                     <td>
                                         <span className="font-semibold text-black">{mov.ingrediente.nombre}</span>
                                     </td>
                                     <td className={`font-medium rounded-xl border ${condEstilo}`}>
-                                        {(mov.cant > 0) ? (
+                                        {(mov.cantidad > 0) ? (
                                             <span><HiOutlineArrowSmUp /> Ingreso</span>
                                         ) : (
                                             <span><HiOutlineArrowSmDown /> Consumo</span>
                                         )}
                                     </td>
                                     <td>
-                                        <span className="font-medium">{mov.cant} {mov.ingrediente.unidad}</span>
+                                        <span className="font-medium">{mov.cantidad} {mov.ingrediente.unidad}</span>
                                     </td>
                                     <td>
                                         <span className="font-medium">{mov.usuario.rol}</span>
