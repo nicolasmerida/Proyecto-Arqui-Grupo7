@@ -14,9 +14,13 @@ public class IngredienteService {
 
     // Inyección por constructor (adiós @Autowired)
     private final IngredienteRepository ingredienteRepository;
+    private final WebSocketNotificacionService wsNotifiaNotificacionService;    
 
-    public IngredienteService(IngredienteRepository ingredienteRepository) {
+    public IngredienteService(IngredienteRepository ingredienteRepository,
+                            WebSocketNotificacionService wsNotifiaNotificacionService) {
+        
         this.ingredienteRepository = ingredienteRepository;
+        this.wsNotifiaNotificacionService = wsNotifiaNotificacionService;
     }
 
     public List<Ingrediente> obtenerTodos() {
@@ -68,7 +72,8 @@ public class IngredienteService {
         // Evaluar alerta de umbral
         if (ingrediente.estaBajoMinimo()) {
             System.out.println("ALERTA: Ingrediente " + ingrediente.getNombre() + " por debajo del mínimo!");
-            // TODO: Notificar por email o WebSocket a Admin/Cocinero
+            //Notificar por WebSocket a Admin/Cocinero
+            wsNotifiaNotificacionService.notificarAlertaStock(ingrediente);
         }
 
         return ingredienteRepository.save(ingrediente);

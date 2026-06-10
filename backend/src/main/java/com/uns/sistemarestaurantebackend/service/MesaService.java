@@ -19,12 +19,17 @@ public class MesaService {
     // Inyección por constructor (Inmutable)
     private final MesaRepository mesaRepository;
     private final ComandaService comandaService;
+    private final WebSocketNotificacionService wSocketNotificacionService;
+
 
     // NOTA SOBRE DEPENDENCIA CIRCULAR:
     // Como ComandaService NO inyecta a MesaService, es 100% seguro usar inyección por constructor acá.
-    public MesaService(MesaRepository mesaRepository, ComandaService comandaService) {
+    public MesaService(MesaRepository mesaRepository, 
+                        ComandaService comandaService, 
+                        WebSocketNotificacionService wSocketNotificacionService) {
         this.mesaRepository = mesaRepository;
         this.comandaService = comandaService;
+        this.wSocketNotificacionService = wSocketNotificacionService;
     }
 
     public List<Mesa> obtenerTodas() {
@@ -69,8 +74,9 @@ public class MesaService {
         Mesa mesaGuardada = mesaRepository.save(mesa);
 
         comandaService.crearComandaParaMesa(mesaGuardada);
-        // TODO: notificarCambioSalon(mesaGuardada) via WebSocket
-
+        //notificarCambioSalon(mesaGuardada) via WebSocket
+        wSocketNotificacionService.notificarCambioSalon(mesaGuardada);
+        
         return mesaGuardada;
     }
 

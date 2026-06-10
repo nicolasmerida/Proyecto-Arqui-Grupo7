@@ -18,13 +18,16 @@ public class ItemPedidoService {
     private final ItemPedidoRepository itemPedidoRepository;
     private final RecetaService recetaService;
     private final GestorStockFacade gestorStockFacade;
+    private final WebSocketNotificacionService wsNotifiaNotificacionService;
 
     public ItemPedidoService(ItemPedidoRepository itemPedidoRepository,
                              RecetaService recetaService,
-                             GestorStockFacade gestorStockFacade) {
+                             GestorStockFacade gestorStockFacade,
+                             WebSocketNotificacionService wsNotifiaNotificacionService) {
         this.itemPedidoRepository = itemPedidoRepository;
         this.recetaService = recetaService;
         this.gestorStockFacade = gestorStockFacade;
+        this.wsNotifiaNotificacionService = wsNotifiaNotificacionService;
     }
 
     public List<ItemPedido> obtenerPorComanda(Integer numeroComanda) {
@@ -68,7 +71,12 @@ public class ItemPedidoService {
 
         item.setEstadoItem(estadoNuevo);
         ItemPedido guardado = itemPedidoRepository.save(item);
-        // TODO: notificar al mozo via WebSocket cuando el item este LISTO
+
+        //notificar al mozo via WebSocket cuando el item este LISTO
+        if (estadoNuevo == EstadoItem.LISTO) {
+            wsNotifiaNotificacionService.notificarItemListo(guardado);
+        }
+
         return guardado;
     }
 
@@ -143,7 +151,10 @@ public class ItemPedidoService {
             // Por ahora, asumimos usuario ID 1 hasta implementar Security
             gestorStockFacade.registrarMovimiento(receta.getIngrediente().getIdIngrediente(), -cantidadADescontar, 1);
         }
-        // TODO: notificar a cocina vía WebSocket de nuevo pedido pendiente
+
+        //notificar a cocina vía WebSocket de nuevo pedido pendiente
+        wsNotifiaNotificacionService.notificarNuevoPedidoCocina(itemPedido);
+
         return guardado;
     }
 }
