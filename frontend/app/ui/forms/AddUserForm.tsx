@@ -1,6 +1,5 @@
 // app/ui/forms/AddUserForm.tsx
 'use client';
-
 import { EstadoUsuario, Rol } from "@/app/lib/definitions";
 import { useActionState, useState } from "react";
 import { useSearchParams } from "next/navigation";

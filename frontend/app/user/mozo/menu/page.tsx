@@ -35,7 +35,12 @@ export default async function MozoMenu({ searchParams }: MozoProps) {
             }
             //Si el plato no esta en la comanda, agregar nuevo item a la comanda
             return [...prev, {
-                id: prev.length, cantidad: 1, notas, estado: EstadoItem.Pendiente, nComanda: numeroComanda, plato: plato
+                id: { numeroComanda, idPlato: plato.idPlato },
+                comanda: { numeroComanda },
+                plato,
+                cantidad: 1,
+                notas,
+                estadoItem: EstadoItem.Pendiente,
             }];
         })
     }

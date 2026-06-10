@@ -63,7 +63,7 @@ export default function MenuList({ items, addItem }: MenuListProps) {
             />
           ))
         ) : (
-          <p className="col-span-full text-center text-slate-500">
+          <p className="col-span-full text-center italic text-slate-500">
             No hay platos disponibles.
           </p>
         )}
