@@ -22,20 +22,20 @@ export default async function MozoMenu({ searchParams }: MozoProps) {
 
         setItemsComanda((prev) => {
             // Verificar si el plato ya está en la comanda con las mismas notas
-            const index = prev.findIndex((item) => item.nComanda === numeroComanda && item.plato.id === plato.id && item.notas.trim() === notas.trim());
+            const index = prev.findIndex((item) => item.comanda.numeroComanda === numeroComanda && item.plato.idPlato === plato.idPlato && item.notas.trim() === notas.trim());
             if (index !== -1) {   //Si el plato esta en la comanda, incrementar la cantidad
                 return prev.map((item, i) =>
                     (i === index) ?
                     {
                         ...item,
-                        cant: item.cant + 1,
+                        cantidad: item.cantidad + 1,
                     } :
                     item
                 );
             }
             //Si el plato no esta en la comanda, agregar nuevo item a la comanda
             return [...prev, {
-                id: prev.length, cant: 1, notas, estado: EstadoItem.Pendiente, nComanda: numeroComanda, plato: plato
+                id: prev.length, cantidad: 1, notas, estado: EstadoItem.Pendiente, nComanda: numeroComanda, plato: plato
             }];
         })
     }

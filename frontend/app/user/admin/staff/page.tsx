@@ -15,10 +15,6 @@ export default function Staff() {
                 <span className="font-serif font-semibold text-xl text-black">Usuarios</span>
                 <span className="text-sm text-gray-400">Personal del restuarante</span>
             </div>
-            <button className="rounded-lg text-center">
-                {/* Invocar función para registrar un nuveo usuario en el backend */}
-                Nuevo usuario
-            </button>
         </div>
         <div className="m-2">
             <TableStaff />

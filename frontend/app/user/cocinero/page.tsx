@@ -7,11 +7,11 @@ import { useEffect, useState } from "react";
 import { HiOutlineBell, HiOutlineCheck, HiOutlineFire } from "react-icons/hi";
 
 const colorByState: Record<EstadoComanda, string> = {
+  [EstadoComanda.Abierta]: "comanda-abierta",
   [EstadoComanda.Cancelada]: "comanda-cancelada",
   [EstadoComanda.Cerrada]: "comanda-cerrada",
   [EstadoComanda.Entregada]: "comanda-entregada",
   [EstadoComanda.Lista]: "comanda-lista",
-  [EstadoComanda.Pendiente]: "comanda-pendiente",
   [EstadoComanda.Preparacion]: "comanda-preparacion",
 }
 
@@ -22,20 +22,54 @@ export default function Cocinero() {
   const fetchComandas = async () => {
     const response = await fetch(`${process.env.BACKEND_URL}/api/comandas`);
 
+    if (!response.ok) {
+      let errorMessage = `Error ${response.status} inesperado al consultar las comandas`;
+      let errorCode = `ERROR_DESCONOCIDO`;
+      try {
+        //Intento obtener el mensaje de error desde la API
+        const errorData = await response.json();
+        if (errorData?.error?.message) {
+          errorMessage = errorData.error.message;
+          errorCode = errorData.error.code || errorCode;
+        }
+      }
+      catch (e) {
+        //Se mantiene el mensaje de error por defecto
+      }
+      //Lanzo el error
+      throw new Error(errorMessage, { cause: errorCode });
+    }
+
     const data = await response.json();
     setComandas(data);
   }
 
   // Cambia el estado de una comanda y actualiza las comandas
   const cambiarEstado = async (numero: number, nuevo: EstadoComanda) => {
-    await fetch(`${process.env.BACKEND_URL}/api/comandas/${numero}`, {
+    const response = await fetch(`${process.env.BACKEND_URL}/api/comandas/${numero}/estado?nuevoEstado=${nuevo}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ estado: nuevo, }),
+      }
     });
 
+    if (!response.ok) {
+      let errorMessage = `Error ${response.status} inesperado al cambiar el estado de una comanda`;
+      let errorCode = `ERROR_DESCONOCIDO`;
+      try {
+        //Intento obtener el mensaje de error desde la API
+        const errorData = await response.json();
+        if (errorData?.error?.message) {
+          errorMessage = errorData.error.message;
+          errorCode = errorData.error.code || errorCode;
+        }
+      }
+      catch (e) {
+        //Se mantiene el mensaje de error por defecto
+      }
+      //Lanzo el error
+      throw new Error(errorMessage, { cause: errorCode });
+    }
     // Actualizar comandas
     await fetchComandas();
   }
@@ -52,9 +86,9 @@ export default function Cocinero() {
   }, []);
 
   //Separo las comandas según su estado
-  const pendientes = comandas.filter((c) => c.estado === EstadoComanda.Pendiente);
-  const enPreparacion = comandas.filter((c) => c.estado === EstadoComanda.Preparacion);
-  const listos = comandas.filter((c) => c.estado === EstadoComanda.Lista);
+  const pendientes = comandas.filter((c) => c.estadoComanda === EstadoComanda.Abierta);
+  const enPreparacion = comandas.filter((c) => c.estadoComanda === EstadoComanda.Preparacion);
+  const listos = comandas.filter((c) => c.estadoComanda === EstadoComanda.Lista);
 
   return (
     <div className="flex flex-col flex-1 items-center justify-center">  {/* Agregar margen superior segun Userbar */}
@@ -64,9 +98,9 @@ export default function Cocinero() {
           <div className="flex flex-col py-1">
             {
               pendientes.map((comanda) => (
-                <div className={`flex flex-col border-y-4 ${colorByState[comanda.estado]}`}>
+                <div className={`flex flex-col border-y-4 ${colorByState[comanda.estadoComanda]}`}>
                   <CommandCard command={comanda} />
-                  <button className="rounded-md" onClick={() => cambiarEstado(comanda.numero_comanda, EstadoComanda.Preparacion)}>
+                  <button className="rounded-md" onClick={() => cambiarEstado(comanda.numeroComanda, EstadoComanda.Preparacion)}>
                     <HiOutlineFire /> Empezar a preparar
                   </button>
                 </div>
@@ -81,7 +115,7 @@ export default function Cocinero() {
               enPreparacion.map((comanda) => (
                 <div className="flex flex-col">
                   <CommandCard command={comanda} />
-                  <button className="rounded-md" onClick={() => cambiarEstado(comanda.numero_comanda, EstadoComanda.Lista)}>
+                  <button className="rounded-md" onClick={() => cambiarEstado(comanda.numeroComanda, EstadoComanda.Lista)}>
                     <HiOutlineCheck /> Todo listo
                   </button>
                 </div>
@@ -96,7 +130,7 @@ export default function Cocinero() {
               listos.map((comanda) => (
                 <div className="flex flex-col">
                   <CommandCard command={comanda} />
-                  <button className="rounded-md" onClick={() => cambiarEstado(comanda.numero_comanda, EstadoComanda.Lista)}>
+                  <button className="rounded-md" onClick={() => cambiarEstado(comanda.numeroComanda, EstadoComanda.Lista)}>
                     <HiOutlineBell /> Listo para servir
                   </button>
                 </div>

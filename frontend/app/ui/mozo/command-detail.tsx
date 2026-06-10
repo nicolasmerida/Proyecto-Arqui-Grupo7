@@ -13,10 +13,10 @@ export default function CommandMozo({command} : CommandCardProps) {
             <div className="flex justify-between content-center">
                 <div className="flex space-x-0.5">
                     <div className="text-lg text-black">
-                        Mesa N°{command.numero_mesa}
+                        Mesa N°{command.mesa.numeroMesa}
                     </div>
                     <div className="text-sm text-gray-400">
-                        #{command.numero_comanda}
+                        #{command.numeroComanda}
                     </div>
                 </div>
                 <div className="flex flex-row space-x-0.5">
@@ -26,7 +26,7 @@ export default function CommandMozo({command} : CommandCardProps) {
             </div>
             <div className="flex justify-between content-center">
                 <div className="rounded-xl">
-                    {command.estado}
+                    {command.estadoComanda}
                 </div>
                 <div className="font-bold text-black">
                     ${/* Precio total comanda */}

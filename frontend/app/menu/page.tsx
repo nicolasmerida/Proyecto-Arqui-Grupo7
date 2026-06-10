@@ -20,8 +20,6 @@ export default async function Menu({ searchParams, addItem }: MenuProps) {
   const resolvedParams = await searchParams;
   const currentPage = Number(resolvedParams?.page) || 1;
   const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/menu?page=${currentPage-1}`);
-  //const response = await fetch(`${process.env.BACKEND_URL}/api/menu?page=${currentPage-1}`);
-  //Validar llamada al backend mediante fetch
 
   if (!response.ok) {
     let errorMessage = `Error ${response.status} inesperado al consultar el menú`;
