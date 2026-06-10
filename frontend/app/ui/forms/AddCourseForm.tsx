@@ -44,7 +44,7 @@ export default function AddCourseForm({ course }: AddCourseFormProps) {
     setSaving(true);
     const categoryOption = CATEGORY_OPTIONS.find((option) => option === categoria);
     const categoriaId = categoryOption ? CATEGORY_OPTIONS.indexOf(categoryOption) + 1 : undefined;
-    //Enviar detalles de nuevo plato al backend
+    //Enviar detalles de plato creado o editado al backend
     try {
       const payload = {
         nombre: nombre.trim(),
@@ -56,10 +56,10 @@ export default function AddCourseForm({ course }: AddCourseFormProps) {
         },
       };
 
-      const endpoint = course?.id
-        ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/platos/${course.id}`
+      const endpoint = course?.idPlato
+        ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/platos/${course.idPlato}`
         : `${process.env.NEXT_PUBLIC_BACKEND_URL}/platos`;
-      const method = course?.id ? 'PUT' : 'POST';
+      const method = course?.idPlato ? 'PUT' : 'POST';
 
       const response = await fetch(endpoint, {
         method,
@@ -68,18 +68,26 @@ export default function AddCourseForm({ course }: AddCourseFormProps) {
       });
 
       if (!response.ok) {
-        let errorMessage = `Error ${response.status} inesperado al guardar el plato.`;
+        let errorMessage = `Error ${response.status} inesperado al agregar o editar un plato del menú`;
+        let errorCode = `ERROR_DESCONOCIDO`;
         try {
+          //Intento obtener el mensaje de error desde la API
           const errorData = await response.json();
-          if (errorData?.error?.message) errorMessage = errorData.error.message;
-        } catch {
-          // ignore
+          if (errorData?.error?.message) {
+            errorMessage = errorData.error.message;
+            errorCode = errorData.error.code || errorCode;
+          }
         }
-        throw new Error(errorMessage);
+        catch (e) {
+          //Se mantiene el mensaje de error por defecto
+        }
+        //Lanzo el error
+        throw new Error(errorMessage, { cause: errorCode });
       }
 
       router.push('/user/admin/menu');
-    } catch (error) {
+    }
+    catch (error) {
       console.error(error);
       alert('No se pudo guardar el plato, intente nuevamente.');
     }
@@ -97,7 +105,7 @@ export default function AddCourseForm({ course }: AddCourseFormProps) {
           <span>Volver</span>
         </button>
         <span className="text-2xl font-serif italic text-black ">
-          Completa los datos del plato para {course?.id ? 'editar plato' : 'crear un nuevo plato'}.
+          Completa los datos del plato para {course?.idPlato ? 'editar plato' : 'crear un nuevo plato'}.
         </span>
       </div>
 

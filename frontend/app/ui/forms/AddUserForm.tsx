@@ -1,7 +1,7 @@
 // app/ui/forms/AddUserForm.tsx
 'use client';
 
-import { Rol } from "@/app/lib/definitions";
+import { EstadoUsuario, Rol } from "@/app/lib/definitions";
 import { useActionState, useState } from "react";
 import { useSearchParams } from "next/navigation";
 
@@ -12,6 +12,7 @@ export function AddUserForm() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [rol, setRol] = useState<'' | Rol>('');
+    const [state, setState] = useState<EstadoUsuario>(EstadoUsuario.Activo)
 
     //const initialState: StateUser = { message: null, errors: {} };
     //const [state, formAction] = useActionState(addUser, initialState); Agregar funcion a invocar
