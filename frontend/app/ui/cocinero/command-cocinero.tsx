@@ -1,5 +1,7 @@
 // app/ui/Cocinero/command-cocinero.tsx
+'use client';
 import { Comanda, EstadoComanda, EstadoItem, Item_Pedido } from "@/app/lib/definitions";
+import { useEffect, useState } from "react";
 import { HiOutlineArrowSmRight, HiOutlineCheck, HiOutlineClock, HiOutlineX } from "react-icons/hi";
 
 type CommandProps = {
@@ -8,11 +10,12 @@ type CommandProps = {
 }
 
 export default function CommandCocinero({command, state} : CommandProps) {
-    const items : Item_Pedido[] = []; //Consultar items de la comanda desde el backend
+    const [items, setItems]= useState<Item_Pedido[]>([]); //Consultar items de la comanda desde el backend
 
     // Cambia el estado de un item de la comanda
     const cambiarEstado = async (item: Item_Pedido, nuevo: EstadoItem) => {
-        await fetch(`${process.env.BACKEND_URL}/api/items-pedido/estado=${nuevo}`, {
+        // Pensar cómo indico cuál es el item/comanda que cambia
+        await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/items-pedido/estado=${nuevo}`, {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json",
@@ -20,6 +23,41 @@ export default function CommandCocinero({command, state} : CommandProps) {
             body: JSON.stringify({ estado: nuevo, }),
         });
     }
+
+    //Consultar items de la comanda al backend
+    useEffect(() => {
+        const fetchItems = async () => {
+        try {
+            //Ajustar URL de la API
+            const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/items-pedido/comanda/${command?.numeroComanda}`)
+            if (!response.ok) {
+                let errorMessage = `Error ${response.status} inesperado al consultar items de la comanda`;
+                let errorCode = `ERROR_DESCONOCIDO`;
+                try {
+                //Intento obtener el mensaje de error desde la API
+                const errorData = await response.json();
+                if (errorData?.error?.message) {
+                    errorMessage = errorData.error.message;
+                    errorCode = errorData.error.code || errorCode;
+                }
+                }
+                catch (e) {
+                //Se mantiene el mensaje de error por defecto
+                }
+                //Lanzo el error
+                throw new Error(errorMessage, { cause: errorCode });
+            }
+
+            const data = await response.json();
+            setItems(data);
+        }
+        catch (error) {
+            console.error("Error al obtener los items de la comanda:", error);
+        }
+        };
+
+        fetchItems();
+    }, [])
 
     return(
         <div className="flex flex-col rounded-md">

@@ -1,12 +1,46 @@
 // app/ui/admin/TopSales.tsx
 'use client';
-import { Item_Pedido, Plato } from "@/app/lib/definitions";
-import { useState } from "react";
+import { Item_Pedido } from "@/app/lib/definitions";
+import { useEffect, useState } from "react";
 
 export default function TopSales() {
-    //Consultar top de ventas y cantidades al backend
-    const [items, setItems] = useState<Item_Pedido[]>([]);
-    const max = Math.max(...items.map(p => p.cantidad));
+    const [sales, setSales] = useState<Item_Pedido[]>([]);
+    const max = Math.max(...sales.map(p => p.cantidad));
+
+    //Consultar top de ventas al backend
+    useEffect(() => {
+        const fetchSales = async () => {
+        try {
+            //Ajustar URL de la API
+            const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/ventas`)
+            if (!response.ok) {
+                let errorMessage = `Error ${response.status} inesperado al consultar top de ventas`;
+                let errorCode = `ERROR_DESCONOCIDO`;
+                try {
+                //Intento obtener el mensaje de error desde la API
+                const errorData = await response.json();
+                if (errorData?.error?.message) {
+                    errorMessage = errorData.error.message;
+                    errorCode = errorData.error.code || errorCode;
+                }
+                }
+                catch (e) {
+                //Se mantiene el mensaje de error por defecto
+                }
+                //Lanzo el error
+                throw new Error(errorMessage, { cause: errorCode });
+            }
+
+            const data = await response.json();
+            setSales(data);
+        }
+        catch (error) {
+            console.error("Error al obtener el top de ventas:", error);
+        }
+        };
+
+        fetchSales();
+    }, [])
 
     return (
         <div className="flex flex-col border m-2">
@@ -15,7 +49,7 @@ export default function TopSales() {
                 <span className="text-gray-400 text-base">Top 5</span>
             </div>
             <div className="space-y-2">
-                {items.map((item, index) => {
+                {sales.map((item, index) => {
                     const porcentaje = (item.cantidad / max) * 100;
 
                     return (

@@ -7,7 +7,6 @@ import { HiOutlinePlusSm } from "react-icons/hi";
 
 export default function TableStaff() {
     const [staff, setStaff] = useState<Usuario []>([]);
-
     const [showAdd, setShowAdd] = useState<boolean>(false);
 
     //Consultar staff al backend
@@ -44,8 +43,15 @@ export default function TableStaff() {
         fetchStaff();
     }, [])
 
-    const handleAdd = (userId: number) => {
+    const handleChangeState = async (user: Usuario) => {
         //Cambiar el estado del usuario
+        await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/usuarios/${user.idUsuario}`, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ estado: (user.estado === EstadoUsuario.Activo) ? EstadoUsuario.Suspendido : EstadoUsuario.Activo, }),
+        });
         //Actualizar estado en backend?
     }
 
@@ -99,12 +105,12 @@ export default function TableStaff() {
                                 <td>
                                     {(estadoUsuario === EstadoUsuario.Activo) ? (
                                         <button className="text-black font-semibold border rounded-lg"
-                                                onClick={() => handleAdd(user.idUsuario)}>
+                                                onClick={() => handleChangeState(user)}>
                                                     Suspender
                                         </button>
                                     ) : (
                                         <button className="text-black font-semibold border rounded-lg"
-                                                onClick={() => handleAdd(user.idUsuario)}>
+                                                onClick={() => handleChangeState(user)}>
                                                     Activar
                                         </button>
                                     )}

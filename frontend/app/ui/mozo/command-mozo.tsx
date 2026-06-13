@@ -93,7 +93,7 @@ export default function CommandMozo({command} : CommandCardProps) {
                 </div>
                 <div className="flex flex-row space-x-0.5">
                     <HiOutlineClock />
-                    {/* Tiempo activa */}
+                    {/* Cómo obtener tiempo activa? */}
                 </div>
             </div>
             <div className="flex justify-between content-center">
