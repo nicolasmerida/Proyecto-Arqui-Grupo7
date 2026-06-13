@@ -19,8 +19,8 @@ export function useStompClient<T>(topic: string, onMessageReceived: (message: T)
 
   useEffect(() => {
     const client = new Client({
-      // Usamos factory con SockJS dado que el backend expone .withSockJS() en '/ws'
-      webSocketFactory: () => new SockJS(`${BACKEND_URL}/ws`),
+      // Usamos factory con SockJS dado que el backend expone .withSockJS() en '/api/ws'
+      webSocketFactory: () => new SockJS(`${BACKEND_URL}/api/ws`),
       reconnectDelay: 5000,
       onConnect: () => {
         console.log(`[STOMP] Conectado. Suscribiendo a ${topic}`);
