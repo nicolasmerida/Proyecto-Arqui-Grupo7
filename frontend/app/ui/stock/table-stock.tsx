@@ -9,7 +9,6 @@ import AddIngredient from "@/app/ui/stock/AddIngredient";
 type Condition = "todos" | "regla" | "advertencia" | "bajo";
 
 export default function TableStock() {
-    //Consultar ingredientes al backend al inicio con useEffect
     const [ingredients, setIngredients] = useState<Ingrediente[]>([]);
     const [condicion, setCondicion] = useState<Condition>("todos");
     const [showDetail, setShowDetail] = useState(false);
@@ -23,12 +22,12 @@ export default function TableStock() {
                 let errorMessage = `Error ${response.status} inesperado al consultar ingredientes`;
                 let errorCode = `ERROR_DESCONOCIDO`;
                 try {
-                //Intento obtener el mensaje de error desde la API
-                const errorData = await response.json();
-                if (errorData?.error?.message) {
-                    errorMessage = errorData.error.message;
-                    errorCode = errorData.error.code || errorCode;
-                }
+                    //Intento obtener el mensaje de error desde la API
+                    const errorData = await response.json();
+                    if (errorData?.error?.message) {
+                        errorMessage = errorData.error.message;
+                        errorCode = errorData.error.code || errorCode;
+                    }
                 }
                 catch (e) {
                 //Se mantiene el mensaje de error por defecto
@@ -39,11 +38,11 @@ export default function TableStock() {
 
             const data = await response.json();
             setIngredients(data);
-            }
-            catch (error) {
-                console.error("Error al obtener los ingredientes:", error);
-            }
-        };
+        }
+        catch (error) {
+            console.error("Error al obtener los ingredientes:", error);
+        }
+    };
     
     //Consultar ingredientes al backend
     useEffect(() => {

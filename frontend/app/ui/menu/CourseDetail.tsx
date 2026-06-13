@@ -1,6 +1,5 @@
 // app/ui/menu/CourseDetail.tsx
 'use client';
-
 import { Plato } from "@/app/lib/definitions";
 import { useEffect, useRef } from "react";
 import { HiOutlineX } from "react-icons/hi";

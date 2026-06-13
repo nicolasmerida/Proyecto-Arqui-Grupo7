@@ -1,6 +1,5 @@
 // app/user/cocinero/page.tsx
 'use client';
-
 import { Comanda, EstadoComanda } from "@/app/lib/definitions";
 import CommandCard from "@/app/ui/cocinero/command-cocinero";
 import { useEffect, useState } from "react";
@@ -20,7 +19,7 @@ export default function Cocinero() {
 
   // Obtiene las comandas desde el backend
   const fetchComandas = async () => {
-    const response = await fetch(`${process.env.BACKEND_URL}/api/comandas`);
+    const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/comandas`);
 
     if (!response.ok) {
       let errorMessage = `Error ${response.status} inesperado al consultar las comandas`;
@@ -46,7 +45,7 @@ export default function Cocinero() {
 
   // Cambia el estado de una comanda y actualiza las comandas
   const cambiarEstado = async (numero: number, nuevo: EstadoComanda) => {
-    const response = await fetch(`${process.env.BACKEND_URL}/api/comandas/${numero}/estado?nuevoEstado=${nuevo}`, {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/comandas/${numero}/estado?nuevoEstado=${nuevo}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",

@@ -47,7 +47,7 @@ export default function AddStock({ show, onClose, onStockUpdate, ingredient} : A
             onClose();
         }
         catch (error) {
-            console.error("Error al obtener el personal del restaurante:", error);
+            console.error("Error al actualizar el stock de un ingrediente:", error);
         }
     };
 

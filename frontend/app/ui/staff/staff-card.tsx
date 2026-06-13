@@ -2,6 +2,8 @@
 import { HiOutlineUserGroup } from "react-icons/hi2";
 
 export default function StaffCard() {
+    //Consultar todos los mozos
+    // A partir de ahí obtener la cantidad total y cantidad de activos
 
     return (
         <div className="flex flex-col border">

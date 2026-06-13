@@ -22,7 +22,7 @@ export default function AdminMenuList({ items }: AdminMenuListProps) {
   };
 
   const openEditCourse = (course: Plato) => {
-    router.push(`/user/admin/menu/course/${course.id}`);
+    router.push(`/user/admin/menu/course/${course.idPlato}`);
   };
 
   return (
@@ -39,7 +39,7 @@ export default function AdminMenuList({ items }: AdminMenuListProps) {
 
       <div className="grid grid-cols-2 sm:grid-cols-1 lg:grid-cols-3 gap-6">
         {filteredCourses.map((course) => (
-          <div key={course.id} className="group">
+          <div key={course.idPlato} className="group">
             <CourseCard course={course} onSelect={() => openEditCourse(course)} />
             <div className="mt-2 flex justify-end opacity-0 transition group-hover:opacity-100">
               <button

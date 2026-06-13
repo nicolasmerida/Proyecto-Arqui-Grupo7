@@ -8,7 +8,6 @@ interface CourseCardProps {
 }
 
 export default function CourseCard({ course, onSelect }: CourseCardProps) {
-  
   if (!course)
     return notFound();
 
