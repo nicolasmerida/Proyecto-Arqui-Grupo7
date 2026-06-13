@@ -3,9 +3,12 @@ import SalesChart from "@/app/ui/admin/SalesChart";
 import StatsBar from "@/app/ui/admin/StatsBar";
 import StockAlerts from "@/app/ui/admin/StockAlerts";
 import TopSales from "@/app/ui/admin/TopSales";
+import { getAlertasStock } from "@/app/lib/actions";
 
-export default function Admin() {
+export default async function Admin() {
   //Consultar ventas, mas vendidos, datos de comandas, tickets y mozos para las estadisticas y alertas de stock
+  const initialAlerts = await getAlertasStock();
+
   return (
     <div className="min-h-screen m-5">  {/* Agregar margen superior segun Userbar */}
       <main className=" p-4"> {/* Ajustar margen superior e izquierdo segun panel y barra  */}
@@ -18,7 +21,7 @@ export default function Admin() {
           </div>
         </div>
       </main>
-      <StockAlerts />
+      <StockAlerts initialAlerts={initialAlerts} />
     </div>
   );
 }
