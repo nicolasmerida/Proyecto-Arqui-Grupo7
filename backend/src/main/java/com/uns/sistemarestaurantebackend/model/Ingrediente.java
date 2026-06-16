@@ -2,6 +2,7 @@ package com.uns.sistemarestaurantebackend.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 // HU-09: ver stock / HU-10: registrar ingreso / HU-11: descuento auto / HU-12: stock minimo
 @Entity

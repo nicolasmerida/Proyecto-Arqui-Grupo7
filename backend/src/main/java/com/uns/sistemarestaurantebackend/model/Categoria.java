@@ -3,6 +3,8 @@ package com.uns.sistemarestaurantebackend.model;
 import jakarta.persistence.*;
 import lombok.*;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 // Agrupa platos por tipo: entradas, principales, postres, bebidas (HU-04, HU-13)
 @Entity
 @Table(name = "categoria")
