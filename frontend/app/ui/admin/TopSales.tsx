@@ -10,33 +10,33 @@ export default function TopSales() {
     //Consultar top de ventas al backend
     useEffect(() => {
         const fetchSales = async () => {
-        try {
-            //Ajustar URL de la API
-            const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/ventas`)
-            if (!response.ok) {
-                let errorMessage = `Error ${response.status} inesperado al consultar top de ventas`;
-                let errorCode = `ERROR_DESCONOCIDO`;
-                try {
-                //Intento obtener el mensaje de error desde la API
-                const errorData = await response.json();
-                if (errorData?.error?.message) {
-                    errorMessage = errorData.error.message;
-                    errorCode = errorData.error.code || errorCode;
+            try {
+                //Ajustar URL de la API
+                const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/items-pedido/ventas`)
+                if (!response.ok) {
+                    let errorMessage = `Error ${response.status} inesperado al consultar top de ventas`;
+                    let errorCode = `ERROR_DESCONOCIDO`;
+                    try {
+                        //Intento obtener el mensaje de error desde la API
+                        const errorData = await response.json();
+                        if (errorData?.error?.message) {
+                            errorMessage = errorData.error.message;
+                            errorCode = errorData.error.code || errorCode;
+                        }
+                    }
+                    catch (e) {
+                        //Se mantiene el mensaje de error por defecto
+                    }
+                    //Lanzo el error
+                    throw new Error(errorMessage, { cause: errorCode });
                 }
-                }
-                catch (e) {
-                //Se mantiene el mensaje de error por defecto
-                }
-                //Lanzo el error
-                throw new Error(errorMessage, { cause: errorCode });
-            }
 
-            const data = await response.json();
-            setSales(data);
-        }
-        catch (error) {
-            console.error("Error al obtener el top de ventas:", error);
-        }
+                const data = await response.json();
+                setSales(data);
+            }
+            catch (error) {
+                console.error("Error al obtener el top de ventas:", error);
+            }
         };
 
         fetchSales();
@@ -56,7 +56,7 @@ export default function TopSales() {
                         <div className="flex flex-col gap-1" key={index}>
                             <div className="flex justify-between">
                                 <div className="gap-1">
-                                    <span className="italic text-gray-400">{index+1}.</span>
+                                    <span className="italic text-gray-400">{index + 1}.</span>
                                     <span className="text-black">{item.plato.nombre}</span>
                                 </div>
                                 <span>{item.cantidad}</span>

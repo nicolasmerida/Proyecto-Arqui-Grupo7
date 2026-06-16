@@ -25,7 +25,7 @@ export function useStompClient<T>(topic: string, onMessageReceived: (message: T)
       onConnect: () => {
         console.log(`[STOMP] Conectado. Suscribiendo a ${topic}`);
         setConnected(true);
-        
+
         client.subscribe(topic, (msg: IMessage) => {
           if (msg.body) {
             const body = JSON.parse(msg.body) as T;

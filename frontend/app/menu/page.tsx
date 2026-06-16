@@ -1,12 +1,10 @@
-// app/menu/page.tsx
+'use client';
 import MenuList from "@/app/ui/menu/MenuList";
 import Pagination from "@/app/ui/menu/pagination";
 import { Plato } from "@/app/lib/definitions";
-import { Metadata } from "next";
+import { useEffect, useState, use } from "react";
 
-export const metadata: Metadata = {
-  title: 'Menú',
-};
+// metadata eliminada para permitir importación desde client components
 
 type SearchParams = {
   page?: string;
@@ -16,31 +14,41 @@ interface MenuProps {
   addItem?: (plato: Plato, notas?: string) => void;
 };
 
-export default async function Menu({ searchParams, addItem }: MenuProps) {
-  const resolvedParams = await searchParams;
-  const currentPage = Number(resolvedParams?.page) || 1;
-  const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/menu?page=${currentPage-1}`);
+export default function Menu({ searchParams, addItem }: MenuProps) {
+  const params = searchParams ? use(searchParams) : undefined;
+  const currentPage = Number(params?.page) || 1;
+  const [data, setData] = useState<{ content: Plato[], totalPages: number }>({ content: [], totalPages: 1 });
+  const [error, setError] = useState<string | null>(null);
 
-  if (!response.ok) {
-    let errorMessage = `Error ${response.status} inesperado al consultar el menú`;
-    let errorCode = `ERROR_DESCONOCIDO`;
-    try {
-      //Intento obtener el mensaje de error desde la API
-      const errorData = await response.json();
-      if (errorData?.error?.message) {
-        errorMessage = errorData.error.message;
-        errorCode = errorData.error.code || errorCode;
+  useEffect(() => {
+    const fetchMenu = async () => {
+      try {
+        const baseUrl = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8080";
+        const response = await fetch(`${baseUrl}/api/menu?page=${currentPage - 1}`);
+
+        if (!response.ok) {
+          throw new Error(`Error al consultar el menú`);
+        }
+
+        const result = await response.json();
+        setData(result);
+      } catch (err: unknown) {
+        if (err instanceof Error) {
+          setError(err.message);
+        } else {
+          setError("Ocurrió un error inesperado al cargar el menú");
+        }
       }
-    }
-    catch (e) {
-      //Se mantiene el mensaje de error por defecto
-    }
-    //Lanzo el error
-    throw new Error(errorMessage, { cause: errorCode });
+    };
+
+    fetchMenu();
+  }, [currentPage]);
+
+  if (error) {
+    return <div className="text-red-500 m-5">Error: {error}</div>;
   }
 
-  const data: { content: Plato[]; totalPages: number } = await response.json();
-  const items = data.content ?? [];  //Revisar nombre del parámetro para que coincida con backend
+  const items = data.content ?? [];
   const totalPages = data.totalPages;
 
   return (

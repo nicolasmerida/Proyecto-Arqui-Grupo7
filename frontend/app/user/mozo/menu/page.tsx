@@ -3,37 +3,39 @@
 import { EstadoItem, Item_Pedido, Plato } from "@/app/lib/definitions";
 import Menu from "@/app/menu/page";
 import CommandDetail from "@/app/ui/commands/CommandDetail";
-import { useState } from "react";
+import { useState, use } from "react";
+import { useRouter } from "next/navigation";
 
 type SearchParams = {
-  page?: string;
-  comanda?: string;
+    page?: string;
+    comanda?: string;
 };
 type MozoProps = {
-  searchParams?: Promise<SearchParams>; 
+    searchParams?: Promise<SearchParams>;
 };
 
-export default async function MozoMenu({ searchParams }: MozoProps) {
-    const numeroComanda = Number((await searchParams)?.comanda);
-    const [itemsComanda, setItemsComanda] = useState<Item_Pedido[]>([]); //Lista de platos seleccionados para la comanda actual
+export default function MozoMenu({ searchParams }: MozoProps) {
+    const params = searchParams ? use(searchParams) : undefined;
+    const numeroComanda = Number(params?.comanda);
+    const [itemsComanda, setItemsComanda] = useState<Item_Pedido[]>([]); // Lista de platos seleccionados localmente
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const router = useRouter();
 
     const agregarItem = (plato: Plato, nota?: string) => {
         const notas = nota ?? "";
 
         setItemsComanda((prev) => {
-            // Verificar si el plato ya está en la comanda con las mismas notas
             const index = prev.findIndex((item) => item.comanda.numeroComanda === numeroComanda && item.plato.idPlato === plato.idPlato && item.notas.trim() === notas.trim());
-            if (index !== -1) {   //Si el plato esta en la comanda, incrementar la cantidad
+            if (index !== -1) {
                 return prev.map((item, i) =>
                     (i === index) ?
-                    {
-                        ...item,
-                        cantidad: item.cantidad + 1,
-                    } :
-                    item
+                        {
+                            ...item,
+                            cantidad: item.cantidad + 1,
+                        } :
+                        item
                 );
             }
-            //Si el plato no esta en la comanda, agregar nuevo item a la comanda
             return [...prev, {
                 id: { numeroComanda, idPlato: plato.idPlato },
                 comanda: { numeroComanda },
@@ -43,12 +45,55 @@ export default async function MozoMenu({ searchParams }: MozoProps) {
                 estadoItem: EstadoItem.Pendiente,
             }];
         })
-    }
+    };
+
+    const handleConfirmOrder = async () => {
+        if (itemsComanda.length === 0) return;
+        setIsSubmitting(true);
+
+        try {
+            const baseUrl = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8080";
+
+            // Enviamos cada item al backend
+            const requests = itemsComanda.map(item =>
+                fetch(`${baseUrl}/api/items-pedido`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(item)
+                })
+            );
+
+            const responses = await Promise.all(requests);
+
+            const hasErrors = responses.some(res => !res.ok);
+            if (hasErrors) {
+                alert("Hubo un error al enviar algunos ítems a la cocina. Por favor, reintente.");
+                setIsSubmitting(false);
+                return;
+            }
+
+            // Éxito: volvemos al mapa del salón
+            router.push('/user/mozo');
+
+        } catch (error) {
+            console.error("Error al enviar el pedido:", error);
+            alert("Ocurrió un error al enviar el pedido.");
+            setIsSubmitting(false);
+        }
+    };
 
     return (
-        <div className="flex flex-row"> {/* Agregar margen superior segun Userbar */}
-            <Menu searchParams={searchParams} addItem={agregarItem} />
-            <CommandDetail items={itemsComanda} />
+        <div className="flex flex-row relative h-screen">
+            <div className="flex-1 overflow-y-auto">
+                <Menu searchParams={searchParams} addItem={agregarItem} />
+            </div>
+            <CommandDetail
+                items={itemsComanda}
+                onConfirm={handleConfirmOrder}
+                isSubmitting={isSubmitting}
+            />
         </div>
     );
 }

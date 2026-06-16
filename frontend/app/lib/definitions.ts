@@ -65,8 +65,8 @@ export type Plato = {
 };
 
 export type Receta = {
-  cant: number;
-  plato: Plato;
+  cantidad: number;
+  plato?: Plato;
   ingrediente: Ingrediente;
 };
 

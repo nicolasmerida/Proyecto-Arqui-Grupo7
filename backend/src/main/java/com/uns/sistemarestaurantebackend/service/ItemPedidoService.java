@@ -9,7 +9,10 @@ import com.uns.sistemarestaurantebackend.repository.ItemPedidoRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class ItemPedidoService {
@@ -36,6 +39,31 @@ public class ItemPedidoService {
 
     public List<ItemPedido> obtenerPorEstado(String estado) {
         return itemPedidoRepository.findByEstadoItem(EstadoItem.fromValor(estado));
+    }
+
+    public List<Map<String, Object>> obtenerTopVentas() {
+        List<ItemPedido> todos = itemPedidoRepository.findAll();
+        Map<Integer, Integer> ventasPorPlato = new HashMap<>();
+        Map<Integer, com.uns.sistemarestaurantebackend.model.Plato> infoPlatos = new HashMap<>();
+
+        for (ItemPedido item : todos) {
+            if (item.getEstadoItem() != EstadoItem.CANCELADO) {
+                Integer id = item.getPlato().getIdPlato();
+                ventasPorPlato.put(id, ventasPorPlato.getOrDefault(id, 0) + item.getCantidad());
+                infoPlatos.putIfAbsent(id, item.getPlato());
+            }
+        }
+
+        return ventasPorPlato.entrySet().stream()
+                .sorted((e1, e2) -> e2.getValue().compareTo(e1.getValue()))
+                .limit(5)
+                .map(e -> {
+                    Map<String, Object> map = new HashMap<>();
+                    map.put("cantidad", e.getValue());
+                    map.put("plato", infoPlatos.get(e.getKey()));
+                    return map;
+                })
+                .collect(Collectors.toList());
     }
 
     public ItemPedido guardar(ItemPedido itemPedido) {

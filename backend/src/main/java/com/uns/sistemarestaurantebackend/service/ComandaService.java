@@ -34,7 +34,7 @@ public class ComandaService {
     }
 
     public Optional<Comanda> obtenerPorMesa(Integer numeroMesa) {
-        return comandaRepository.findByMesaNumeroMesa(numeroMesa);
+        return comandaRepository.findComandaActivaByMesaNumero(numeroMesa);
     }
 
     public List<Comanda> obtenerPorEstado(String estado) {

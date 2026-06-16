@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/items-pedido")
@@ -26,6 +27,11 @@ public class ItemPedidoController {
     @GetMapping("/estado/{estado}")
     public ResponseEntity<List<ItemPedido>> obtenerPorEstado(@PathVariable String estado) {
         return ResponseEntity.ok(itemPedidoService.obtenerPorEstado(estado));
+    }
+
+    @GetMapping("/ventas")
+    public ResponseEntity<List<Map<String, Object>>> obtenerTopVentas() {
+        return ResponseEntity.ok(itemPedidoService.obtenerTopVentas());
     }
 
     @PostMapping
