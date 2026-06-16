@@ -15,6 +15,10 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
 
   return (
       <html lang="es">
+        <head>
+          <link rel="icon" href="/logo.png" />
+        </head>
+        
         <body className="flex flex-col min-h-screen">
           <Navbar />
           <main className="flex-auto">{children}</main>

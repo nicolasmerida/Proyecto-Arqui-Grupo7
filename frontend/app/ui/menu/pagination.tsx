@@ -1,5 +1,5 @@
+// app/ui/menu/pagination.tsx
 'use client';
-
 import Link from 'next/link';
 import { usePathname, useSearchParams } from 'next/navigation';
 import { HiArrowSmLeft, HiArrowSmRight } from 'react-icons/hi';
