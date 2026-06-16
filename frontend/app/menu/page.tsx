@@ -19,7 +19,6 @@ export default function Menu({ searchParams, addItem }: MenuProps) {
   const currentPage = Number(params?.page) || 1;
   const [data, setData] = useState<{ content: Plato[], totalPages: number }>({ content: [], totalPages: 1 });
   const [error, setError] = useState<string | null>(null);
-
   useEffect(() => {
     const fetchMenu = async () => {
       try {

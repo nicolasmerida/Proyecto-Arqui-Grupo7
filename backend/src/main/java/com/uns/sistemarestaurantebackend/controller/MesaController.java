@@ -1,5 +1,7 @@
 package com.uns.sistemarestaurantebackend.controller;
 
+import com.uns.sistemarestaurantebackend.dto.MesaDTO;
+import com.uns.sistemarestaurantebackend.dto.mapper.MesaMapper;
 import com.uns.sistemarestaurantebackend.model.Mesa;
 import com.uns.sistemarestaurantebackend.service.MesaService;
 import org.springframework.http.ResponseEntity;
@@ -12,46 +14,34 @@ import java.util.List;
 public class MesaController {
 
     private final MesaService mesaService;
+    private final MesaMapper mesaMapper;
 
-    // Inyección recomendada por constructor de la industria
-    public MesaController(MesaService mesaService) {
+    public MesaController(MesaService mesaService, MesaMapper mesaMapper) {
         this.mesaService = mesaService;
+        this.mesaMapper = mesaMapper;
     }
 
     @GetMapping
-    public ResponseEntity<List<Mesa>> obtenerTodas() {
-        return ResponseEntity.ok(mesaService.obtenerTodas());
+    public ResponseEntity<List<MesaDTO>> obtenerTodas() {
+        List<Mesa> mesas = mesaService.obtenerTodas();
+        return ResponseEntity.ok(mesaMapper.toDTOList(mesas));
     }
 
-    @GetMapping("/{numero}")
-    public ResponseEntity<Mesa> obtenerPorNumero(@PathVariable Integer numero) {
-        // Super limpio: si no existe, el Service tira la excepción y ataja el GlobalExceptionHandler
-        return ResponseEntity.ok(mesaService.obtenerPorNumero(numero));
-    }
-
-    @GetMapping("/estado/{estado}")
-    public ResponseEntity<List<Mesa>> obtenerPorEstado(@PathVariable String estado) {
-        return ResponseEntity.ok(mesaService.obtenerPorEstado(estado));
+    @GetMapping("/{id}")
+    public ResponseEntity<MesaDTO> obtenerPorId(@PathVariable Integer id) {
+        Mesa mesa = mesaService.obtenerPorNumero(id);
+        return ResponseEntity.ok(mesaMapper.toDTO(mesa));
     }
 
     @PostMapping
-    public ResponseEntity<Mesa> crear(@RequestBody Mesa mesa) {
-        return ResponseEntity.ok(mesaService.guardar(mesa));
+    public ResponseEntity<MesaDTO> crear(@RequestBody MesaDTO dto) {
+        Mesa guardada = mesaService.guardar(mesaMapper.toEntity(dto));
+        return ResponseEntity.ok(mesaMapper.toDTO(guardada));
     }
 
-    @PutMapping("/{numero}/abrir")
-    public ResponseEntity<Mesa> abrir(@PathVariable Integer numero, @RequestParam Integer numeroComensales) {
-        return ResponseEntity.ok(mesaService.abrirMesa(numero, numeroComensales));
-    }
-
-    @PutMapping("/{numero}/cerrar")
-    public ResponseEntity<Mesa> cerrar(@PathVariable Integer numero) {
-        return ResponseEntity.ok(mesaService.cerrarMesa(numero));
-    }
-
-    @DeleteMapping("/{numero}")
-    public ResponseEntity<Void> eliminar(@PathVariable Integer numero) {
-        mesaService.eliminar(numero);
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> eliminar(@PathVariable Integer id) {
+        mesaService.eliminar(id);
         return ResponseEntity.noContent().build();
     }
 }

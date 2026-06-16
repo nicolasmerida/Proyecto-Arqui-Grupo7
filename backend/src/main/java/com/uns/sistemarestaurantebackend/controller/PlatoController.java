@@ -1,5 +1,7 @@
 package com.uns.sistemarestaurantebackend.controller;
 
+import com.uns.sistemarestaurantebackend.dto.PlatoDTO;
+import com.uns.sistemarestaurantebackend.dto.mapper.PlatoMapper;
 import com.uns.sistemarestaurantebackend.model.Plato;
 import com.uns.sistemarestaurantebackend.service.PlatoService;
 import org.springframework.http.ResponseEntity;
@@ -12,46 +14,29 @@ import java.util.List;
 public class PlatoController {
 
     private final PlatoService platoService;
+    private final PlatoMapper platoMapper;
 
-    // Inyección por constructor
-    public PlatoController(PlatoService platoService) {
+    public PlatoController(PlatoService platoService, PlatoMapper platoMapper) {
         this.platoService = platoService;
+        this.platoMapper = platoMapper;
     }
 
     @GetMapping
-    public ResponseEntity<List<Plato>> obtenerTodos() {
-        return ResponseEntity.ok(platoService.obtenerTodos());
-    }
-
-    @GetMapping("/activos")
-    public ResponseEntity<List<Plato>> obtenerActivos() {
-        return ResponseEntity.ok(platoService.obtenerActivos());
-    }
-
-    @GetMapping("/categoria/{idCategoria}")
-    public ResponseEntity<List<Plato>> obtenerPorCategoria(@PathVariable Integer idCategoria) {
-        return ResponseEntity.ok(platoService.obtenerPorCategoria(idCategoria));
+    public ResponseEntity<List<PlatoDTO>> obtenerTodos() {
+        List<Plato> platos = platoService.obtenerTodos();
+        return ResponseEntity.ok(platoMapper.toDTOList(platos));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Plato> obtenerPorId(@PathVariable Integer id) {
-        return ResponseEntity.ok(platoService.obtenerPorId(id));
+    public ResponseEntity<PlatoDTO> obtenerPorId(@PathVariable Integer id) {
+        Plato plato = platoService.obtenerPorId(id);
+        return ResponseEntity.ok(platoMapper.toDTO(plato));
     }
 
     @PostMapping
-    public ResponseEntity<Plato> crear(@RequestBody Plato plato) {
-        return ResponseEntity.ok(platoService.guardar(plato));
-    }
-
-    @PutMapping("/{id}")
-    public ResponseEntity<Plato> actualizar(@PathVariable Integer id, @RequestBody Plato plato) {
-        // Toda la lógica pesada se fue al Service. El Controller respira.
-        return ResponseEntity.ok(platoService.actualizar(id, plato));
-    }
-
-    @PutMapping("/{id}/toggle-activo")
-    public ResponseEntity<Plato> toggleActivo(@PathVariable Integer id) {
-        return ResponseEntity.ok(platoService.toggleActivo(id));
+    public ResponseEntity<PlatoDTO> crear(@RequestBody PlatoDTO dto) {
+        Plato guardado = platoService.guardar(platoMapper.toEntity(dto));
+        return ResponseEntity.ok(platoMapper.toDTO(guardado));
     }
 
     @DeleteMapping("/{id}")
