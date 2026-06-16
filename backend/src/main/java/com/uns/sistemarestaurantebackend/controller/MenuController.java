@@ -8,7 +8,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/menu")
+@RequestMapping("/platos")
 public class MenuController {
 
     @Autowired
