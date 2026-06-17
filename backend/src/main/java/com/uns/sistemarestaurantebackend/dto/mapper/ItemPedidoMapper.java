@@ -12,6 +12,7 @@ public class ItemPedidoMapper {
         return new ItemPedidoDTO(
                 item.getId().getNumeroComanda(),
                 item.getId().getIdPlato(),
+                item.getPlato() != null ? item.getPlato().getNombre() : null,
                 item.getCantidad(),
                 item.getNotas(),
                 item.getEstadoItem()
@@ -25,6 +26,15 @@ public class ItemPedidoMapper {
         item.setCantidad(dto.getCantidad());
         item.setNotas(dto.getNotas());
         item.setEstadoItem(dto.getEstadoItem());
+        
+        com.uns.sistemarestaurantebackend.model.Plato plato = new com.uns.sistemarestaurantebackend.model.Plato();
+        plato.setIdPlato(dto.getIdPlato());
+        item.setPlato(plato);
+        
+        com.uns.sistemarestaurantebackend.model.Comanda comanda = new com.uns.sistemarestaurantebackend.model.Comanda();
+        comanda.setNumeroComanda(dto.getNumeroComanda());
+        item.setComanda(comanda);
+
         return item;
     }
 
