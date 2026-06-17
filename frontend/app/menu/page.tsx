@@ -28,7 +28,6 @@ export default function Menu({ searchParams, addItem }: MenuProps) {
         if (!response.ok) {
           throw new Error(`Error al consultar el menú`);
         }
-
         const result = await response.json();
         setData(result);
       } catch (err: unknown) {
