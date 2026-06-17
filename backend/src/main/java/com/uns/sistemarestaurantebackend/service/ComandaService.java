@@ -25,6 +25,9 @@ public class ComandaService {
     @Autowired
     private WebSocketNotificacionService wsNotifiaNotificacionService; 
 
+    @Autowired
+    private com.uns.sistemarestaurantebackend.dto.mapper.ComandaMapper comandaMapper;
+
     public List<Comanda> obtenerTodas() {
         return comandaRepository.findAll();
     }
@@ -34,7 +37,7 @@ public class ComandaService {
     }
 
     public Optional<Comanda> obtenerPorMesa(Integer numeroMesa) {
-        return comandaRepository.findByMesaNumeroMesa(numeroMesa);
+        return comandaRepository.findComandaActivaByMesaNumero(numeroMesa);
     }
 
     public List<Comanda> obtenerPorEstado(String estado) {
@@ -45,6 +48,7 @@ public class ComandaService {
         return comandaRepository.save(comanda);
     }
 
+    @org.springframework.transaction.annotation.Transactional
     public Comanda cambiarEstado(Integer id, String nuevoEstado) {
         Comanda comanda = comandaRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Comanda no encontrada"));
@@ -58,9 +62,33 @@ public class ComandaService {
 
         Comanda comandaActualizada = comandaRepository.save(comanda);
 
+        // Actualizar el estado de los items si corresponde (Casacada lógica)
+        List<ItemPedido> items = itemPedidoRepository.findByComanda(comandaActualizada);
+        boolean itemsModificados = false;
+        
+        for (ItemPedido item : items) {
+            if (item.getEstadoItem() != EstadoItem.CANCELADO) {
+                if (estadoNuevo == EstadoComanda.EN_PREPARACION && item.getEstadoItem() == EstadoItem.PENDIENTE) {
+                    item.setEstadoItem(EstadoItem.EN_PREPARACION);
+                    itemsModificados = true;
+                } else if (estadoNuevo == EstadoComanda.LISTA && item.getEstadoItem() == EstadoItem.EN_PREPARACION) {
+                    item.setEstadoItem(EstadoItem.LISTO);
+                    itemsModificados = true;
+                } else if (estadoNuevo == EstadoComanda.ENTREGADA && item.getEstadoItem() == EstadoItem.LISTO) {
+                    item.setEstadoItem(EstadoItem.ENTREGADO);
+                    itemsModificados = true;
+                }
+            }
+        }
+        
+        if (itemsModificados) {
+            itemPedidoRepository.saveAll(items);
+            // Avisar también a la cocina con el detalle actualizado para que se refresquen los items
+            wsNotifiaNotificacionService.notificarNuevoPedidoCocina(comandaMapper.toDetalleDTO(comandaActualizada, items));
+        }
 
         //Avisar que cambia de estado la comanda via ws
-        wsNotifiaNotificacionService.notificarCambioEstadoComanda(comandaActualizada);
+        wsNotifiaNotificacionService.notificarCambioEstadoComanda(comandaMapper.toResumenDTO(comandaActualizada));
 
         return comandaActualizada;
     }
@@ -87,8 +115,10 @@ public class ComandaService {
         }
 
         if (!valida) {
-            throw new IllegalStateException(
-                    "Transición de estado inválida: no se puede pasar de " + actual.name() + " a " + nuevo.name());
+            throw new com.uns.sistemarestaurantebackend.exception.NegocioException(
+                    "TRANSICION_INVALIDA",
+                    "Transición de estado inválida: no se puede pasar de " + actual.name() + " a " + nuevo.name()
+            );
         }
     }
 

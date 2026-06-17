@@ -9,7 +9,10 @@ import com.uns.sistemarestaurantebackend.repository.ItemPedidoRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class ItemPedidoService {
@@ -19,15 +22,21 @@ public class ItemPedidoService {
     private final RecetaService recetaService;
     private final GestorStockFacade gestorStockFacade;
     private final WebSocketNotificacionService wsNotifiaNotificacionService;
+    private final com.uns.sistemarestaurantebackend.dto.mapper.ComandaMapper comandaMapper;
+    private final com.uns.sistemarestaurantebackend.dto.mapper.ItemPedidoMapper itemPedidoMapper;
 
     public ItemPedidoService(ItemPedidoRepository itemPedidoRepository,
                              RecetaService recetaService,
                              GestorStockFacade gestorStockFacade,
-                             WebSocketNotificacionService wsNotifiaNotificacionService) {
+                             WebSocketNotificacionService wsNotifiaNotificacionService,
+                             com.uns.sistemarestaurantebackend.dto.mapper.ComandaMapper comandaMapper,
+                             com.uns.sistemarestaurantebackend.dto.mapper.ItemPedidoMapper itemPedidoMapper) {
         this.itemPedidoRepository = itemPedidoRepository;
         this.recetaService = recetaService;
         this.gestorStockFacade = gestorStockFacade;
         this.wsNotifiaNotificacionService = wsNotifiaNotificacionService;
+        this.comandaMapper = comandaMapper;
+        this.itemPedidoMapper = itemPedidoMapper;
     }
 
     public List<ItemPedido> obtenerPorComanda(Integer numeroComanda) {
@@ -36,6 +45,35 @@ public class ItemPedidoService {
 
     public List<ItemPedido> obtenerPorEstado(String estado) {
         return itemPedidoRepository.findByEstadoItem(EstadoItem.fromValor(estado));
+    }
+
+    public List<Map<String, Object>> obtenerTopVentas() {
+        List<ItemPedido> todos = itemPedidoRepository.findAll();
+        Map<Integer, Integer> ventasPorPlato = new HashMap<>();
+        Map<Integer, com.uns.sistemarestaurantebackend.model.Plato> infoPlatos = new HashMap<>();
+
+        for (ItemPedido item : todos) {
+            if (item.getEstadoItem() != EstadoItem.CANCELADO) {
+                Integer id = item.getPlato().getIdPlato();
+                ventasPorPlato.put(id, ventasPorPlato.getOrDefault(id, 0) + item.getCantidad());
+                infoPlatos.putIfAbsent(id, item.getPlato());
+            }
+        }
+
+        return ventasPorPlato.entrySet().stream()
+                .sorted((e1, e2) -> e2.getValue().compareTo(e1.getValue()))
+                .limit(5)
+                .map(e -> {
+                    Map<String, Object> map = new HashMap<>();
+                    map.put("cantidad", e.getValue());
+                    com.uns.sistemarestaurantebackend.model.Plato p = infoPlatos.get(e.getKey());
+                    Map<String, Object> platoReducido = new HashMap<>();
+                    platoReducido.put("idPlato", p.getIdPlato());
+                    platoReducido.put("nombre", p.getNombre());
+                    map.put("plato", platoReducido);
+                    return map;
+                })
+                .collect(Collectors.toList());
     }
 
     public ItemPedido guardar(ItemPedido itemPedido) {
@@ -63,7 +101,7 @@ public class ItemPedidoService {
             for (Receta receta : recetas) {
                 int cantidadADevolver = receta.getCantidad() * item.getCantidad();
                 // cantidad positiva = sumar al stock (inverso de agregarItemAComanda)
-                // TODO: con Spring Security, reemplazar el 1 por el ID del usuario autenticado
+                // TODO: Sistema de Login (Spring Security) - Reemplazar el 1 hardcodeado por el ID del usuario autenticado
                 gestorStockFacade.registrarMovimiento(
                         receta.getIngrediente().getIdIngrediente(), cantidadADevolver, 1);
             }
@@ -74,8 +112,12 @@ public class ItemPedidoService {
 
         //notificar al mozo via WebSocket cuando el item este LISTO
         if (estadoNuevo == EstadoItem.LISTO) {
-            wsNotifiaNotificacionService.notificarItemListo(guardado);
+            wsNotifiaNotificacionService.notificarItemListo(itemPedidoMapper.toDTO(guardado));
         }
+
+        // Notificar a cocina del cambio de estado para que React recargue la tarjeta automáticamente
+        List<ItemPedido> items = itemPedidoRepository.findByComandaNumeroComanda(guardado.getComanda().getNumeroComanda());
+        wsNotifiaNotificacionService.notificarNuevoPedidoCocina(comandaMapper.toDetalleDTO(guardado.getComanda(), items));
 
         return guardado;
     }
@@ -148,12 +190,13 @@ public class ItemPedidoService {
             int cantidadADescontar = receta.getCantidad() * guardado.getCantidad();
 
             // enviamos la cantidad en negativo para que registrarMovimiento realice la resta
-            // Por ahora, asumimos usuario ID 1 hasta implementar Security
+            // TODO: Sistema de Login (Spring Security) - Reemplazar el 1 hardcodeado por el ID del usuario autenticado
             gestorStockFacade.registrarMovimiento(receta.getIngrediente().getIdIngrediente(), -cantidadADescontar, 1);
         }
 
         //notificar a cocina vía WebSocket de nuevo pedido pendiente
-        wsNotifiaNotificacionService.notificarNuevoPedidoCocina(itemPedido);
+        List<ItemPedido> items = itemPedidoRepository.findByComandaNumeroComanda(guardado.getComanda().getNumeroComanda());
+        wsNotifiaNotificacionService.notificarNuevoPedidoCocina(comandaMapper.toDetalleDTO(guardado.getComanda(), items));
 
         return guardado;
     }

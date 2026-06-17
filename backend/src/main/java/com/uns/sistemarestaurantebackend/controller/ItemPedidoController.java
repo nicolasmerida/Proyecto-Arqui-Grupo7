@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/items-pedido")
@@ -34,19 +35,25 @@ public class ItemPedidoController {
         return ResponseEntity.ok(items.stream().map(itemPedidoMapper::toDTO).toList());
     }
 
+    @GetMapping("/ventas")
+    public ResponseEntity<List<Map<String, Object>>> obtenerTopVentas() {
+        return ResponseEntity.ok(itemPedidoService.obtenerTopVentas());
+    }
+
     @PostMapping
     public ResponseEntity<ItemPedidoDTO> guardar(@RequestBody ItemPedidoDTO dto) {
         ItemPedido item = itemPedidoMapper.toEntity(dto);
-        ItemPedido guardado = itemPedidoService.guardar(item);
+        ItemPedido guardado = itemPedidoService.agregarItemAComanda(item);
         return ResponseEntity.ok(itemPedidoMapper.toDTO(guardado));
     }
 
-    @PutMapping("/estado")
-    public ResponseEntity<ItemPedidoDTO> cambiarEstado(@RequestParam Integer numeroComanda,
-                                                       @RequestParam Integer idPlato,
-                                                       @RequestParam String nuevoEstado) {
+    @PutMapping("/{numeroComanda}/{idPlato}/estado")
+    public ResponseEntity<ItemPedidoDTO> cambiarEstado(
+            @PathVariable Integer numeroComanda,
+            @PathVariable Integer idPlato,
+            @RequestBody com.uns.sistemarestaurantebackend.dto.ItemEstadoInputDTO input) {
         ItemPedidoId id = new ItemPedidoId(numeroComanda, idPlato);
-        ItemPedido actualizado = itemPedidoService.cambiarEstado(id, nuevoEstado);
+        ItemPedido actualizado = itemPedidoService.cambiarEstado(id, input.getNuevoEstado());
         return ResponseEntity.ok(itemPedidoMapper.toDTO(actualizado));
     }
 

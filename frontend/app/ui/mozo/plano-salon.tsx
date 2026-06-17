@@ -2,26 +2,28 @@
 'use client';
 import { EstadoMesa, Mesa } from "@/app/lib/definitions";
 import AddDiner from "@/app/ui/forms/AddDiners";
-import { useEffect, useState, type FormEvent } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { GiTable } from "react-icons/gi";
+import { useStompClient } from "@/app/lib/hooks/useStompClient";
 
-enum VISTA {"todas", "libres", "ocupadas"};
+enum VISTA { "todas", "libres", "ocupadas" };
 
 export default function PlanoSalon() {
-    const [mesas, setMesas] = useState<Mesa []>([]);
+    const [mesas, setMesas] = useState<Mesa[]>([]);
     const [vista, setVista] = useState<VISTA>(VISTA.todas);
     const [mesaSeleccionada, setMesaSeleccionada] = useState<Mesa | null>(null);
     const [comensales, setComensales] = useState<number>(1);
     const [cargando, setCargando] = useState(false);
     const [modalVisible, setModalVisible] = useState(false);
     const router = useRouter();
-    
+
     //Consultar mesas al backend
     const fetchMesas = async () => {
         try {
-            const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/mesas`);
-            
+            const baseUrl = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8080";
+            const response = await fetch(`${baseUrl}/api/mesas`);
+
             if (!response.ok) {
                 let errorMessage = `Error ${response.status} inesperado al consultar mesas`;
                 let errorCode = `ERROR_DESCONOCIDO`;
@@ -59,11 +61,16 @@ export default function PlanoSalon() {
         setCargando(true);
 
         try {
-            const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/mesas/${mesa.numeroMesa}/abrir?numeroComensales=${numeroComensales}`, {
+            const baseUrl = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8080";
+            const response = await fetch(`${baseUrl}/api/mesas/${mesa.numeroMesa}/estado`, {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",
                 },
+                body: JSON.stringify({
+                    estadoMesa: "Ocupada",
+                    numeroComensales: numeroComensales
+                })
             });
 
             if (!response.ok) {
@@ -86,7 +93,7 @@ export default function PlanoSalon() {
 
             await response.json();
             //Obtengo la comanda para la mesa seleccionada
-            const responseComanda = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/comandas/mesa/${mesa.numeroMesa}`);
+            const responseComanda = await fetch(`${baseUrl}/api/comandas/mesa/${mesa.numeroMesa}`);
 
             if (!responseComanda.ok) {
                 throw new Error(`No se pudo obtener la comanda de la mesa ${mesa.numeroMesa}`);
@@ -109,8 +116,17 @@ export default function PlanoSalon() {
         setMesaSeleccionada(null);
     };
 
+    // Suscripción WebSocket para actualizar mesas en tiempo real
+    const onMesaUpdate = useCallback((mesaActualizada: Mesa) => {
+        setMesas(prev => prev.map(m =>
+            m.numeroMesa === mesaActualizada.numeroMesa ? mesaActualizada : m
+        ));
+    }, []);
+
+    useStompClient<Mesa>('/topic/mesa', onMesaUpdate);
+
     useEffect(() => {
-        fetchMesas();        
+        fetchMesas();
     }, []);
 
     const ocupadas = mesas.filter(mesa => mesa.estadoMesa === EstadoMesa.Ocupada);
@@ -127,16 +143,16 @@ export default function PlanoSalon() {
                 </div>
                 <div className="grid grid-cols-5 items-center p-1 gap-1">
                     <button className={`border rounded-lg transition ${vista === VISTA.todas ? "text-black bg-amber-200" : "text-slate-400"}`}
-                            onClick={() => setVista(VISTA.todas)}>
-                                Todas
+                        onClick={() => setVista(VISTA.todas)}>
+                        Todas
                     </button>
                     <button className={`border rounded-lg transition ${vista === VISTA.libres ? "text-black bg-amber-200" : "text-slate-400"}`}
-                            onClick={() => setVista(VISTA.libres)}>
-                                Libres
+                        onClick={() => setVista(VISTA.libres)}>
+                        Libres
                     </button>
                     <button className={`border rounded-lg transition ${vista === VISTA.ocupadas ? "text-black bg-amber-200" : "text-slate-400"}`}
-                            onClick={() => setVista(VISTA.ocupadas)}>
-                                Ocupadas
+                        onClick={() => setVista(VISTA.ocupadas)}>
+                        Ocupadas
                     </button>
                 </div>
             </div>
@@ -146,9 +162,9 @@ export default function PlanoSalon() {
                         mesas.filter(mesa => mesa.estadoMesa === EstadoMesa.Libre)
                             .map((mesa, index) => (
                                 <button key={index} className="border rounded-lg p-2 bg-green-300 border-green-500"
-                                        onClick={() => handleMesaLibre(mesa)}
-                                        disabled={cargando}
-                            >
+                                    onClick={() => handleMesaLibre(mesa)}
+                                    disabled={cargando}
+                                >
                                     <div className="flex flex-col justify-center items-center text-green-500">
                                         <GiTable />
                                         <span className="text-xl font-serif">{mesa.numeroMesa}</span>

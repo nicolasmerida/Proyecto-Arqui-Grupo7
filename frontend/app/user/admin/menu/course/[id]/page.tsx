@@ -13,7 +13,13 @@ interface CourseEditPageProps {
 }
 
 async function fetchCourse(id: string): Promise<Plato> {
-  const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/platos/${id}`);
+  const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/platos/${id}`, { cache: 'no-store' });
+
+  //Si no se encuentra el plato elegido
+  if (response.status === 404) {
+    notFound();
+  }
+
   if (!response.ok) {
     let errorMessage = `Error ${response.status} inesperado al consultar un plato del menú`;
     let errorCode = `ERROR_DESCONOCIDO`;
@@ -30,11 +36,6 @@ async function fetchCourse(id: string): Promise<Plato> {
     }
     //Lanzo el error
     throw new Error(errorMessage, { cause: errorCode });
-  }
-
-  //Si no se encuentra el plato elegido
-  if (response.status === 404) {
-    notFound();
   }
 
   return response.json();

@@ -54,6 +54,7 @@ public class IngredienteController {
     @PutMapping("/{id}/stock")
     public ResponseEntity<IngredienteDTO> actualizarStock(@PathVariable Integer id,
                                                           @RequestParam Integer cantidad) {
+        // TODO: Sistema de Login (Spring Security) - Reemplazar el 1 hardcodeado por el ID del usuario autenticado
         Ingrediente actualizado = gestorStockFacade.registrarMovimiento(id, cantidad, 1);
         return ResponseEntity.ok(ingredienteMapper.toDTO(actualizado));
     }

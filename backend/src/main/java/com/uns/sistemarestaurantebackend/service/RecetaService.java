@@ -22,6 +22,13 @@ public class RecetaService {
     }
 
     public Receta guardar(Receta receta) {
+        // Inicializar el ID compuesto automáticamente para evitar que Jackson/Hibernate fallen
+        if (receta.getId() == null && receta.getPlato() != null && receta.getIngrediente() != null) {
+            receta.setId(new Receta.RecetaId(
+                    receta.getPlato().getIdPlato(),
+                    receta.getIngrediente().getIdIngrediente()
+            ));
+        }
         return recetaRepository.save(receta);
     }
 

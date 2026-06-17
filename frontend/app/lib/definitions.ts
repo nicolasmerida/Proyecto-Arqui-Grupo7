@@ -47,12 +47,19 @@ export type Mesa = {
   horaApertura: string | null;
 };
 
-export type Comanda = {
+export type ComandaResumen = {
   numeroComanda: number;
   estadoComanda: EstadoComanda;
   fecha: string;
   mesa: Mesa;
-  mozo: Usuario;
+};
+
+export type ComandaDetalle = {
+  numeroComanda: number;
+  estadoComanda: EstadoComanda;
+  fecha: string;
+  mesa: Mesa;
+  items: Item_Pedido[];
 };
 
 export type Plato = {
@@ -65,18 +72,19 @@ export type Plato = {
 };
 
 export type Receta = {
-  cant: number;
-  plato: Plato;
+  cantidad: number;
+  plato?: Plato;
   ingrediente: Ingrediente;
 };
 
 export type Item_Pedido = {
-  id: { numeroComanda: number; idPlato: number };
-  comanda: { numeroComanda: number };
-  plato: Plato;
+  numeroComanda: number;
+  idPlato: number;
+  nombrePlato: string;
   cantidad: number;
   notas: string;
   estadoItem: EstadoItem;
+  precio?: number; // Usado solo en el frontend para el carrito
 };
 
 export type Categoria = {
@@ -103,8 +111,9 @@ export type Usuario = {
 
 export type Mov_Stock = {
   idMov: number;
+  nombreIngrediente: string;
+  unidadIngrediente: string;
+  nombreUsuario: string;
   cantidad: number;
   fecha: string;
-  ingrediente: Ingrediente;
-  usuario: Usuario;
 };

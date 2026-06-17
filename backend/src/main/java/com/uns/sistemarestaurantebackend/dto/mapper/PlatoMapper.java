@@ -2,12 +2,19 @@ package com.uns.sistemarestaurantebackend.dto.mapper;
 
 import com.uns.sistemarestaurantebackend.dto.PlatoDTO;
 import com.uns.sistemarestaurantebackend.model.Plato;
+import com.uns.sistemarestaurantebackend.repository.CategoriaRepository;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 
 @Component
 public class PlatoMapper {
+
+    private final CategoriaRepository categoriaRepository;
+
+    public PlatoMapper(CategoriaRepository categoriaRepository) {
+        this.categoriaRepository = categoriaRepository;
+    }
 
     public PlatoDTO toDTO(Plato plato) {
         return new PlatoDTO(
@@ -19,8 +26,6 @@ public class PlatoMapper {
                 plato.getActivo()
         );
     }
-
-    //TODO: Versión correcta si querés mapear la categoría. Necesitás buscar la Categoria desde un service o repository, no desde el mapper solo
     
      public Plato toEntity(PlatoDTO dto) {
         Plato plato = new Plato();
@@ -29,6 +34,14 @@ public class PlatoMapper {
         plato.setPrecio(dto.getPrecio());
         plato.setDescripcion(dto.getDescripcion());
         plato.setActivo(dto.getActivo());
+        
+        if (dto.getCategoria() != null) {
+            categoriaRepository.findAll().stream()
+                .filter(c -> c.getNombre().equalsIgnoreCase(dto.getCategoria()))
+                .findFirst()
+                .ifPresent(plato::setCategoria);
+        }
+        
         return plato;
     }
 

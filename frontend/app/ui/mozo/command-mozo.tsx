@@ -1,15 +1,15 @@
 // app/ui/commands/command-mozo.tsx
 'use client';
-import { Comanda, Item_Pedido } from "@/app/lib/definitions";
+import { ComandaResumen, Item_Pedido } from "@/app/lib/definitions";
 import { useEffect, useState } from "react";
 import { HiOutlineClock } from "react-icons/hi";
 
 interface CommandCardProps {
-    command: Comanda;
+    command: ComandaResumen;
 }
 
-export default function CommandMozo({command} : CommandCardProps) {
-    const [items, setItems] = useState<Item_Pedido []>([]);
+export default function CommandMozo({ command }: CommandCardProps) {
+    const [items, setItems] = useState<Item_Pedido[]>([]);
     const [total, setTotal] = useState<number>(0);
 
 
@@ -17,7 +17,7 @@ export default function CommandMozo({command} : CommandCardProps) {
     const fetchItems = async () => {
         try {
             const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/items-pedido/comanda/${command.numeroComanda}`);
-            
+
             if (!response.ok) {
                 let errorMessage = `Error ${response.status} inesperado al consultar items de la comanda`;
                 let errorCode = `ERROR_DESCONOCIDO`;
@@ -48,7 +48,7 @@ export default function CommandMozo({command} : CommandCardProps) {
     const fetchTotal = async () => {
         try {
             const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/comandas/${command.numeroComanda}/total`);
-            
+
             if (!response.ok) {
                 let errorMessage = `Error ${response.status} inesperado al obtener importe total de la comanda`;
                 let errorCode = `ERROR_DESCONOCIDO`;
@@ -76,8 +76,8 @@ export default function CommandMozo({command} : CommandCardProps) {
     };
 
     useEffect(() => {
-        fetchItems();  
-        fetchTotal();      
+        fetchItems();
+        fetchTotal();
     }, []);
 
     return (
@@ -85,7 +85,7 @@ export default function CommandMozo({command} : CommandCardProps) {
             <div className="flex justify-between content-center">
                 <div className="flex space-x-0.5">
                     <div className="text-lg text-black">
-                        Mesa N°{command.mesa.numeroMesa}
+                        Mesa N°{command.mesa?.numeroMesa || '?'}
                     </div>
                     <div className="text-sm text-gray-400">
                         #{command.numeroComanda}
@@ -105,7 +105,7 @@ export default function CommandMozo({command} : CommandCardProps) {
                 </div>
             </div>
             <div className="text-sm text-gray-400 justify-items-start">
-                {items.length} • {command.mozo.nombre}
+                {items.length} items
             </div>
         </div>
     );

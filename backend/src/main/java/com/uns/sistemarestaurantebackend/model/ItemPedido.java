@@ -1,5 +1,6 @@
 package com.uns.sistemarestaurantebackend.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.uns.sistemarestaurantebackend.model.enums.EstadoItem;
 import jakarta.persistence.*;
 import lombok.*;

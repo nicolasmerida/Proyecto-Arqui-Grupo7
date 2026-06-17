@@ -38,7 +38,6 @@ public class Plato {
     @Builder.Default
     private Boolean activo = true;
 
-    // CORRECCION: faltaba FetchType.LAZY y nullable=false en @JoinColumn
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_categoria", nullable = false)
     private Categoria categoria;
