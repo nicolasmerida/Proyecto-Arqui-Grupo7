@@ -53,8 +53,8 @@ export default function StatsBar() {
 
     if (!stats)
         return (
-            <div>
-                Cargando estadísticas...
+            <div className="flex-col gap-4 w-full flex items-center justify-center">
+                <span className="text-sm text-gray-400 animate-pulse">Cargando estadísticas...</span>
             </div>
         );
 
