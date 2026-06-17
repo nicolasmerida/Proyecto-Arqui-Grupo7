@@ -20,16 +20,19 @@ public class MesaService {
     private final MesaRepository mesaRepository;
     private final ComandaService comandaService;
     private final WebSocketNotificacionService wSocketNotificacionService;
+    private final com.uns.sistemarestaurantebackend.dto.mapper.MesaMapper mesaMapper;
 
 
     // NOTA SOBRE DEPENDENCIA CIRCULAR:
     // Como ComandaService NO inyecta a MesaService, es 100% seguro usar inyección por constructor acá.
     public MesaService(MesaRepository mesaRepository, 
                         ComandaService comandaService, 
-                        WebSocketNotificacionService wSocketNotificacionService) {
+                        WebSocketNotificacionService wSocketNotificacionService,
+                        com.uns.sistemarestaurantebackend.dto.mapper.MesaMapper mesaMapper) {
         this.mesaRepository = mesaRepository;
         this.comandaService = comandaService;
         this.wSocketNotificacionService = wSocketNotificacionService;
+        this.mesaMapper = mesaMapper;
     }
 
     public List<Mesa> obtenerTodas() {
@@ -75,7 +78,7 @@ public class MesaService {
 
         comandaService.crearComandaParaMesa(mesaGuardada);
         //notificarCambioSalon(mesaGuardada) via WebSocket
-        wSocketNotificacionService.notificarCambioSalon(mesaGuardada);
+        wSocketNotificacionService.notificarCambioSalon(mesaMapper.toDTO(mesaGuardada));
         
         return mesaGuardada;
     }

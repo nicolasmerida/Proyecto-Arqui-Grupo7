@@ -25,6 +25,9 @@ public class ComandaService {
     @Autowired
     private WebSocketNotificacionService wsNotifiaNotificacionService; 
 
+    @Autowired
+    private com.uns.sistemarestaurantebackend.dto.mapper.ComandaMapper comandaMapper;
+
     public List<Comanda> obtenerTodas() {
         return comandaRepository.findAll();
     }
@@ -60,7 +63,7 @@ public class ComandaService {
 
 
         //Avisar que cambia de estado la comanda via ws
-        wsNotifiaNotificacionService.notificarCambioEstadoComanda(comandaActualizada);
+        wsNotifiaNotificacionService.notificarCambioEstadoComanda(comandaMapper.toResumenDTO(comandaActualizada));
 
         return comandaActualizada;
     }

@@ -73,7 +73,14 @@ public class IngredienteService {
         if (ingrediente.estaBajoMinimo()) {
             System.out.println("ALERTA: Ingrediente " + ingrediente.getNombre() + " por debajo del mínimo!");
             //Notificar por WebSocket a Admin/Cocinero
-            wsNotifiaNotificacionService.notificarAlertaStock(ingrediente);
+            wsNotifiaNotificacionService.notificarAlertaStock(
+                new com.uns.sistemarestaurantebackend.dto.IngredienteAlertaDTO(
+                    ingrediente.getIdIngrediente(),
+                    ingrediente.getNombre(),
+                    ingrediente.getStock(),
+                    ingrediente.getStockMinimo()
+                )
+            );
         }
 
         return ingredienteRepository.save(ingrediente);

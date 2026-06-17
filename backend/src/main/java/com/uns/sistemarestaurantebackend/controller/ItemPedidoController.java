@@ -43,7 +43,7 @@ public class ItemPedidoController {
     @PostMapping
     public ResponseEntity<ItemPedidoDTO> guardar(@RequestBody ItemPedidoDTO dto) {
         ItemPedido item = itemPedidoMapper.toEntity(dto);
-        ItemPedido guardado = itemPedidoService.guardar(item);
+        ItemPedido guardado = itemPedidoService.agregarItemAComanda(item);
         return ResponseEntity.ok(itemPedidoMapper.toDTO(guardado));
     }
 

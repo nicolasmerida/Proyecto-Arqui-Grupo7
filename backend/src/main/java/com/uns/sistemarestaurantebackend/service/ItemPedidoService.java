@@ -22,15 +22,21 @@ public class ItemPedidoService {
     private final RecetaService recetaService;
     private final GestorStockFacade gestorStockFacade;
     private final WebSocketNotificacionService wsNotifiaNotificacionService;
+    private final com.uns.sistemarestaurantebackend.dto.mapper.ComandaMapper comandaMapper;
+    private final com.uns.sistemarestaurantebackend.dto.mapper.ItemPedidoMapper itemPedidoMapper;
 
     public ItemPedidoService(ItemPedidoRepository itemPedidoRepository,
                              RecetaService recetaService,
                              GestorStockFacade gestorStockFacade,
-                             WebSocketNotificacionService wsNotifiaNotificacionService) {
+                             WebSocketNotificacionService wsNotifiaNotificacionService,
+                             com.uns.sistemarestaurantebackend.dto.mapper.ComandaMapper comandaMapper,
+                             com.uns.sistemarestaurantebackend.dto.mapper.ItemPedidoMapper itemPedidoMapper) {
         this.itemPedidoRepository = itemPedidoRepository;
         this.recetaService = recetaService;
         this.gestorStockFacade = gestorStockFacade;
         this.wsNotifiaNotificacionService = wsNotifiaNotificacionService;
+        this.comandaMapper = comandaMapper;
+        this.itemPedidoMapper = itemPedidoMapper;
     }
 
     public List<ItemPedido> obtenerPorComanda(Integer numeroComanda) {
@@ -102,7 +108,7 @@ public class ItemPedidoService {
 
         //notificar al mozo via WebSocket cuando el item este LISTO
         if (estadoNuevo == EstadoItem.LISTO) {
-            wsNotifiaNotificacionService.notificarItemListo(guardado);
+            wsNotifiaNotificacionService.notificarItemListo(itemPedidoMapper.toDTO(guardado));
         }
 
         return guardado;
@@ -181,7 +187,8 @@ public class ItemPedidoService {
         }
 
         //notificar a cocina vía WebSocket de nuevo pedido pendiente
-        wsNotifiaNotificacionService.notificarNuevoPedidoCocina(itemPedido);
+        List<ItemPedido> items = itemPedidoRepository.findByComandaNumeroComanda(guardado.getComanda().getNumeroComanda());
+        wsNotifiaNotificacionService.notificarNuevoPedidoCocina(comandaMapper.toDetalleDTO(guardado.getComanda(), items));
 
         return guardado;
     }

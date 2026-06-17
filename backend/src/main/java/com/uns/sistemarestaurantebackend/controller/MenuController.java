@@ -9,7 +9,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/platos")
+@RequestMapping("/menu")
 public class MenuController {
 
     private final PlatoService platoService;
@@ -22,8 +22,8 @@ public class MenuController {
 
     @GetMapping
     public Page<PlatoDTO> getMenu(@RequestParam(defaultValue = "0") int page,
-                                  @RequestParam(defaultValue = "8") int size) {
+                                @RequestParam(defaultValue = "8") int size) {
         Page<Plato> platos = platoService.obtenerMenuPaginado(PageRequest.of(page, size));
-        return platos.map(platoMapper::toDTO);
+    return platos.map(platoMapper::toDTO);
     }
 }
