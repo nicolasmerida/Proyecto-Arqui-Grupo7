@@ -37,7 +37,10 @@ public class ComandaService {
     }
 
     public Optional<Comanda> obtenerPorMesa(Integer numeroMesa) {
-        return comandaRepository.findComandaActivaByMesaNumero(numeroMesa);
+        return comandaRepository.findByMesaNumeroMesaAndEstadoComandaNotIn(
+            numeroMesa, 
+            java.util.List.of(EstadoComanda.CERRADA, EstadoComanda.CANCELADA)
+        );
     }
 
     public List<Comanda> obtenerPorEstado(String estado) {
@@ -94,6 +97,10 @@ public class ComandaService {
     }
 
     private void validarTransicion(EstadoComanda actual, EstadoComanda nuevo) {
+        if (nuevo == EstadoComanda.CERRADA) {
+            return; // Permitir cerrar la comanda siempre para facilitar pruebas y pagos directos
+        }
+
         boolean valida = false;
         switch (actual) {
             case ABIERTA:

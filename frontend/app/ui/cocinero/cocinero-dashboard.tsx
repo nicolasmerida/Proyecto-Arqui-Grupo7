@@ -65,10 +65,12 @@ export default function CocineroDashboard({ initialComandas }: CocineroDashboard
 
   const connected = connectedComandas && connectedCocina;
 
-  // Cambia el estado de una comanda optimísticamente y actualiza el backend
+  const [loading, setLoading] = useState<Record<number, boolean>>({});
+
+  // Cambia el estado de una comanda de forma segura sin race conditions
   const cambiarEstado = async (numero: number, nuevo: EstadoComanda) => {
-    // Actualización optimista
-    setComandas((prev) => prev.map(c => c.numeroComanda === numero ? { ...c, estadoComanda: nuevo } : c));
+    if (loading[numero]) return; // Evitar doble click
+    setLoading(prev => ({ ...prev, [numero]: true }));
 
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/comandas/${numero}/estado`, {
@@ -83,9 +85,12 @@ export default function CocineroDashboard({ initialComandas }: CocineroDashboard
       if (!response.ok) {
         throw new Error(`Error al cambiar estado a ${nuevo}`);
       }
+      // No hacemos actualización optimista. Confiamos en el WebSocket para que mueva la comanda a la siguiente columna.
     } catch (error) {
       console.error(error);
-      // Opcional: Revertir en caso de error o notificar al usuario
+      alert(`No se pudo cambiar el estado a ${nuevo}. Es posible que alguien más ya lo haya cambiado.`);
+    } finally {
+      setLoading(prev => ({ ...prev, [numero]: false }));
     }
   }
 
@@ -116,10 +121,12 @@ export default function CocineroDashboard({ initialComandas }: CocineroDashboard
               <div key={comanda.numeroComanda} className={`flex flex-col border-y-4 ${colorByState[comanda.estadoComanda]} shadow-sm`}>
                 <CommandCard command={comanda} state={comanda.estadoComanda} lastUpdate={lastItemUpdate} />
                 <button
-                  className="rounded-b-md py-2 flex items-center justify-center gap-2 bg-orange-100 hover:bg-orange-200 transition-colors text-orange-800 font-semibold"
+                  className="rounded-b-md py-2 flex items-center justify-center gap-2 bg-orange-100 hover:bg-orange-200 transition-colors text-orange-800 font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
                   onClick={() => cambiarEstado(comanda.numeroComanda, EstadoComanda.Preparacion)}
+                  disabled={loading[comanda.numeroComanda]}
                 >
-                  <HiOutlineFire className="text-xl" /> Empezar a preparar
+                  <HiOutlineFire className="text-xl" /> 
+                  {loading[comanda.numeroComanda] ? "Procesando..." : "Empezar a preparar"}
                 </button>
               </div>
             ))}
@@ -135,10 +142,12 @@ export default function CocineroDashboard({ initialComandas }: CocineroDashboard
               <div key={comanda.numeroComanda} className={`flex flex-col border-y-4 ${colorByState[comanda.estadoComanda]} shadow-sm`}>
                 <CommandCard command={comanda} state={comanda.estadoComanda} lastUpdate={lastItemUpdate} />
                 <button
-                  className="rounded-b-md py-2 flex items-center justify-center gap-2 bg-green-100 hover:bg-green-200 transition-colors text-green-800 font-semibold"
+                  className="rounded-b-md py-2 flex items-center justify-center gap-2 bg-green-100 hover:bg-green-200 transition-colors text-green-800 font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
                   onClick={() => cambiarEstado(comanda.numeroComanda, EstadoComanda.Lista)}
+                  disabled={loading[comanda.numeroComanda]}
                 >
-                  <HiOutlineCheck className="text-xl" /> Todo listo
+                  <HiOutlineCheck className="text-xl" /> 
+                  {loading[comanda.numeroComanda] ? "Procesando..." : "Todo listo"}
                 </button>
               </div>
             ))}
@@ -153,9 +162,14 @@ export default function CocineroDashboard({ initialComandas }: CocineroDashboard
             {listos.map((comanda) => (
               <div key={comanda.numeroComanda} className={`flex flex-col border-y-4 ${colorByState[comanda.estadoComanda]} shadow-sm`}>
                 <CommandCard command={comanda} state={comanda.estadoComanda} lastUpdate={lastItemUpdate} />
-                <div className="rounded-b-md py-2 flex items-center justify-center gap-2 bg-gray-100 text-gray-500 font-medium text-sm">
-                  Esperando que el mozo lo retire...
-                </div>
+                <button
+                  className="rounded-b-md py-2 flex items-center justify-center gap-2 bg-blue-100 hover:bg-blue-200 transition-colors text-blue-800 font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+                  onClick={() => cambiarEstado(comanda.numeroComanda, EstadoComanda.Entregada)}
+                  disabled={loading[comanda.numeroComanda]}
+                >
+                  <HiOutlineBell className="text-xl" /> 
+                  {loading[comanda.numeroComanda] ? "Procesando..." : "Entregar al mozo"}
+                </button>
               </div>
             ))}
             {listos.length === 0 && <span className="text-gray-500 italic self-center mt-4">No hay comandas listas</span>}

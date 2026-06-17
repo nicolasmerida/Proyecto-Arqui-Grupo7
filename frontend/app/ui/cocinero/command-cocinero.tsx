@@ -54,27 +54,29 @@ export default function CommandCocinero({ command, state, lastUpdate }: CommandP
                     {/* Tiempo activa */}
                 </div>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 rounded-md gap-2 mt-2">
+            <div className="flex flex-col rounded-md gap-2 mt-2">
                 {
                     items.map((item) => (
-                        <div key={`${item.numeroComanda}-${item.idPlato}`} className="flex flex-col items-center justify-between p-2 border rounded-md gap-2 bg-gray-50">
-                            <div className="flex items-center gap-2">
-                                <div className="rounded-full flex items-center justify-center w-6 h-6 bg-black text-white text-xs font-bold">{item.cantidad}</div>
-                                <span className="text-black text-center text-sm font-medium">{item.nombrePlato}</span>
+                        <div key={`${item.numeroComanda}-${item.idPlato}`} className="flex flex-row items-center justify-between p-2 border rounded-md gap-3 bg-gray-50">
+                            <div className="flex items-center gap-2 flex-1">
+                                <div className="rounded-full flex items-center justify-center w-6 h-6 shrink-0 bg-black text-white text-xs font-bold">{item.cantidad}</div>
+                                <span className="text-black text-sm font-medium line-clamp-2">{item.nombrePlato}</span>
                             </div>
-                            <span className="text-xs text-gray-500 uppercase">{item.estadoItem}</span>
-                            <button
-                                className="w-full flex justify-center py-1 rounded-md border hover:bg-gray-200 transition-colors disabled:opacity-50"
-                                onClick={() => cambiarEstado(item, obtenerSiguienteEstado(item.estadoItem))}
-                                disabled={item.estadoItem === EstadoItem.Listo || item.estadoItem === EstadoItem.Entregado}
-                                title="Avanzar estado"
-                            >
-                                {(item.estadoItem === EstadoItem.Pendiente) ? <HiOutlineArrowSmRight className="text-blue-500" /> : (
-                                    (item.estadoItem === EstadoItem.Preparacion) ? <HiOutlineCheck className="text-green-500" /> : (
-                                        (item.estadoItem === EstadoItem.Listo) ? <HiOutlineArrowSmRight className="text-gray-500" /> : <HiOutlineX className="text-red-500" />
-                                    ))
-                                }
-                            </button>
+                            <div className="flex items-center gap-3">
+                                <span className="text-xs text-gray-500 uppercase font-semibold">{item.estadoItem}</span>
+                                <button
+                                    className="flex justify-center p-1.5 rounded-md border hover:bg-gray-200 transition-colors disabled:opacity-50"
+                                    onClick={() => cambiarEstado(item, obtenerSiguienteEstado(item.estadoItem))}
+                                    disabled={item.estadoItem === EstadoItem.Listo || item.estadoItem === EstadoItem.Entregado}
+                                    title="Avanzar estado"
+                                >
+                                    {(item.estadoItem === EstadoItem.Pendiente) ? <HiOutlineArrowSmRight className="text-blue-500 text-lg" /> : (
+                                        (item.estadoItem === EstadoItem.Preparacion) ? <HiOutlineCheck className="text-green-500 text-lg" /> : (
+                                            (item.estadoItem === EstadoItem.Listo) ? <HiOutlineArrowSmRight className="text-gray-500 text-lg" /> : <HiOutlineX className="text-red-500 text-lg" />
+                                        ))
+                                    }
+                                </button>
+                            </div>
                         </div>
                     ))
                 }
