@@ -90,7 +90,7 @@ export default function CourseDetail({ isVisible, course, notes, onNotesChange, 
                 {/* Notas */}
                 {onAddToCommand && (
                     <div className="mb-6">
-                        <label htmlFor="notas" className="block text-sm font-medium text-slate-900 mb-2">
+                        <label htmlFor="notas" className="block text-sm font-medium text-black mb-2">
                             Notas de la comanda (opcional)
                         </label>
                         <textarea
@@ -98,7 +98,7 @@ export default function CourseDetail({ isVisible, course, notes, onNotesChange, 
                             value={notes}
                             onChange={(e) => onNotesChange(e.target.value)}
                             placeholder="Notas del plato para la preparación"
-                            className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent resize-none"
+                            className="w-full px-3 py-2 text-black border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent resize-none"
                             rows={3}
                         />
                     </div>

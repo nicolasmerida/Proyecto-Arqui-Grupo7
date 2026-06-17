@@ -2,6 +2,7 @@
 'use client';
 import { EstadoMesa, Mesa } from "@/app/lib/definitions";
 import AddDiner from "@/app/ui/forms/AddDiners";
+import OpcionesMesa from "@/app/ui/forms/OpcionesMesa";
 import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { GiTable } from "react-icons/gi";
@@ -16,6 +17,10 @@ export default function PlanoSalon() {
     const [comensales, setComensales] = useState<number>(1);
     const [cargando, setCargando] = useState(false);
     const [modalVisible, setModalVisible] = useState(false);
+    const [modalOcupadaVisible, setModalOcupadaVisible] = useState(false);
+    const [comandaActivaId, setComandaActivaId] = useState<number | null>(null);
+    const [comandaActivaItems, setComandaActivaItems] = useState<any[]>([]);
+    const [totalComanda, setTotalComanda] = useState<string>("0.00");
     const router = useRouter();
 
     //Consultar mesas al backend
@@ -54,6 +59,70 @@ export default function PlanoSalon() {
         setMesaSeleccionada(mesa);
         setComensales(1);
         setModalVisible(true);
+    };
+
+    const handleMesaOcupada = async (mesa: Mesa) => {
+        if (cargando) return;
+        setCargando(true);
+        setMesaSeleccionada(mesa);
+        try {
+            const baseUrl = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8080";
+            // Obtener la comanda activa de esta mesa
+            const responseComanda = await fetch(`${baseUrl}/api/comandas/mesa/${mesa.numeroMesa}`);
+            if (!responseComanda.ok) throw new Error("No se pudo obtener la comanda de la mesa.");
+            const comandaResumen = await responseComanda.json();
+            
+            // Obtener el detalle completo para los items
+            const responseDetalle = await fetch(`${baseUrl}/api/comandas/${comandaResumen.numeroComanda}`);
+            if (!responseDetalle.ok) throw new Error("No se pudo obtener el detalle de la comanda.");
+            const comandaDetalle = await responseDetalle.json();
+            
+            // Obtener el total de la comanda
+            const responseTotal = await fetch(`${baseUrl}/api/comandas/${comandaDetalle.numeroComanda}/total`);
+            if (!responseTotal.ok) throw new Error("No se pudo obtener el total.");
+            const total = await responseTotal.text();
+            
+            setComandaActivaId(comandaDetalle.numeroComanda);
+            setComandaActivaItems(comandaDetalle.items || []);
+            setTotalComanda(total);
+            setModalOcupadaVisible(true);
+        } catch (error) {
+            console.error(error);
+            alert("Hubo un error al cargar los datos de la mesa.");
+        } finally {
+            setCargando(false);
+        }
+    };
+
+    const handlePagarMesa = async () => {
+        if (!mesaSeleccionada) return;
+        setCargando(true);
+        try {
+            // Simular demora de Mercado Pago
+            await new Promise(resolve => setTimeout(resolve, 2000));
+            
+            const baseUrl = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8080";
+            const response = await fetch(`${baseUrl}/api/mesas/${mesaSeleccionada.numeroMesa}/estado`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ estadoMesa: "Libre" })
+            });
+
+            if (!response.ok) throw new Error("No se pudo cerrar la mesa.");
+            
+            alert("¡Pago procesado exitosamente por Mercado Pago! La mesa ha sido liberada.");
+            setModalOcupadaVisible(false);
+            setMesaSeleccionada(null);
+            setComandaActivaId(null);
+            
+            // Refrescar mesas
+            fetchMesas();
+        } catch (error) {
+            console.error(error);
+            alert("Hubo un problema al procesar el pago.");
+        } finally {
+            setCargando(false);
+        }
     };
 
     const abrirMesa = async (mesa: Mesa, numeroComensales: number) => {
@@ -176,11 +245,17 @@ export default function PlanoSalon() {
                     {(vista === VISTA.todas || vista === VISTA.ocupadas) && (
                         mesas.filter(mesa => mesa.estadoMesa === EstadoMesa.Ocupada)
                             .map((mesa, index) => (
-                                <button key={index} className="border rounded-lg p-2 bg-red-300 border-red-500">
-                                    <div className="flex flex-col justify-center items-center text-red-500">
+                                <button key={index} className="border rounded-lg p-2 bg-red-300 border-red-500 hover:bg-red-400 transition-colors group relative overflow-hidden"
+                                    onClick={() => handleMesaOcupada(mesa)}
+                                    disabled={cargando}
+                                >
+                                    <div className="flex flex-col justify-center items-center text-red-600 group-hover:text-red-800 transition-colors">
                                         <GiTable />
                                         <span className="text-xl font-serif">{mesa.numeroMesa}</span>
                                         <span className="text-sm">{mesa.capacidad} personas</span>
+                                        <div className="absolute inset-0 bg-red-500/80 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <span className="text-white font-bold text-sm text-center px-1">Ver/Cobrar<br/>Cuenta</span>
+                                        </div>
                                     </div>
                                 </button>
                             ))
@@ -199,6 +274,19 @@ export default function PlanoSalon() {
                     setComensales={setComensales}
                     onClose={cerrarModal}
                     onSubmit={() => abrirMesa(mesaSeleccionada, comensales)}
+                    cargando={cargando}
+                />
+            )}
+
+            {modalOcupadaVisible && mesaSeleccionada && comandaActivaId !== null && (
+                <OpcionesMesa
+                    mesa={mesaSeleccionada}
+                    comandaId={comandaActivaId}
+                    total={totalComanda}
+                    items={comandaActivaItems}
+                    onClose={() => { setModalOcupadaVisible(false); setMesaSeleccionada(null); }}
+                    onAgregarPlatos={() => router.push(`/user/mozo/menu?comanda=${comandaActivaId}`)}
+                    onPagar={handlePagarMesa}
                     cargando={cargando}
                 />
             )}

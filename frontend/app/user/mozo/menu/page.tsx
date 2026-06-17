@@ -3,6 +3,7 @@
 import { EstadoItem, Item_Pedido, Plato } from "@/app/lib/definitions";
 import Menu from "@/app/menu/page";
 import CommandDetail from "@/app/ui/commands/CommandDetail";
+import CourseDetail from "@/app/ui/menu/CourseDetail";
 import { useState, use } from "react";
 import { useRouter } from "next/navigation";
 
@@ -96,6 +97,60 @@ export default function MozoMenu({ searchParams }: MozoProps) {
         }
     };
 
+    const updateQuantity = (index: number, delta: number) => {
+        setItemsComanda(prev => {
+            const newItems = [...prev];
+            const item = { ...newItems[index] }; // COPIA el objeto para evitar bugs de mutación en React Strict Mode
+            if (item.cantidad + delta > 0) {
+                item.cantidad += delta;
+            } else {
+                // Si la cantidad llega a 0, opcionalmente se puede eliminar. Aquí solo no dejamos bajar de 1.
+                // Para eliminar, se usa el botón de basurero.
+            }
+            newItems[index] = item;
+            return newItems;
+        });
+    };
+
+    const removeItem = (index: number) => {
+        setItemsComanda(prev => prev.filter((_, i) => i !== index));
+    };
+
+    // --- Lógica de Edición de Notas ---
+    const [selectedEditIndex, setSelectedEditIndex] = useState<number | null>(null);
+    const [editPlatoData, setEditPlatoData] = useState<Plato | null>(null);
+    const [editNotes, setEditNotes] = useState<string>("");
+
+    const handleEditItem = async (index: number) => {
+        const item = itemsComanda[index];
+        try {
+            const baseUrl = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8080";
+            const response = await fetch(`${baseUrl}/api/platos/${item.idPlato}`);
+            if (response.ok) {
+                const plato = await response.json();
+                setEditPlatoData(plato);
+                setEditNotes(item.notas || "");
+                setSelectedEditIndex(index);
+            }
+        } catch (error) {
+            console.error("Error cargando detalles del plato para editar", error);
+        }
+    };
+
+    const saveEditItem = () => {
+        if (selectedEditIndex !== null) {
+            setItemsComanda(prev => {
+                const newItems = [...prev];
+                const item = { ...newItems[selectedEditIndex] };
+                item.notas = editNotes;
+                newItems[selectedEditIndex] = item;
+                return newItems;
+            });
+            setSelectedEditIndex(null);
+            setEditPlatoData(null);
+        }
+    };
+
     return (
         <div className="flex flex-row relative h-screen">
             <div className="flex-1 overflow-y-auto">
@@ -105,7 +160,22 @@ export default function MozoMenu({ searchParams }: MozoProps) {
                 items={itemsComanda}
                 onConfirm={handleConfirmOrder}
                 isSubmitting={isSubmitting}
+                onUpdateQuantity={updateQuantity}
+                onRemoveItem={removeItem}
+                onEditItem={handleEditItem}
             />
+
+            {/* Modal de edición reutilizando CourseDetail */}
+            {editPlatoData && selectedEditIndex !== null && (
+                <CourseDetail
+                    isVisible={true}
+                    course={editPlatoData}
+                    notes={editNotes}
+                    onNotesChange={setEditNotes}
+                    onAddToCommand={saveEditItem} 
+                    onClose={() => { setSelectedEditIndex(null); setEditPlatoData(null); }}
+                />
+            )}
         </div>
     );
 }
