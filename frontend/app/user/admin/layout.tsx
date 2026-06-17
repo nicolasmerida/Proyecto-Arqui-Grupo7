@@ -14,7 +14,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     return (
         <div className="min-h-screen">
           <FunctionsPanel />
-          <main className="pl-28 pt-10">
+          <main className="border-l pl-36 pt-10">
             {children}
           </main>
         </div>

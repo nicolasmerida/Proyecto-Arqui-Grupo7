@@ -86,11 +86,11 @@ export default function TableStock() {
     return (
         <>
         <div className="flex items-center justify-between mb-2">
-            <div className="grid grid-cols-4 rounded-md p-2">
-                <button onClick={() => setCondicion("todos")}>Todos</button>
-                <button onClick={() => setCondicion("regla")}>En regla</button>
-                <button onClick={() => setCondicion("advertencia")}>Advertencia</button>
-                <button onClick={() => setCondicion("bajo")}>Bajo</button>
+            <div className="grid grid-cols-4 rounded-md p-2 space-x-3">
+                <button className={`${(condicion === "todos") ? 'text-white border border-black bg-black rounded-md' : 'text-black'}`} onClick={() => setCondicion("todos")}>Todos</button>
+                <button className={`${(condicion === "regla") ? 'text-white border border-black bg-black rounded-md' : 'text-black'}`} onClick={() => setCondicion("regla")}>En regla</button>
+                <button className={`${(condicion === "advertencia") ? 'text-white border border-black bg-black rounded-md' : 'text-black'}`} onClick={() => setCondicion("advertencia")}>Advertencia</button>
+                <button className={`${(condicion === "bajo") ? 'text-white border border-black bg-black rounded-md' : 'text-black'}`} onClick={() => setCondicion("bajo")}>Bajo</button>
             </div>
             <button onClick={() => setShowCreate(true)}
                     className="flex items-center gap-1 rounded-xl bg-green-500 text-white text-base"
@@ -98,10 +98,10 @@ export default function TableStock() {
                 <HiOutlinePlusSm /> Nuevo ingrediente
             </button>
         </div>
-        <div className="overflow-hidden rounded-xl border">
+        <div className="overflow-hidden rounded-lg border">
             <table className="w-full p-2">
                 <thead>
-                    <tr className="text-left text-sm uppercase">
+                    <tr className="text-center text-sm uppercase">
                         <th>Ingrediente</th>
                         <th>Stock actual</th>
                         <th>Condición</th>

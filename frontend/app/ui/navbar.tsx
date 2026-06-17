@@ -33,7 +33,7 @@ export default function Navbar() {
                     <Link href="/menu" className={`${navLinkClass} ${underlineClass}`}>Menú</Link> {/* Detectar rol para redirigir al menu del mozo */}
                 </div>
 
-                {/* Icono de login */}
+                {/* Icono de login - Si hay una sesión iniciada ocultar */}
                 <div className="flex items-center justify-end space-x-2 md:space-x-4">
                     {!isUserArea && (
                         <Link href="/login" className={`flex flex-row space-x-1 ${navLinkClass} ${underlineClass}`}>

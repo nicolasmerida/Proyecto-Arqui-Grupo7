@@ -1,7 +1,12 @@
 // app/ui/commands/command-card.tsx
+import { Comanda } from "@/app/lib/definitions";
 import { HiOutlineDocumentDuplicate } from "react-icons/hi2";
 
-export default function CommandCard() {
+interface CommandCardProps {
+    commands: Comanda[]
+}
+
+export default function CommandCard({ commands }: CommandCardProps) {
 
     return (
         <div className="flex flex-col border">
@@ -10,6 +15,7 @@ export default function CommandCard() {
             </div>
             <div className="flex text-xl text-black font-serif">
                 {/* Cant total comandas */}
+                {commands.length}
             </div>
         </div>
     );
