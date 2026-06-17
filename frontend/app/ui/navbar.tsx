@@ -2,7 +2,7 @@
 'use client';
 import Link from "next/link"
 import { useState } from "react";
-import { HiOutlineLogin } from "react-icons/hi";
+import { HiOutlineLogin } from "react-icons/hi";import { usePathname } from 'next/navigation';
 
 const navLinkClass =
   "relative text-white text-sm transition-transform duration-300 hover:scale-105";
@@ -15,6 +15,8 @@ const underlineClass = `
 
 export default function Navbar() {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const pathname = usePathname();
+    const isUserArea = pathname?.startsWith('/user') || false;
     
     const toggleMobileMenu = () => {
         setIsMobileMenuOpen(!isMobileMenuOpen);
@@ -33,10 +35,12 @@ export default function Navbar() {
 
                 {/* Icono de login */}
                 <div className="flex items-center justify-end space-x-2 md:space-x-4">
-                    <Link href="/login" className={`flex flex-row space-x-1 ${navLinkClass} ${underlineClass}`}>
-                        <span>Iniciar sesión</span>
-                        <HiOutlineLogin className="text-base" />
-                    </Link>
+                    {!isUserArea && (
+                        <Link href="/login" className={`flex flex-row space-x-1 ${navLinkClass} ${underlineClass}`}>
+                            <span>Iniciar sesión</span>
+                            <HiOutlineLogin className="text-base" />
+                        </Link>
+                    )}
 
                     {/* Botón de hamburguesa para móvil */}
                     <button
