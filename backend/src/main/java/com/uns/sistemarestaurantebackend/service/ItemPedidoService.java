@@ -97,7 +97,7 @@ public class ItemPedidoService {
             for (Receta receta : recetas) {
                 int cantidadADevolver = receta.getCantidad() * item.getCantidad();
                 // cantidad positiva = sumar al stock (inverso de agregarItemAComanda)
-                // TODO: con Spring Security, reemplazar el 1 por el ID del usuario autenticado
+                // TODO: Sistema de Login (Spring Security) - Reemplazar el 1 hardcodeado por el ID del usuario autenticado
                 gestorStockFacade.registrarMovimiento(
                         receta.getIngrediente().getIdIngrediente(), cantidadADevolver, 1);
             }
@@ -182,7 +182,7 @@ public class ItemPedidoService {
             int cantidadADescontar = receta.getCantidad() * guardado.getCantidad();
 
             // enviamos la cantidad en negativo para que registrarMovimiento realice la resta
-            // Por ahora, asumimos usuario ID 1 hasta implementar Security
+            // TODO: Sistema de Login (Spring Security) - Reemplazar el 1 hardcodeado por el ID del usuario autenticado
             gestorStockFacade.registrarMovimiento(receta.getIngrediente().getIdIngrediente(), -cantidadADescontar, 1);
         }
 

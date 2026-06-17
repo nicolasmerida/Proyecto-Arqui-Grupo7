@@ -35,10 +35,11 @@ public class GestorStockFacade {
         Ingrediente ingrediente = ingredienteService.actualizarStockFisico(idIngrediente, cantidad);
 
         // 2. Obtener el usuario (Actualmente recibe el ID)
-        // TODO: con Spring Security, esto se saca del contexto del token)
-        // HARDCODEADO: por ahora siempre ID = 1
+        // TODO: Sistema de Login (Spring Security) - Eliminar este Fallback en el futuro.
+        // Se deberá extraer obligatoriamente el usuario real del token JWT en vez de buscar el primero disponible.
         Usuario usuario = usuarioRepository.findById(idUsuario)
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+                .orElseGet(() -> usuarioRepository.findAll().stream().findFirst()
+                        .orElseThrow(() -> new RuntimeException("Usuario no encontrado (No hay usuarios en la BD)")));
 
         // 3. Crear y guardar el registro de auditoría
         MovStock movimiento = MovStock.builder()
