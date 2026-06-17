@@ -120,10 +120,8 @@ export default function AddCourseForm({ course }: AddCourseFormProps) {
         nombre: nombre.trim(),
         descripcion: descripcion.trim(),
         precio,
-        categoria: {
-          idCategoria: categoriaId,
-          nombre: categoria,
-        },
+        categoria: categoria, // Enviar como String según PlatoDTO
+        activo: course ? course.activo : true,
       };
 
       const endpoint = course?.idPlato

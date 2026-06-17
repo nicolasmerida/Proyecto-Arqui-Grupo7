@@ -111,8 +111,9 @@ export type Usuario = {
 
 export type Mov_Stock = {
   idMov: number;
+  nombreIngrediente: string;
+  unidadIngrediente: string;
+  nombreUsuario: string;
   cantidad: number;
   fecha: string;
-  ingrediente: Ingrediente;
-  usuario: Usuario;
 };

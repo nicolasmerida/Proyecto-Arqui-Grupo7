@@ -67,7 +67,7 @@ export default function TableMovements() {
                                         {mov.fecha}
                                     </td>
                                     <td>
-                                        <span className="font-semibold text-black">{mov.ingrediente.nombre}</span>
+                                        <span className="font-semibold text-black">{mov.nombreIngrediente}</span>
                                     </td>
                                     <td className={`font-medium rounded-xl border ${condEstilo}`}>
                                         {(mov.cantidad > 0) ? (
@@ -77,10 +77,10 @@ export default function TableMovements() {
                                         )}
                                     </td>
                                     <td>
-                                        <span className="font-medium">{mov.cantidad} {mov.ingrediente.unidad}</span>
+                                        <span className="font-medium">{mov.cantidad} {mov.unidadIngrediente}</span>
                                     </td>
                                     <td>
-                                        <span className="font-medium">{mov.usuario.rol}</span>
+                                        <span className="font-medium">{mov.nombreUsuario}</span>
                                     </td>
                                 </tr>
                             );
