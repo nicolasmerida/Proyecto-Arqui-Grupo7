@@ -44,13 +44,3 @@ public class WebSocketNotificacionService {
         messagingTemplate.convertAndSend("/topic/mesa", mesa);
     }
 }
-
-    //TODO: definir correctamente los metodos para reducir el payload con DTO'S:
-    /*Ejemplo: 
-
-        Map<String, Object> payload = Map.of(
-        "ingrediente", nombreIngrediente,
-        "stockActual", stockActual
-    );
-    messagingTemplate.convertAndSend("/topic/alertas/stock", payload);
-     */
