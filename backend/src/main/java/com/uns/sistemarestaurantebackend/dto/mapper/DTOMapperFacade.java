@@ -5,7 +5,6 @@ import org.springframework.stereotype.Component;
 import com.uns.sistemarestaurantebackend.dto.IngredienteDTO;
 import com.uns.sistemarestaurantebackend.dto.MesaDTO;
 import com.uns.sistemarestaurantebackend.dto.ItemPedidoDTO;
-import com.uns.sistemarestaurantebackend.dto.PlatoDTO;
 import com.uns.sistemarestaurantebackend.dto.ComandaDTO;
 
 import com.uns.sistemarestaurantebackend.model.Comanda;
