@@ -1,11 +1,18 @@
 // app/ui/admin/TopSales.tsx
 'use client';
-import { Item_Pedido } from "@/app/lib/definitions";
 import { useEffect, useState } from "react";
 
+type TopSaleItem = {
+    cantidad: number;
+    plato: {
+        idPlato: number;
+        nombre: string;
+    }
+}
+
 export default function TopSales() {
-    const [sales, setSales] = useState<Item_Pedido[]>([]);
-    const max = Math.max(...sales.map(p => p.cantidad));
+    const [sales, setSales] = useState<TopSaleItem[]>([]);
+    const max = Math.max(...sales.map(p => p.cantidad), 1);
 
     //Consultar top de ventas al backend
     useEffect(() => {

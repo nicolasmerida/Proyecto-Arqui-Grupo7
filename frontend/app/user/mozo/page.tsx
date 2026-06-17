@@ -2,13 +2,15 @@
 import { getComandas } from "@/app/lib/actions";
 import MozoDashboard from "@/app/ui/mozo/mozo-dashboard";
 
-import { Comanda } from "@/app/lib/definitions";
+export const dynamic = 'force-dynamic';
+
+import { ComandaResumen } from "@/app/lib/definitions";
 
 // Eliminar 'use client' - Esto ahora es un Server Component
 export default async function Mozo() {
   // Obtiene el estado inicial de las comandas usando SSR y Server Actions
   // Sin necesidad de exponer endpoints del backend al navegador (excepto websocket)
-  let comandas: Comanda[] = [];
+  let comandas: ComandaResumen[] = [];
   try {
     comandas = await getComandas();
   } catch (error) {

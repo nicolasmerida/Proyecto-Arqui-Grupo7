@@ -1,6 +1,6 @@
 // app/ui/cocinero/cocinero-dashboard.tsx
 'use client';
-import { Comanda, EstadoComanda, Item_Pedido } from "@/app/lib/definitions";
+import { ComandaResumen, ComandaDetalle, EstadoComanda, Item_Pedido } from "@/app/lib/definitions";
 import CommandCard from "@/app/ui/cocinero/command-cocinero";
 import { useState, useCallback } from "react";
 import { HiOutlineBell, HiOutlineCheck, HiOutlineFire } from "react-icons/hi";
@@ -16,57 +16,52 @@ const colorByState: Record<EstadoComanda, string> = {
 }
 
 interface CocineroDashboardProps {
-  initialComandas: Comanda[];
+  initialComandas: ComandaDetalle[];
 }
 
 export default function CocineroDashboard({ initialComandas }: CocineroDashboardProps) {
-  const [comandas, setComandas] = useState<Comanda[]>(initialComandas);
+  const [comandas, setComandas] = useState<ComandaDetalle[]>(initialComandas);
   const [lastItemUpdate, setLastItemUpdate] = useState<number>(Date.now());
 
   // 1. Suscripción a cambios en COMANDAS (ej. cuando cambia a estado lista/preparacion)
-  const onComandaReceived = useCallback((comanda: Comanda) => {
+  const onComandaReceived = useCallback((comanda: ComandaResumen) => {
     setComandas((prev) => {
       const idx = prev.findIndex(c => c.numeroComanda === comanda.numeroComanda);
       if (idx >= 0) {
         const next = [...prev];
-        // Si la comanda se cerró/canceló/entregó, podríamos quitarla de la vista de cocina
+        // Si la comanda se cerró/canceló/entregó, la quitamos de la vista
         if ([EstadoComanda.Cerrada, EstadoComanda.Cancelada, EstadoComanda.Entregada].includes(comanda.estadoComanda)) {
           return prev.filter(c => c.numeroComanda !== comanda.numeroComanda);
         }
-        next[idx] = comanda;
+        // Solo actualizamos el estado, preservamos los items que ya teníamos
+        next[idx] = { ...next[idx], estadoComanda: comanda.estadoComanda };
         return next;
       } else {
         if ([EstadoComanda.Abierta, EstadoComanda.Preparacion, EstadoComanda.Lista].includes(comanda.estadoComanda)) {
-          return [...prev, comanda];
+          return [...prev, { ...comanda, items: [] as Item_Pedido[] }];
         }
         return prev;
       }
     });
   }, []);
 
-  // 2. Suscripción a nuevos ITEMS en comandas existentes
-  const onItemReceived = useCallback((item: Item_Pedido) => {
-    // Al recibir un nuevo item, forzamos a los hijos CommandCocinero a recargar sus items
-    setLastItemUpdate(Date.now());
-
-    // Si la comanda de este ítem no existe en nuestra vista, la agregamos para que aparezca la tarjeta
-    if (item.comanda) {
-      setComandas(prev => {
-        if (!prev.some(c => c.numeroComanda === item.comanda.numeroComanda)) {
-          // Casteamos a Comanda y asignamos un estado base para que TS compile y se renderice en la columna correcta
-          const nuevaComanda = {
-            ...item.comanda,
-            estadoComanda: EstadoComanda.Abierta
-          } as Comanda;
-          return [...prev, nuevaComanda];
+  // 2. Suscripción a la vista de cocina (Recibe la comanda detallada actualizada)
+  const onItemReceived = useCallback((comandaDetalle: ComandaDetalle) => {
+    // Al recibir el detalle actualizado, reemplazamos la comanda entera
+    setComandas(prev => {
+        const idx = prev.findIndex(c => c.numeroComanda === comandaDetalle.numeroComanda);
+        if (idx >= 0) {
+            const next = [...prev];
+            next[idx] = comandaDetalle;
+            return next;
         }
-        return prev;
-      });
-    }
+        return [...prev, comandaDetalle];
+    });
+    setLastItemUpdate(Date.now());
   }, []);
 
-  const { connected: connectedComandas } = useStompClient<Comanda>('/topic/comanda', onComandaReceived);
-  const { connected: connectedCocina } = useStompClient<Item_Pedido>('/topic/cocina', onItemReceived);
+  const { connected: connectedComandas } = useStompClient<ComandaResumen>('/topic/comanda', onComandaReceived);
+  const { connected: connectedCocina } = useStompClient<ComandaDetalle>('/topic/cocina', onItemReceived);
 
   const connected = connectedComandas && connectedCocina;
 

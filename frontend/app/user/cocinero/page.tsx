@@ -2,6 +2,8 @@
 import { getComandasCocina } from "@/app/lib/actions";
 import CocineroDashboard from "@/app/ui/cocinero/cocinero-dashboard";
 
+export const dynamic = 'force-dynamic';
+
 export default async function Cocinero() {
   // Obtiene las comandas iniciales desde el servidor (SSR)
   const initialComandas = await getComandasCocina();

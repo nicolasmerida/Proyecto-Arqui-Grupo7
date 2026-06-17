@@ -9,7 +9,7 @@ interface CommandDetailProps {
 }
 
 export default function CommandDetail({ items, onConfirm, isSubmitting }: CommandDetailProps) {
-    const total = items.reduce((acc, item) => acc + (item.plato.precio * item.cantidad), 0);
+    const total = items.reduce((acc, item) => acc + ((item.precio || 0) * item.cantidad), 0);
 
     return (
         <div className="flex flex-col w-80 bg-white border-l border-slate-200 h-screen sticky top-0 p-4 shadow-sm">
@@ -26,8 +26,8 @@ export default function CommandDetail({ items, onConfirm, isSubmitting }: Comman
                     items.map((item, index) => (
                         <div key={index} className="flex flex-col p-3 border rounded-lg bg-slate-50 gap-1">
                             <div className="flex justify-between items-start">
-                                <span className="font-bold text-slate-800">{item.cantidad}x {item.plato.nombre}</span>
-                                <span className="text-slate-600 font-medium">${item.plato.precio * item.cantidad}</span>
+                                <span className="font-bold text-slate-800">{item.cantidad}x {item.nombrePlato}</span>
+                                <span className="text-slate-600 font-medium">${(item.precio || 0) * item.cantidad}</span>
                             </div>
                             {item.notas && (
                                 <div className="text-xs text-slate-500 italic border-t pt-1 mt-1">

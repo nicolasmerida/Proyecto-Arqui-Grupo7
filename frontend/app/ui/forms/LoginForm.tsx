@@ -19,6 +19,9 @@ export function LoginForm() {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false); // Nuevo estado para mostrar/ocultar contraseña
   //const [errorMessage, formAction, isPending] = useActionState(authenticate, undefined); Agregar funcion a invocar
+  const formAction = () => {};
+  const errorMessage = "";
+  const isPending = false;
 
   // Función para alternar la visibilidad de la contraseña
   const handleTogglePassword = () => {

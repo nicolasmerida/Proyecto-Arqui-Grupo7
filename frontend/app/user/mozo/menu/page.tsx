@@ -25,7 +25,7 @@ export default function MozoMenu({ searchParams }: MozoProps) {
         const notas = nota ?? "";
 
         setItemsComanda((prev) => {
-            const index = prev.findIndex((item) => item.comanda.numeroComanda === numeroComanda && item.plato.idPlato === plato.idPlato && item.notas.trim() === notas.trim());
+            const index = prev.findIndex((item) => item.numeroComanda === numeroComanda && item.idPlato === plato.idPlato && item.notas.trim() === notas.trim());
             if (index !== -1) {
                 return prev.map((item, i) =>
                     (i === index) ?
@@ -37,9 +37,10 @@ export default function MozoMenu({ searchParams }: MozoProps) {
                 );
             }
             return [...prev, {
-                id: { numeroComanda, idPlato: plato.idPlato },
-                comanda: { numeroComanda },
-                plato,
+                numeroComanda,
+                idPlato: plato.idPlato,
+                nombrePlato: plato.nombre,
+                precio: plato.precio,
                 cantidad: 1,
                 notas,
                 estadoItem: EstadoItem.Pendiente,

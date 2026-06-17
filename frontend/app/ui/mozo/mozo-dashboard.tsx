@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from "react";
-import { Comanda, EstadoComanda } from "@/app/lib/definitions";
+import { ComandaResumen, EstadoComanda } from "@/app/lib/definitions";
 import CommandDetailCard from "@/app/ui/mozo/command-mozo";
 import PlanoSalon from "@/app/ui/mozo/plano-salon";
 import { useStompClient } from "@/app/lib/hooks/useStompClient";
@@ -16,14 +16,14 @@ const colorByState: Record<EstadoComanda, string> = {
 };
 
 interface MozoDashboardProps {
-  initialComandas: Comanda[];
+  initialComandas: ComandaResumen[];
 }
 
 export default function MozoDashboard({ initialComandas }: MozoDashboardProps) {
-  const [comandas, setComandas] = useState<Comanda[]>(initialComandas);
+  const [comandas, setComandas] = useState<ComandaResumen[]>(initialComandas);
 
   // Escuchar actualizaciones en tiempo real de las comandas
-  const { connected } = useStompClient<Comanda>('/topic/comanda', (updatedComanda) => {
+  const { connected } = useStompClient<ComandaResumen>('/topic/comanda', (updatedComanda) => {
     setComandas((prevComandas) => {
       const exists = prevComandas.find((c) => c.numeroComanda === updatedComanda.numeroComanda);
       if (exists) {

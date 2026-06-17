@@ -1,4 +1,5 @@
 // app/user/admin/page.tsx
+export const dynamic = 'force-dynamic';
 import SalesChart from "@/app/ui/admin/SalesChart";
 import StatsBar from "@/app/ui/admin/StatsBar";
 import StockAlerts from "@/app/ui/admin/StockAlerts";

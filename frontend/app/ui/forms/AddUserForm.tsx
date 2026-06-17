@@ -11,10 +11,13 @@ export function AddUserForm() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [rol, setRol] = useState<'' | Rol>('');
-    const [state, setState] = useState<EstadoUsuario>(EstadoUsuario.Activo)
+    const [estadoUsuario, setEstadoUsuario] = useState<EstadoUsuario>(EstadoUsuario.Activo)
 
+    // TODO: Restaurar esto cuando addUser esté implementado
     //const initialState: StateUser = { message: null, errors: {} };
-    //const [state, formAction] = useActionState(addUser, initialState); Agregar funcion a invocar
+    //const [formState, formAction] = useActionState(addUser, initialState); Agregar funcion a invocar
+    const formState: any = {};
+    const formAction = () => {};
 
     const searchParams = useSearchParams();
     const callbackUrl = searchParams.get('callbackUrl') || '/login';
@@ -113,13 +116,13 @@ export function AddUserForm() {
         </button>
 
         <div className="flex h-8 items-end space-x-1" aria-live="polite" aria-atomic="true">
-          {(state?.errors) ? (
+          {(formState?.errors) ? (
             <>
-              <p className="text-sm text-red-500">{state.message}</p>
+              <p className="text-sm text-red-500">{formState.message}</p>
             </>
           ) : (
             <>
-              <p className="text-sm text-green-500">{state.message}</p>
+              <p className="text-sm text-green-500">{formState.message}</p>
             </>
           )}
         </div>

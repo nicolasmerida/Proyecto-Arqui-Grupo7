@@ -1,11 +1,11 @@
 // app/ui/commands/command-mozo.tsx
 'use client';
-import { Comanda, Item_Pedido } from "@/app/lib/definitions";
+import { ComandaResumen, Item_Pedido } from "@/app/lib/definitions";
 import { useEffect, useState } from "react";
 import { HiOutlineClock } from "react-icons/hi";
 
 interface CommandCardProps {
-    command: Comanda;
+    command: ComandaResumen;
 }
 
 export default function CommandMozo({ command }: CommandCardProps) {
@@ -105,7 +105,7 @@ export default function CommandMozo({ command }: CommandCardProps) {
                 </div>
             </div>
             <div className="text-sm text-gray-400 justify-items-start">
-                {items.length} • {command.mozo?.nombre || 'Sin asignar'}
+                {items.length} items
             </div>
         </div>
     );
