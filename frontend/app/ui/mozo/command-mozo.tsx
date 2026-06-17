@@ -38,7 +38,7 @@ export default function CommandMozo({ command, onSelect }: CommandCardProps) {
     useEffect(() => {
         fetchItems();
         fetchTotal();
-    }, []);
+    }, [command.estadoComanda, command.numeroComanda]);
 
     return (
         <div className="flex flex-col p-3 gap-1 cursor-pointer" onClick={() => onSelect(items, total)}>

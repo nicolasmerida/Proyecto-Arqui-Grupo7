@@ -1,7 +1,7 @@
 // app/ui/mozo/mozo-dashboard.tsx
 'use client';
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { ComandaResumen, EstadoComanda, Item_Pedido } from "@/app/lib/definitions";
 import CommandDetailCard from "@/app/ui/mozo/command-mozo";
 import PlanoSalon from "@/app/ui/mozo/plano-salon";
@@ -28,7 +28,7 @@ export default function MozoDashboard({ initialComandas }: MozoDashboardProps) {
   const [total, setTotal] = useState<number>(0);
   const [cerrando, setCerrando] = useState(false);
 
-  const { connected } = useStompClient<ComandaResumen>('/topic/comanda', (updatedComanda) => {
+  const onComandaUpdate = useCallback((updatedComanda: ComandaResumen) => {
     setComandas((prevComandas) => {
       const exists = prevComandas.find((c) => c.numeroComanda === updatedComanda.numeroComanda);
       if (exists) {
@@ -39,7 +39,9 @@ export default function MozoDashboard({ initialComandas }: MozoDashboardProps) {
         return [...prevComandas, updatedComanda];
       }
     });
-  });
+  }, []);
+
+  const { connected } = useStompClient<ComandaResumen>('/topic/comanda', onComandaUpdate);
 
   const abrirModal = (comanda: ComandaResumen, items: Item_Pedido[], total: number) => {
       setComandaSeleccionada(comanda);
@@ -163,10 +165,15 @@ const handleCerrarComanda = async () => {
                   onClick={async () => {
                     setCerrando(true);
                     try {
-                      await fetch(
-                        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/comandas/${comandaSeleccionada.numeroComanda}/estado?nuevoEstado=ENTREGADA`,
-                        { method: 'PUT' }
+                      const response = await fetch(
+                        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/comandas/${comandaSeleccionada.numeroComanda}/estado`,
+                        { 
+                          method: 'PUT',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({ nuevoEstado: 'ENTREGADA' })
+                        }
                       );
+                      if (!response.ok) throw new Error("Error del servidor");
                       setComandas(prev => prev.map(c =>
                         c.numeroComanda === comandaSeleccionada.numeroComanda
                           ? { ...c, estadoComanda: EstadoComanda.Entregada }
