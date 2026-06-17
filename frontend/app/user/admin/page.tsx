@@ -5,8 +5,7 @@ import StockAlerts from "@/app/ui/admin/StockAlerts";
 import TopSales from "@/app/ui/admin/TopSales";
 
 export default function Admin() {
-  // Consultar ventas, mas vendidos, datos de comandas, tickets y mozos para las estadisticas y alertas de stock
-  // en cada componente segun corresponda
+  //Consultar ventas, mas vendidos, datos de comandas, tickets y mozos para las estadisticas y alertas de stock
   return (
     <div className="min-h-screen m-5">  {/* Agregar margen superior segun Userbar */}
       <main className=" p-4"> {/* Ajustar margen superior e izquierdo segun panel y barra  */}

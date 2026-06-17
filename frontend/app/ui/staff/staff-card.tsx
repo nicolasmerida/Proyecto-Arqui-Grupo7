@@ -1,15 +1,9 @@
 // app/ui/staff/staff-card.tsx
-import { EstadoUsuario, Rol, Usuario } from "@/app/lib/definitions";
 import { HiOutlineUserGroup } from "react-icons/hi2";
 
-interface StaffCardProps {
-    staff: Usuario[]
-}
-
-export default function StaffCard({ staff }: StaffCardProps) {
-    //Consultar la cantidad total y cantidad de activos
-    const mozos = staff.filter((m) => m.rol === Rol.Mozo);
-    const activos = mozos.filter((a) => a.estado === EstadoUsuario.Activo);
+export default function StaffCard() {
+    //Consultar todos los mozos
+    // A partir de ahí obtener la cantidad total y cantidad de activos
 
     return (
         <div className="flex flex-col border">
@@ -17,10 +11,10 @@ export default function StaffCard({ staff }: StaffCardProps) {
                 Mozos activos <HiOutlineUserGroup />
             </div>
             <div className="flex text-xl text-black font-serif">
-                {activos.length}
+                {/* Cant mozos activos */}
             </div>
             <div className="text-sm text-gray-400">
-                {mozos.length} staff total
+                {/* Cant mozos total */} staff total
             </div>
         </div>
     );

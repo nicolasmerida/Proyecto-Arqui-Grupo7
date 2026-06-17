@@ -8,7 +8,8 @@ export default function StockAlerts() {
     const [alerts, setAlerts] = useState<Ingrediente[]>([]);
     
     //Consultar alertas de stock bajo al backend
-    const fetchAlerts = async () => {
+    useEffect(() => {
+        const fetchAlerts = async () => {
         try {
             const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/ingredientes/bajo-stock`)
             if (!response.ok) {
@@ -35,18 +36,10 @@ export default function StockAlerts() {
         catch (error) {
             console.error("Error al obtener los alertas de stock:", error);
         }
-    };
-    
-    // Recupera las alertas al comienzo y cada 5 segundos
-    useEffect(() => {
+        };
+
         fetchAlerts();
-        
-        const interval = setInterval(() => {
-            fetchAlerts();
-        }, 15000);
-        
-        return () => clearInterval(interval);
-    }, []);
+    }, [])
 
     return (
         <div className="flex flex-col rounded-md mx-5 text-black bg-red-300 border-red-600">

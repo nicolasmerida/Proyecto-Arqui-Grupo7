@@ -79,7 +79,7 @@ export default function Cocinero() {
 
     const interval = setInterval(() => {
       fetchComandas();
-    }, 10000);
+    }, 5000);
 
     return () => clearInterval(interval);
   }, []);

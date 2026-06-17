@@ -1,11 +1,7 @@
 // app/ui/sales/sales-card.tsx
 import { HiOutlineTrendingUp } from "react-icons/hi";
 
-interface SalesCardProps {
-    sales: number
-}
-
-export default function SalesCard({ sales }: SalesCardProps) {
+export default function SalesCard() {
     var total = 0; //Consultar ganancia total desde el backend
     const colorTotal = (total > 0) ? "text-green-500" : 
                         (total < 0) ? "text-red-500" :
