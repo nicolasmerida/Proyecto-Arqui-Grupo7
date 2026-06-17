@@ -44,4 +44,20 @@ public class MesaController {
         mesaService.eliminar(id);
         return ResponseEntity.noContent().build();
     }
+
+    @PutMapping("/{numero}/estado")
+    public ResponseEntity<MesaDTO> cambiarEstado(@PathVariable Integer numero, @RequestBody com.uns.sistemarestaurantebackend.dto.MesaEstadoInputDTO input) {
+        Mesa mesa;
+        if ("Ocupada".equalsIgnoreCase(input.getEstadoMesa())) {
+            if (input.getNumeroComensales() == null) {
+                return ResponseEntity.badRequest().build();
+            }
+            mesa = mesaService.abrirMesa(numero, input.getNumeroComensales());
+        } else if ("Libre".equalsIgnoreCase(input.getEstadoMesa())) {
+            mesa = mesaService.cerrarMesa(numero);
+        } else {
+            return ResponseEntity.badRequest().build();
+        }
+        return ResponseEntity.ok(mesaMapper.toDTO(mesa));
+    }
 }

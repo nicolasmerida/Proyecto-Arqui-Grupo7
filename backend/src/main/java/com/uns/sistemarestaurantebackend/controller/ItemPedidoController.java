@@ -47,12 +47,13 @@ public class ItemPedidoController {
         return ResponseEntity.ok(itemPedidoMapper.toDTO(guardado));
     }
 
-    @PutMapping("/estado")
-    public ResponseEntity<ItemPedidoDTO> cambiarEstado(@RequestParam Integer numeroComanda,
-                                                       @RequestParam Integer idPlato,
-                                                       @RequestParam String nuevoEstado) {
+    @PutMapping("/{numeroComanda}/{idPlato}/estado")
+    public ResponseEntity<ItemPedidoDTO> cambiarEstado(
+            @PathVariable Integer numeroComanda,
+            @PathVariable Integer idPlato,
+            @RequestBody com.uns.sistemarestaurantebackend.dto.ItemEstadoInputDTO input) {
         ItemPedidoId id = new ItemPedidoId(numeroComanda, idPlato);
-        ItemPedido actualizado = itemPedidoService.cambiarEstado(id, nuevoEstado);
+        ItemPedido actualizado = itemPedidoService.cambiarEstado(id, input.getNuevoEstado());
         return ResponseEntity.ok(itemPedidoMapper.toDTO(actualizado));
     }
 

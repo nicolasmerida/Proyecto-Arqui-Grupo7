@@ -90,8 +90,10 @@ public class ComandaService {
         }
 
         if (!valida) {
-            throw new IllegalStateException(
-                    "Transición de estado inválida: no se puede pasar de " + actual.name() + " a " + nuevo.name());
+            throw new com.uns.sistemarestaurantebackend.exception.NegocioException(
+                    "TRANSICION_INVALIDA",
+                    "Transición de estado inválida: no se puede pasar de " + actual.name() + " a " + nuevo.name()
+            );
         }
     }
 

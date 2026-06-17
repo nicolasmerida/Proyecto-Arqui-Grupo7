@@ -81,10 +81,10 @@ public class ComandaController {
     }
 
     @PutMapping("/{id}/estado")
-    public ResponseEntity<ComandaResumenDTO> cambiarEstado(
+    public ResponseEntity<com.uns.sistemarestaurantebackend.dto.ComandaResumenDTO> cambiarEstado(
             @PathVariable Integer id,
-            @RequestParam String nuevoEstado) {
-        Comanda actualizada = comandaService.cambiarEstado(id, nuevoEstado);
+            @RequestBody com.uns.sistemarestaurantebackend.dto.ComandaEstadoInputDTO input) {
+        Comanda actualizada = comandaService.cambiarEstado(id, input.getNuevoEstado());
         return ResponseEntity.ok(comandaMapper.toResumenDTO(actualizada));
     }
 
