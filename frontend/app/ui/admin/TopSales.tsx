@@ -8,8 +8,7 @@ export default function TopSales() {
     const max = Math.max(...sales.map(p => p.cantidad));
 
     //Consultar top de ventas al backend
-    useEffect(() => {
-        const fetchSales = async () => {
+    const fetchSales = async () => {
         try {
             //Ajustar URL de la API
             const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/ventas`)
@@ -37,8 +36,9 @@ export default function TopSales() {
         catch (error) {
             console.error("Error al obtener el top de ventas:", error);
         }
-        };
-
+    };
+    
+    useEffect(() => {
         fetchSales();
     }, [])
 
