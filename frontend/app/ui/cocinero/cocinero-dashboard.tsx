@@ -71,9 +71,14 @@ export default function CocineroDashboard({ initialComandas }: CocineroDashboard
     setComandas((prev) => prev.map(c => c.numeroComanda === numero ? { ...c, estadoComanda: nuevo } : c));
 
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/comandas/${numero}/estado?nuevoEstado=${nuevo}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/comandas/${numero}/estado`, {
         method: "PUT",
-        headers: { "Content-Type": "application/json" }
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          nuevoEstado: nuevo
+        })
       });
       if (!response.ok) {
         throw new Error(`Error al cambiar estado a ${nuevo}`);

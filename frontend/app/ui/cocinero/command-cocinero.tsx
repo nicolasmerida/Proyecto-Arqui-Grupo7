@@ -23,11 +23,14 @@ export default function CommandCocinero({ command, state, lastUpdate }: CommandP
     const cambiarEstado = async (item: Item_Pedido, nuevo: EstadoItem) => {
         try {
             const baseUrl = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8080";
-            const response = await fetch(`${baseUrl}/api/items-pedido/estado?numeroComanda=${item.numeroComanda}&idPlato=${item.idPlato}&nuevoEstado=${nuevo}`, {
+            const response = await fetch(`${baseUrl}/api/items-pedido/${item.numeroComanda}/${item.idPlato}/estado`, {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",
-                }
+                },
+                body: JSON.stringify({
+                    nuevoEstado: nuevo
+                })
             });
 
             if (!response.ok) {

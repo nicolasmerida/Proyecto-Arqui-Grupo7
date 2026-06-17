@@ -62,11 +62,15 @@ export default function PlanoSalon() {
 
         try {
             const baseUrl = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8080";
-            const response = await fetch(`${baseUrl}/api/mesas/${mesa.numeroMesa}/abrir?numeroComensales=${numeroComensales}`, {
+            const response = await fetch(`${baseUrl}/api/mesas/${mesa.numeroMesa}/estado`, {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",
                 },
+                body: JSON.stringify({
+                    estadoMesa: "Ocupada",
+                    numeroComensales: numeroComensales
+                })
             });
 
             if (!response.ok) {
