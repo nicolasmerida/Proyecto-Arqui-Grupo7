@@ -68,9 +68,20 @@ export default function MozoMenu({ searchParams }: MozoProps) {
 
             const responses = await Promise.all(requests);
 
-            const hasErrors = responses.some(res => !res.ok);
-            if (hasErrors) {
-                alert("Hubo un error al enviar algunos ítems a la cocina. Por favor, reintente.");
+            const itemsFallidos = itemsComanda.filter((_, index) => !responses[index].ok);
+
+            if (itemsFallidos.length > 0) {
+                // Actualizamos el carrito para dejar SOLO los que fallaron, 
+                // así no re-enviamos duplicados a la cocina en el próximo intento.
+                setItemsComanda(itemsFallidos);
+                
+                try {
+                    const errorResponse = responses.find(res => !res.ok);
+                    const errorData = await errorResponse!.json();
+                    alert(`Error del sistema: ${errorData.error?.message || 'Error desconocido'}`);
+                } catch(e) {
+                    alert("Hubo un error al enviar algunos ítems a la cocina. Por favor, reintente.");
+                }
                 setIsSubmitting(false);
                 return;
             }

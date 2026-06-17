@@ -60,4 +60,16 @@ public class MesaController {
         }
         return ResponseEntity.ok(mesaMapper.toDTO(mesa));
     }
+
+    // TODO: Eliminar este endpoint de emergencia. Es solo para propósitos de testeo local para forzar la liberación de las mesas sin comanda.
+    @PutMapping("/liberar-todas")
+    public ResponseEntity<Void> liberarTodasForzado() {
+        List<Mesa> mesas = mesaService.obtenerTodas();
+        for (Mesa m : mesas) {
+            m.setEstadoMesa(com.uns.sistemarestaurantebackend.model.enums.EstadoMesa.LIBRE);
+            m.setHoraDeApertura(null);
+            mesaService.guardar(m);
+        }
+        return ResponseEntity.ok().build();
+    }
 }

@@ -66,7 +66,11 @@ public class ItemPedidoService {
                 .map(e -> {
                     Map<String, Object> map = new HashMap<>();
                     map.put("cantidad", e.getValue());
-                    map.put("plato", infoPlatos.get(e.getKey()));
+                    com.uns.sistemarestaurantebackend.model.Plato p = infoPlatos.get(e.getKey());
+                    Map<String, Object> platoReducido = new HashMap<>();
+                    platoReducido.put("idPlato", p.getIdPlato());
+                    platoReducido.put("nombre", p.getNombre());
+                    map.put("plato", platoReducido);
                     return map;
                 })
                 .collect(Collectors.toList());
@@ -110,6 +114,10 @@ public class ItemPedidoService {
         if (estadoNuevo == EstadoItem.LISTO) {
             wsNotifiaNotificacionService.notificarItemListo(itemPedidoMapper.toDTO(guardado));
         }
+
+        // Notificar a cocina del cambio de estado para que React recargue la tarjeta automáticamente
+        List<ItemPedido> items = itemPedidoRepository.findByComandaNumeroComanda(guardado.getComanda().getNumeroComanda());
+        wsNotifiaNotificacionService.notificarNuevoPedidoCocina(comandaMapper.toDetalleDTO(guardado.getComanda(), items));
 
         return guardado;
     }
