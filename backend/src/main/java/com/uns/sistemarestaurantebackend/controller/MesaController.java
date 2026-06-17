@@ -66,9 +66,15 @@ public class MesaController {
     public ResponseEntity<Void> liberarTodasForzado() {
         List<Mesa> mesas = mesaService.obtenerTodas();
         for (Mesa m : mesas) {
-            m.setEstadoMesa(com.uns.sistemarestaurantebackend.model.enums.EstadoMesa.LIBRE);
-            m.setHoraDeApertura(null);
-            mesaService.guardar(m);
+            if (m.getEstadoMesa() == com.uns.sistemarestaurantebackend.model.enums.EstadoMesa.OCUPADA) {
+                try {
+                    mesaService.cerrarMesa(m.getNumeroMesa());
+                } catch (Exception e) {
+                    m.setEstadoMesa(com.uns.sistemarestaurantebackend.model.enums.EstadoMesa.LIBRE);
+                    m.setHoraDeApertura(null);
+                    mesaService.guardar(m);
+                }
+            }
         }
         return ResponseEntity.ok().build();
     }
