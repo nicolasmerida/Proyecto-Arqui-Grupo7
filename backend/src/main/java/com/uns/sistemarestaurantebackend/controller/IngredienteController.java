@@ -1,5 +1,7 @@
 package com.uns.sistemarestaurantebackend.controller;
 
+import com.uns.sistemarestaurantebackend.dto.IngredienteDTO;
+import com.uns.sistemarestaurantebackend.dto.mapper.IngredienteMapper;
 import com.uns.sistemarestaurantebackend.model.Ingrediente;
 import com.uns.sistemarestaurantebackend.service.GestorStockFacade;
 import com.uns.sistemarestaurantebackend.service.IngredienteService;
@@ -12,42 +14,48 @@ import java.util.List;
 @RequestMapping("/ingredientes")
 public class IngredienteController {
 
-    // Inyección por constructor doble
     private final IngredienteService ingredienteService;
     private final GestorStockFacade gestorStockFacade;
+    private final IngredienteMapper ingredienteMapper;
 
-    public IngredienteController(IngredienteService ingredienteService, GestorStockFacade gestorStockFacade) {
+    public IngredienteController(IngredienteService ingredienteService,
+                                 GestorStockFacade gestorStockFacade,
+                                 IngredienteMapper ingredienteMapper) {
         this.ingredienteService = ingredienteService;
         this.gestorStockFacade = gestorStockFacade;
+        this.ingredienteMapper = ingredienteMapper;
     }
 
     @GetMapping
-    public ResponseEntity<List<Ingrediente>> obtenerTodos() {
-        return ResponseEntity.ok(ingredienteService.obtenerTodos());
+    public ResponseEntity<List<IngredienteDTO>> obtenerTodos() {
+        List<Ingrediente> ingredientes = ingredienteService.obtenerTodos();
+        return ResponseEntity.ok(ingredienteMapper.toDTOList(ingredientes));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Ingrediente> obtenerPorId(@PathVariable Integer id) {
-        // Super limpio: el Controller solo llama al Service
-        return ResponseEntity.ok(ingredienteService.obtenerPorId(id));
+    public ResponseEntity<IngredienteDTO> obtenerPorId(@PathVariable Integer id) {
+        Ingrediente ingrediente = ingredienteService.obtenerPorId(id);
+        return ResponseEntity.ok(ingredienteMapper.toDTO(ingrediente));
     }
 
     @GetMapping("/bajo-stock")
-    public ResponseEntity<List<Ingrediente>> obtenerBajoStock() {
-        return ResponseEntity.ok(ingredienteService.obtenerBajoStock());
+    public ResponseEntity<List<IngredienteDTO>> obtenerBajoStock() {
+        List<Ingrediente> ingredientes = ingredienteService.obtenerBajoStock();
+        return ResponseEntity.ok(ingredienteMapper.toDTOList(ingredientes));
     }
 
     @PostMapping
-    public ResponseEntity<Ingrediente> crear(@RequestBody Ingrediente ingrediente) {
-        return ResponseEntity.ok(ingredienteService.guardar(ingrediente));
+    public ResponseEntity<IngredienteDTO> crear(@RequestBody IngredienteDTO ingredienteDTO) {
+        Ingrediente ingrediente = ingredienteMapper.toEntity(ingredienteDTO);
+        Ingrediente guardado = ingredienteService.guardar(ingrediente);
+        return ResponseEntity.ok(ingredienteMapper.toDTO(guardado));
     }
 
     @PutMapping("/{id}/stock")
-    public ResponseEntity<Ingrediente> actualizarStock(
-            @PathVariable Integer id,
-            @RequestParam Integer cantidad) {
-        // Por ahora pasamos usuario 1 por defecto hasta implementar Security
-        return ResponseEntity.ok(gestorStockFacade.registrarMovimiento(id, cantidad, 1));
+    public ResponseEntity<IngredienteDTO> actualizarStock(@PathVariable Integer id,
+                                                          @RequestParam Integer cantidad) {
+        Ingrediente actualizado = gestorStockFacade.registrarMovimiento(id, cantidad, 1);
+        return ResponseEntity.ok(ingredienteMapper.toDTO(actualizado));
     }
 
     @DeleteMapping("/{id}")

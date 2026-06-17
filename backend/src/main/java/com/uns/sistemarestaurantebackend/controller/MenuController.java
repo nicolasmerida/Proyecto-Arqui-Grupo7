@@ -1,28 +1,29 @@
 package com.uns.sistemarestaurantebackend.controller;
 
+import com.uns.sistemarestaurantebackend.dto.PlatoDTO;
+import com.uns.sistemarestaurantebackend.dto.mapper.PlatoMapper;
 import com.uns.sistemarestaurantebackend.model.Plato;
 import com.uns.sistemarestaurantebackend.service.PlatoService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/platos")
+@RequestMapping("/menu")
 public class MenuController {
 
-    @Autowired
     private final PlatoService platoService;
+    private final PlatoMapper platoMapper;
 
-    // Inyección recomendada por constructor de la industria
-    public MenuController(PlatoService platoService) {
+    public MenuController(PlatoService platoService, PlatoMapper platoMapper) {
         this.platoService = platoService;
+        this.platoMapper = platoMapper;
     }
 
     @GetMapping
-    public Page<Plato> getMenu(@RequestParam(defaultValue = "0") int page,
+    public Page<PlatoDTO> getMenu(@RequestParam(defaultValue = "0") int page,
                                 @RequestParam(defaultValue = "8") int size) {
-        return platoService.obtenerMenuPaginado(PageRequest.of(page, size));
+        Page<Plato> platos = platoService.obtenerMenuPaginado(PageRequest.of(page, size));
+    return platos.map(platoMapper::toDTO);
     }
-}    
-
+}
