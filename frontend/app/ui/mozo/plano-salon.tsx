@@ -198,8 +198,8 @@ export default function PlanoSalon() {
         fetchMesas();
     }, []);
 
-    const ocupadas = mesas.filter(mesa => mesa.estadoMesa === EstadoMesa.Ocupada);
-    const libres = mesas.filter(mesa => mesa.estadoMesa === EstadoMesa.Libre);
+    const mesasOcupadas = mesas.filter(mesa => mesa.estadoMesa === EstadoMesa.Ocupada);
+    const mesasLibres = mesas.filter(mesa => mesa.estadoMesa === EstadoMesa.Libre);
 
     return (
         <div className="flex flex-col">
@@ -207,7 +207,7 @@ export default function PlanoSalon() {
                 <div className="flex flex-col">
                     <span className="text-xl text-white font-serif italic">Plano del salon</span>
                     <span className="text-sm text-gray-300">
-                        {ocupadas.length} ocupadas - {libres.length} libres
+                        {mesasOcupadas.length} ocupadas - {mesasLibres.length} libres
                     </span>
                 </div>
                 <div className="grid grid-cols-5 items-center p-1 gap-1">
@@ -217,7 +217,7 @@ export default function PlanoSalon() {
                     </button>
                     <button className={`border rounded-lg transition ${vista === VISTA.libres ? "text-black bg-amber-200" : "text-slate-400"}`}
                         onClick={() => setVista(VISTA.libres)}>
-                        Libres
+                        mesasLibres
                     </button>
                     <button className={`border rounded-lg transition ${vista === VISTA.ocupadas ? "text-black bg-amber-200" : "text-slate-400"}`}
                         onClick={() => setVista(VISTA.ocupadas)}>
@@ -228,34 +228,29 @@ export default function PlanoSalon() {
             {(mesas.length > 0) ? (
                 <div className="grid grid-cols-3 lg:grid-cols-4 sm:grid-cols-2 gap-2 m-1">
                     {(vista === VISTA.todas || vista === VISTA.libres) && (
-                        mesas.filter(mesa => mesa.estadoMesa === EstadoMesa.Libre)
-                            .map((mesa, index) => (
+                        mesasLibres.map((mesa, index) => (
                                 <button key={index} className="border rounded-lg p-2 bg-green-300 border-green-500"
                                     onClick={() => handleMesaLibre(mesa)}
                                     disabled={cargando}
                                 >
                                     <div className="flex flex-col justify-center items-center text-green-500">
-                                        <GiTable />
-                                        <span className="text-xl font-serif">{mesa.numeroMesa}</span>
+                                        <GiTable className="text-xl" />
+                                        <span className="text-lg font-serif">Mesa {mesa.numeroMesa}</span>
                                         <span className="text-sm">{mesa.capacidad} personas</span>
                                     </div>
                                 </button>
                             ))
                     )}
                     {(vista === VISTA.todas || vista === VISTA.ocupadas) && (
-                        mesas.filter(mesa => mesa.estadoMesa === EstadoMesa.Ocupada)
-                            .map((mesa, index) => (
+                        mesasOcupadas.map((mesa, index) => (
                                 <button key={index} className="border rounded-lg p-2 bg-red-300 border-red-500 hover:bg-red-400 transition-colors group relative overflow-hidden"
                                     onClick={() => handleMesaOcupada(mesa)}
                                     disabled={cargando}
                                 >
                                     <div className="flex flex-col justify-center items-center text-red-600 group-hover:text-red-800 transition-colors">
-                                        <GiTable />
-                                        <span className="text-xl font-serif">{mesa.numeroMesa}</span>
+                                        <GiTable className="text-xl" />
+                                        <span className="text-lg font-serif">Mesa {mesa.numeroMesa}</span>
                                         <span className="text-sm">{mesa.capacidad} personas</span>
-                                        <div className="absolute inset-0 bg-red-500/80 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                                            <span className="text-white font-bold text-sm text-center px-1">Ver/Cobrar<br/>Cuenta</span>
-                                        </div>
                                     </div>
                                 </button>
                             ))
