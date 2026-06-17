@@ -1,6 +1,6 @@
 'use server';
 
-import { Comanda } from "./definitions";
+import { ComandaResumen, ComandaDetalle } from "./definitions";
 
 // Usa la URL configurada en el entorno o un fallback local para el backend
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8080';
@@ -8,7 +8,7 @@ const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:808
 /**
  * Obtiene todas las comandas desde el backend.
  */
-export async function getComandas(): Promise<Comanda[]> {
+export async function getComandas(): Promise<ComandaResumen[]> {
   try {
     const response = await fetch(`${BACKEND_URL}/api/comandas`, {
       cache: 'no-store', // Para asegurar datos frescos en renderizado inicial SSR
@@ -39,11 +39,11 @@ export async function getComandas(): Promise<Comanda[]> {
 }
 
 /**
- * Obtiene las comandas relevantes para la vista de cocina desde el backend.
+ * Obtiene las comandas relevantes para la vista de cocina desde el backend con detalles.
  */
-export async function getComandasCocina(): Promise<Comanda[]> {
+export async function getComandasCocina(): Promise<ComandaDetalle[]> {
   try {
-    const response = await fetch(`${BACKEND_URL}/api/comandas`, {
+    const response = await fetch(`${BACKEND_URL}/api/comandas/activas`, {
       cache: 'no-store',
     });
 
@@ -51,7 +51,7 @@ export async function getComandasCocina(): Promise<Comanda[]> {
       throw new Error(`Error ${response.status} al consultar comandas de cocina`);
     }
 
-    const comandas: Comanda[] = await response.json();
+    const comandas: ComandaDetalle[] = await response.json();
     return comandas;
   } catch (error) {
     console.error("Error en getComandasCocina action:", error);
