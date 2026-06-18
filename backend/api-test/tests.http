@@ -92,7 +92,7 @@ GET http://localhost:8080/api/mesas/1
 GET http://localhost:8080/api/mesas/estado/LIBRE
 
 ###
-
+POST http://localhost:8080/api/pagos/crear
 ### Abrir una mesa.
 ### Cambia la mesa de LIBRE a OCUPADA.
 ### También crea automáticamente una comanda activa para esa mesa.

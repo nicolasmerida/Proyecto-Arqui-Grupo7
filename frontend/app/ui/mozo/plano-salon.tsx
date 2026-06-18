@@ -1,4 +1,3 @@
-// app/ui/mozo/plano-salon.tsx
 'use client';
 import { EstadoMesa, Mesa } from "@/app/lib/definitions";
 import AddDiner from "@/app/ui/forms/AddDiners";
@@ -33,7 +32,6 @@ export default function PlanoSalon() {
                 let errorMessage = `Error ${response.status} inesperado al consultar mesas`;
                 let errorCode = `ERROR_DESCONOCIDO`;
                 try {
-                    //Intento obtener el mensaje de error desde la API
                     const errorData = await response.json();
                     if (errorData?.error?.message) {
                         errorMessage = errorData.error.message;
@@ -43,7 +41,6 @@ export default function PlanoSalon() {
                 catch (e) {
                     //Se mantiene el mensaje de error por defecto
                 }
-                //Lanzo el error
                 throw new Error(errorMessage, { cause: errorCode });
             }
 
@@ -67,21 +64,18 @@ export default function PlanoSalon() {
         setMesaSeleccionada(mesa);
         try {
             const baseUrl = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8080";
-            // Obtener la comanda activa de esta mesa
             const responseComanda = await fetch(`${baseUrl}/api/comandas/mesa/${mesa.numeroMesa}`);
             if (!responseComanda.ok) throw new Error("No se pudo obtener la comanda de la mesa.");
             const comandaResumen = await responseComanda.json();
-            
-            // Obtener el detalle completo para los items
+
             const responseDetalle = await fetch(`${baseUrl}/api/comandas/${comandaResumen.numeroComanda}`);
             if (!responseDetalle.ok) throw new Error("No se pudo obtener el detalle de la comanda.");
             const comandaDetalle = await responseDetalle.json();
-            
-            // Obtener el total de la comanda
+
             const responseTotal = await fetch(`${baseUrl}/api/comandas/${comandaDetalle.numeroComanda}/total`);
             if (!responseTotal.ok) throw new Error("No se pudo obtener el total.");
             const total = await responseTotal.text();
-            
+
             setComandaActivaId(comandaDetalle.numeroComanda);
             setComandaActivaItems(comandaDetalle.items || []);
             setTotalComanda(total);
@@ -94,33 +88,33 @@ export default function PlanoSalon() {
         }
     };
 
+    // LOGA REAL DE INTEGRACIÓN CON MERCADO PAGO (REEMPLAZA AL MOCK ANTERIOR)
     const handlePagarMesa = async () => {
         if (!mesaSeleccionada) return;
         setCargando(true);
         try {
-            // Simular demora de Mercado Pago
-            await new Promise(resolve => setTimeout(resolve, 2000));
-            
             const baseUrl = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8080";
-            const response = await fetch(`${baseUrl}/api/mesas/${mesaSeleccionada.numeroMesa}/estado`, {
-                method: "PUT",
+
+            // 1. Solicitamos la creación del link de cobro al servicio de Mercado Pago en Java
+            const response = await fetch(`${baseUrl}/pagos/crear`, {
+                method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ estadoMesa: "Libre" })
+                body: JSON.stringify({ idMesa: mesaSeleccionada.numeroMesa })
             });
 
-            if (!response.ok) throw new Error("No se pudo cerrar la mesa.");
-            
-            alert("¡Pago procesado exitosamente por Mercado Pago! La mesa ha sido liberada.");
-            setModalOcupadaVisible(false);
-            setMesaSeleccionada(null);
-            setComandaActivaId(null);
-            
-            // Refrescar mesas
-            fetchMesas();
+            const urlPago = await response.text();
+
+            // 2. Si el Backend responde con el punto de inicio válido (InitPoint) de la API de MP, redirigimos la ventana
+            if (urlPago && urlPago.startsWith("https://")) {
+                window.location.href = urlPago;
+            } else {
+                // Manejo de errores lógicos del negocio del servidor (ej: si los ítems sumaban $0.00)
+                alert("Error al generar orden: " + urlPago);
+                setCargando(false);
+            }
         } catch (error) {
-            console.error(error);
-            alert("Hubo un problema al procesar el pago.");
-        } finally {
+            console.error("Error de conexión con el backend de pagos:", error);
+            alert("No se pudo establecer comunicación con el servidor. Verifique que el servicio backend esté activo.");
             setCargando(false);
         }
     };
@@ -145,7 +139,6 @@ export default function PlanoSalon() {
             if (!response.ok) {
                 let errorMessage = `Error ${response.status} inesperado al abrir la mesa`;
                 let errorCode = `ERROR_DESCONOCIDO`;
-                //Intento obtener el mensaje de error desde la API
                 try {
                     const errorData = await response.json();
                     if (errorData?.error?.message) {
@@ -154,14 +147,11 @@ export default function PlanoSalon() {
                     }
                 }
                 catch (e) {
-                    // Se mantiene el mensaje de error por defecto
                 }
-                //Lanzo el error
                 throw new Error(errorMessage, { cause: errorCode });
             }
 
             await response.json();
-            //Obtengo la comanda para la mesa seleccionada
             const responseComanda = await fetch(`${baseUrl}/api/comandas/mesa/${mesa.numeroMesa}`);
 
             if (!responseComanda.ok) {
@@ -185,7 +175,6 @@ export default function PlanoSalon() {
         setMesaSeleccionada(null);
     };
 
-    // Suscripción WebSocket para actualizar mesas en tiempo real
     const onMesaUpdate = useCallback((mesaActualizada: Mesa) => {
         setMesas(prev => prev.map(m =>
             m.numeroMesa === mesaActualizada.numeroMesa ? mesaActualizada : m
@@ -212,15 +201,15 @@ export default function PlanoSalon() {
                 </div>
                 <div className="grid grid-cols-5 items-center p-1 gap-1">
                     <button className={`border rounded-lg transition ${vista === VISTA.todas ? "text-black bg-amber-200" : "text-slate-400"}`}
-                        onClick={() => setVista(VISTA.todas)}>
+                            onClick={() => setVista(VISTA.todas)}>
                         Todas
                     </button>
                     <button className={`border rounded-lg transition ${vista === VISTA.libres ? "text-black bg-amber-200" : "text-slate-400"}`}
-                        onClick={() => setVista(VISTA.libres)}>
+                            onClick={() => setVista(VISTA.libres)}>
                         mesasLibres
                     </button>
                     <button className={`border rounded-lg transition ${vista === VISTA.ocupadas ? "text-black bg-amber-200" : "text-slate-400"}`}
-                        onClick={() => setVista(VISTA.ocupadas)}>
+                            onClick={() => setVista(VISTA.ocupadas)}>
                         Ocupadas
                     </button>
                 </div>
@@ -229,31 +218,31 @@ export default function PlanoSalon() {
                 <div className="grid grid-cols-3 lg:grid-cols-4 sm:grid-cols-2 gap-2 m-1">
                     {(vista === VISTA.todas || vista === VISTA.libres) && (
                         mesasLibres.map((mesa, index) => (
-                                <button key={index} className="border rounded-lg p-2 bg-green-300 border-green-500"
+                            <button key={index} className="border rounded-lg p-2 bg-green-300 border-green-500"
                                     onClick={() => handleMesaLibre(mesa)}
                                     disabled={cargando}
-                                >
-                                    <div className="flex flex-col justify-center items-center text-green-500">
-                                        <GiTable className="text-xl" />
-                                        <span className="text-lg font-serif">Mesa {mesa.numeroMesa}</span>
-                                        <span className="text-sm">{mesa.capacidad} personas</span>
-                                    </div>
-                                </button>
-                            ))
+                            >
+                                <div className="flex flex-col justify-center items-center text-green-500">
+                                    <GiTable className="text-xl" />
+                                    <span className="text-lg font-serif">Mesa {mesa.numeroMesa}</span>
+                                    <span className="text-sm">{mesa.capacidad} personas</span>
+                                </div>
+                            </button>
+                        ))
                     )}
                     {(vista === VISTA.todas || vista === VISTA.ocupadas) && (
                         mesasOcupadas.map((mesa, index) => (
-                                <button key={index} className="border rounded-lg p-2 bg-red-300 border-red-500 hover:bg-red-400 transition-colors group relative overflow-hidden"
+                            <button key={index} className="border rounded-lg p-2 bg-red-300 border-red-500 hover:bg-red-400 transition-colors group relative overflow-hidden"
                                     onClick={() => handleMesaOcupada(mesa)}
                                     disabled={cargando}
-                                >
-                                    <div className="flex flex-col justify-center items-center text-red-600 group-hover:text-red-800 transition-colors">
-                                        <GiTable className="text-xl" />
-                                        <span className="text-lg font-serif">Mesa {mesa.numeroMesa}</span>
-                                        <span className="text-sm">{mesa.capacidad} personas</span>
-                                    </div>
-                                </button>
-                            ))
+                            >
+                                <div className="flex flex-col justify-center items-center text-red-600 group-hover:text-red-800 transition-colors">
+                                    <GiTable className="text-xl" />
+                                    <span className="text-lg font-serif">Mesa {mesa.numeroMesa}</span>
+                                    <span className="text-sm">{mesa.capacidad} personas</span>
+                                </div>
+                            </button>
+                        ))
                     )}
                 </div>
             ) : (

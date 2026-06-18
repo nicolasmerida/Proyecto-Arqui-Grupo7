@@ -61,6 +61,22 @@ public class MesaController {
         return ResponseEntity.ok(mesaMapper.toDTO(mesa));
     }
 
+    // NUEVO ENDPOINT: Recibe la confirmación del pago desde el Frontend y libera la mesa
+    @PostMapping("/{numeroMesa}/cerrar-pago")
+    public ResponseEntity<?> cerrarMesaTrasPago(
+            @PathVariable Integer numeroMesa,
+            @RequestParam String paymentId,
+            @RequestParam String metodoPago) {
+        try {
+            // Llama al servicio que guarda la Factura y libera la Mesa
+            Mesa mesaLiberada = mesaService.cerrarMesaConPago(numeroMesa, paymentId, metodoPago);
+            // Devuelve el DTO respetando la arquitectura de la capa de presentación
+            return ResponseEntity.ok(mesaMapper.toDTO(mesaLiberada));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Error al procesar el pago de la mesa: " + e.getMessage());
+        }
+    }
+
     // TODO: Eliminar este endpoint de emergencia. Es solo para propósitos de testeo local para forzar la liberación de las mesas sin comanda.
     @PutMapping("/liberar-todas")
     public ResponseEntity<Void> liberarTodasForzado() {

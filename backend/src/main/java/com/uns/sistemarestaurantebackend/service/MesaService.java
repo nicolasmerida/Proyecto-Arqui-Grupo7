@@ -3,13 +3,17 @@ package com.uns.sistemarestaurantebackend.service;
 import com.uns.sistemarestaurantebackend.exception.NegocioException;
 import com.uns.sistemarestaurantebackend.exception.RecursoNoEncontradoException;
 import com.uns.sistemarestaurantebackend.model.Comanda;
+import com.uns.sistemarestaurantebackend.model.Factura;
 import com.uns.sistemarestaurantebackend.model.Mesa;
 import com.uns.sistemarestaurantebackend.model.enums.EstadoComanda;
 import com.uns.sistemarestaurantebackend.model.enums.EstadoMesa;
+import com.uns.sistemarestaurantebackend.model.enums.MetodoPago;
+import com.uns.sistemarestaurantebackend.repository.FacturaRepository;
 import com.uns.sistemarestaurantebackend.repository.MesaRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -22,24 +26,27 @@ public class MesaService {
     private final WebSocketNotificacionService wSocketNotificacionService;
     private final com.uns.sistemarestaurantebackend.dto.mapper.MesaMapper mesaMapper;
 
+    // NUEVA DEPENDENCIA AGREGADA
+    private final FacturaRepository facturaRepository;
 
     // NOTA SOBRE DEPENDENCIA CIRCULAR:
     // Como ComandaService NO inyecta a MesaService, es 100% seguro usar inyección por constructor acá.
-    public MesaService(MesaRepository mesaRepository, 
-                        ComandaService comandaService, 
-                        WebSocketNotificacionService wSocketNotificacionService,
-                        com.uns.sistemarestaurantebackend.dto.mapper.MesaMapper mesaMapper) {
+    public MesaService(MesaRepository mesaRepository,
+                       ComandaService comandaService,
+                       WebSocketNotificacionService wSocketNotificacionService,
+                       com.uns.sistemarestaurantebackend.dto.mapper.MesaMapper mesaMapper,
+                       FacturaRepository facturaRepository) {
         this.mesaRepository = mesaRepository;
         this.comandaService = comandaService;
         this.wSocketNotificacionService = wSocketNotificacionService;
         this.mesaMapper = mesaMapper;
+        this.facturaRepository = facturaRepository;
     }
 
     public List<Mesa> obtenerTodas() {
         return mesaRepository.findAll();
     }
 
-    // Ya no devuelve Optional. Centraliza el error 404 para todo el servicio.
     public Mesa obtenerPorNumero(Integer numeroMesa) {
         return mesaRepository.findById(numeroMesa)
                 .orElseThrow(() -> new RecursoNoEncontradoException(
@@ -57,7 +64,6 @@ public class MesaService {
 
     @Transactional
     public Mesa abrirMesa(Integer numeroMesa, Integer numeroComensales) {
-        // Reutilizamos el método de arriba para buscar la mesa
         Mesa mesa = obtenerPorNumero(numeroMesa);
 
         if (EstadoMesa.LIBRE != mesa.getEstadoMesa()) {
@@ -77,15 +83,14 @@ public class MesaService {
         Mesa mesaGuardada = mesaRepository.save(mesa);
 
         comandaService.crearComandaParaMesa(mesaGuardada);
-        //notificarCambioSalon(mesaGuardada) via WebSocket
         wSocketNotificacionService.notificarCambioSalon(mesaMapper.toDTO(mesaGuardada));
-        
+
         return mesaGuardada;
     }
 
+    // MÉTODO NUEVO PARA CERRAR LA MESA Y GUARDAR LA FACTURA (MERCADO PAGO)
     @Transactional
-    public Mesa cerrarMesa(Integer numeroMesa) {
-        // Reutilizamos el método de arriba
+    public Mesa cerrarMesaConPago(Integer numeroMesa, String paymentId, String metodoPagoStr) {
         Mesa mesa = obtenerPorNumero(numeroMesa);
 
         Comanda comanda = comandaService.obtenerPorMesa(numeroMesa)
@@ -93,21 +98,55 @@ public class MesaService {
                         "COMANDA_ACTIVA_NO_ENCONTRADA",
                         "No hay una comanda activa para la mesa " + numeroMesa));
 
-        // Permitir cerrar la mesa en cualquier estado para testing (o si no tiene items)
-        // if (EstadoComanda.ENTREGADA != comanda.getEstadoComanda()) {
-        //     throw new NegocioException(
-        //             "ITEMS_NO_ENTREGADOS",
-        //             "La mesa " + numeroMesa + " no puede ser cerrada porque todavia no se han entregado todos los items.");
-        // }
+        // 1. Calculamos el total
+        BigDecimal total = comandaService.calcularTotal(comanda.getNumeroComanda());
 
+        // 2. Guardar la Factura
+        Factura factura = Factura.builder()
+                .fechaHora(LocalDateTime.now())
+                .totalCobrado(total)
+                .metodoPago(MetodoPago.fromValor(metodoPagoStr))
+                .paymentId(paymentId)
+                .numeroMesa(mesa.getNumeroMesa())
+                .numeroComanda(comanda.getNumeroComanda())
+                .build();
+        facturaRepository.save(factura);
+
+        // 3. Cerrar la Comanda
         comanda.setEstadoComanda(EstadoComanda.CERRADA);
         comandaService.guardar(comanda);
 
+        // 4. Liberar la Mesa
         mesa.setEstadoMesa(EstadoMesa.LIBRE);
         mesa.setHoraDeApertura(null);
-        mesaRepository.save(mesa);
+        Mesa mesaLiberada = mesaRepository.save(mesa);
 
-        return mesa;
+        // Notificar por WebSocket
+        wSocketNotificacionService.notificarCambioSalon(mesaMapper.toDTO(mesaLiberada));
+
+        return mesaLiberada;
+    }
+
+    // MÉTODO CLÁSICO: Cierre manual sin registrar factura de MP (Efectivo o cancelación forzada)
+    @Transactional
+    public Mesa cerrarMesa(Integer numeroMesa) {
+        Mesa mesa = obtenerPorNumero(numeroMesa);
+
+        // Cerramos la comanda activa si existe usando ifPresent para no romper si no hay comanda
+        comandaService.obtenerPorMesa(numeroMesa).ifPresent(comanda -> {
+            comanda.setEstadoComanda(EstadoComanda.CERRADA);
+            comandaService.guardar(comanda);
+        });
+
+        // Liberamos la mesa
+        mesa.setEstadoMesa(EstadoMesa.LIBRE);
+        mesa.setHoraDeApertura(null);
+        Mesa mesaLiberada = mesaRepository.save(mesa);
+
+        // Notificamos por WebSocket
+        wSocketNotificacionService.notificarCambioSalon(mesaMapper.toDTO(mesaLiberada));
+
+        return mesaLiberada;
     }
 
     public void eliminar(Integer numeroMesa) {
