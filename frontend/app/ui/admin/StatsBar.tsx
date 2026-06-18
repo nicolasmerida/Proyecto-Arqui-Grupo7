@@ -5,11 +5,11 @@ import CommandsCard from "@/app/ui/commands/command-card";
 import StaffCard from "@/app/ui/staff/staff-card";
 import TicketCard from "@/app/ui/ticket/ticket-card";
 import { useEffect, useState } from "react";
-import { Comanda, Usuario } from "@/app/lib/definitions";
+import { ComandaResumen, Usuario } from "@/app/lib/definitions";
 
 type Stats = {
     sales: number;
-    commands: Comanda[];
+    commands: ComandaResumen[];
     ticket: number;
     staff: Usuario[];
 }

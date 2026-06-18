@@ -21,7 +21,7 @@ export default function ItemCard({ item, onIncrement, onDecrement, onDelete, onE
             <div className="flex items-center gap-3">
                 <div className="flex items-center gap-2 bg-gray-100 rounded-md px-2 py-1">
                     <button onClick={onDecrement} className="text-gray-500 hover:text-black font-bold px-1">-</button>
-                    <span className="font-semibold text-black min-w-[1rem] text-center">{item.cantidad}</span>
+                    <span className="font-semibold text-black min-w-4 text-center">{item.cantidad}</span>
                     <button onClick={onIncrement} className="text-gray-500 hover:text-black font-bold px-1">+</button>
                 </div>
                 <div className="flex flex-col justify-start">

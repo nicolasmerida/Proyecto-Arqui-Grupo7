@@ -1,12 +1,11 @@
 // app/ui/mozo/mozo-dashboard.tsx
 'use client';
-
 import { useState, useCallback } from "react";
 import { ComandaResumen, EstadoComanda, Item_Pedido } from "@/app/lib/definitions";
 import CommandDetailCard from "@/app/ui/mozo/command-mozo";
 import PlanoSalon from "@/app/ui/mozo/plano-salon";
 import { useStompClient } from "@/app/lib/hooks/useStompClient";
-import { HiX, HiOutlineCash } from "react-icons/hi";
+import { HiX, HiOutlineCash, HiOutlineBell } from "react-icons/hi";
 
 const colorByState: Record<EstadoComanda, string> = {
   [EstadoComanda.Abierta]: "comanda-abierta",
@@ -139,7 +138,7 @@ const handleCerrarComanda = async () => {
               className="bg-amber-100 border border-amber-400 text-amber-900 rounded-lg shadow-md px-4 py-3 flex items-center gap-3"
             >
               <span className="font-medium">
-                🔔 Mesa {aviso.numeroMesa} — pedido listo para retirar
+                <HiOutlineBell className="text-base" /> Mesa {aviso.numeroMesa} — pedido listo para retirar
               </span>
               <button
                 onClick={() => descartarAviso(aviso.numeroComanda)}
@@ -169,7 +168,7 @@ const handleCerrarComanda = async () => {
             comandas.map((comanda) => (
               <div
                 key={comanda.numeroComanda}
-                className={`flex flex-col border-l-4 rounded-r-md shadow-sm bg-white overflow-hidden transition-all duration-300 hover:shadow-md hover:translate-y-[-2px] ${colorByState[comanda.estadoComanda]}`}
+                className={`flex flex-col border-l-4 rounded-r-md shadow-sm bg-white overflow-hidden transition-all duration-300 hover:shadow-md hover:translate-y-0.5 ${colorByState[comanda.estadoComanda]}`}
               >
               <CommandDetailCard
                   command={comanda}

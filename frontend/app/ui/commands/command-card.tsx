@@ -1,9 +1,9 @@
 // app/ui/commands/command-card.tsx
-import { Comanda } from "@/app/lib/definitions";
+import { ComandaResumen } from "@/app/lib/definitions";
 import { HiOutlineDocumentDuplicate } from "react-icons/hi2";
 
 interface CommandCardProps {
-    commands: Comanda[]
+    commands: ComandaResumen[]
 }
 
 export default function CommandCard({ commands }: CommandCardProps) {

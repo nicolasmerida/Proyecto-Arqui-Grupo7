@@ -1,6 +1,6 @@
 // app/user/admin/page.tsx
 export const dynamic = 'force-dynamic';
-import SalesChart from "@/app/ui/admin/SalesChart";
+//import SalesChart from "@/app/ui/admin/SalesChart";
 import StatsBar from "@/app/ui/admin/StatsBar";
 import StockAlerts from "@/app/ui/admin/StockAlerts";
 import TopSales from "@/app/ui/admin/TopSales";
@@ -17,7 +17,7 @@ export default async function Admin() {
           <h1 className="text-xl m-1">Bienvenido Admin</h1>
           <StatsBar />
           <div className="flex flex-row m-1 justify-between">
-            <SalesChart />
+            {/*<SalesChart /> Pensar que mostrar para el resumen de ventas*/}
             <TopSales />
           </div>
         </div>
