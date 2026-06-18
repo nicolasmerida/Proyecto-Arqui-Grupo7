@@ -57,7 +57,7 @@ public class MpService {
             PreferenceRequest request = PreferenceRequest.builder()
                     .items(List.of(item))
                     .backUrls(backUrls)
-                  //  .autoReturn("approved")
+                    //.autoReturn("approved") TODO: luego del deploy se puede implementar el return success, por ahora no.
                     .externalReference("MESA-" + idMesa)
                     .build();
 

@@ -104,26 +104,42 @@ const handlePagarYCerrar = async () => {
     if (!comandaSeleccionada) return;
     setCerrando(true);
     try {
-        const response = await fetch(
-            `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/pagos/crear`,
-            {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ idMesa: comandaSeleccionada.mesa.numeroMesa })
-            }
-        );
+        const baseUrl = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8080";
+
+        // 1. Generamos el link de pago
+        const response = await fetch(`${baseUrl}/api/pagos/crear`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ idMesa: comandaSeleccionada.mesa.numeroMesa })
+        });
 
         const urlPago = await response.text();
 
-        if (urlPago && urlPago.startsWith("https://")) {
-            window.location.href = urlPago; // redirige a Mercado Pago
-        } else {
+        if (!urlPago || !urlPago.startsWith("https://")) {
             alert("Error al generar orden: " + urlPago);
             setCerrando(false);
+            return;
         }
+
+        // 2. Liberamos la mesa (igual que antes, sin esperar confirmación del pago)
+        await fetch(
+            `${baseUrl}/api/mesas/${comandaSeleccionada.mesa.numeroMesa}/estado`,
+            {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ estadoMesa: 'Libre' })
+            }
+        );
+
+        setComandas(prev => prev.filter(c => c.numeroComanda !== comandaSeleccionada.numeroComanda));
+        cerrarModal();
+
+        // 3. Recién ahora redirigimos a Mercado Pago
+        window.location.href = urlPago;
+
     } catch (error) {
-        console.error("Error de conexión con el backend de pagos:", error);
-        alert("No se pudo establecer comunicación con el servidor.");
+        console.error("Error al pagar y cerrar comanda:", error);
+        alert("No se pudo completar la operación.");
         setCerrando(false);
     }
 };
