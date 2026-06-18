@@ -30,6 +30,11 @@ export default function MozoDashboard({ initialComandas }: MozoDashboardProps) {
 
   const onComandaUpdate = useCallback((updatedComanda: ComandaResumen) => {
     setComandas((prevComandas) => {
+      // Si la comanda se cerró o canceló, la sacamos de la lista
+      if ([EstadoComanda.Cerrada, EstadoComanda.Cancelada].includes(updatedComanda.estadoComanda)) {
+        return prevComandas.filter(c => c.numeroComanda !== updatedComanda.numeroComanda);
+      }
+
       const exists = prevComandas.find((c) => c.numeroComanda === updatedComanda.numeroComanda);
       if (exists) {
         return prevComandas.map((c) =>
