@@ -65,31 +65,6 @@ public class ComandaService {
 
         Comanda comandaActualizada = comandaRepository.save(comanda);
 
-        // Actualizar el estado de los items si corresponde (Casacada lógica)
-        List<ItemPedido> items = itemPedidoRepository.findByComanda(comandaActualizada);
-        boolean itemsModificados = false;
-        
-        for (ItemPedido item : items) {
-            if (item.getEstadoItem() != EstadoItem.CANCELADO) {
-                if (estadoNuevo == EstadoComanda.EN_PREPARACION && item.getEstadoItem() == EstadoItem.PENDIENTE) {
-                    item.setEstadoItem(EstadoItem.EN_PREPARACION);
-                    itemsModificados = true;
-                } else if (estadoNuevo == EstadoComanda.LISTA && item.getEstadoItem() == EstadoItem.EN_PREPARACION) {
-                    item.setEstadoItem(EstadoItem.LISTO);
-                    itemsModificados = true;
-                } else if (estadoNuevo == EstadoComanda.ENTREGADA && item.getEstadoItem() == EstadoItem.LISTO) {
-                    item.setEstadoItem(EstadoItem.ENTREGADO);
-                    itemsModificados = true;
-                }
-            }
-        }
-        
-        if (itemsModificados) {
-            itemPedidoRepository.saveAll(items);
-            // Avisar también a la cocina con el detalle actualizado para que se refresquen los items
-            wsNotifiaNotificacionService.notificarNuevoPedidoCocina(comandaMapper.toDetalleDTO(comandaActualizada, items));
-        }
-
         //Avisar que cambia de estado la comanda via ws
         wsNotifiaNotificacionService.notificarCambioEstadoComanda(comandaMapper.toResumenDTO(comandaActualizada));
 
@@ -129,11 +104,12 @@ public class ComandaService {
         }
     }
 
-    public Comanda crearComandaParaMesa(Mesa mesa) {
+    public Comanda crearComandaParaMesa(Mesa mesa, Integer comensales) {
         Comanda comanda = Comanda.builder()
                 .mesa(mesa)
                 .estadoComanda(EstadoComanda.ABIERTA)
                 .fecha(java.time.LocalDateTime.now())
+                .comensales(comensales)
                 .build();
         return comandaRepository.save(comanda);
     }

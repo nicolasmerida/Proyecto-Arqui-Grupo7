@@ -56,35 +56,24 @@ export default function MozoMenu({ searchParams }: MozoProps) {
         try {
             const baseUrl = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8080";
 
-            // Enviamos cada item al backend
-            const requests = itemsComanda.map(item =>
-                fetch(`${baseUrl}/api/items-pedido`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(item)
-                })
-            );
+            // Enviamos TODOS los items al backend en un solo lote (transacción atómica)
+            const response = await fetch(`${baseUrl}/api/items-pedido/batch`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(itemsComanda)
+            });
 
-            const responses = await Promise.all(requests);
-
-            const itemsFallidos = itemsComanda.filter((_, index) => !responses[index].ok);
-
-            if (itemsFallidos.length > 0) {
-                // Actualizamos el carrito para dejar SOLO los que fallaron, 
-                // así no re-enviamos duplicados a la cocina en el próximo intento.
-                setItemsComanda(itemsFallidos);
-                
+            if (!response.ok) {
+                let errorMsg = "Ocurrió un error al enviar el pedido.";
                 try {
-                    const errorResponse = responses.find(res => !res.ok);
-                    const errorData = await errorResponse!.json();
-                    alert(`Error del sistema: ${errorData.error?.message || 'Error desconocido'}`);
-                } catch(e) {
-                    alert("Hubo un error al enviar algunos ítems a la cocina. Por favor, reintente.");
-                }
+                    const errorData = await response.json();
+                    errorMsg = `Error del sistema: ${errorData.error?.message || errorData.message || 'Sin stock o error desconocido'}`;
+                } catch(e) {}
+                alert(errorMsg);
                 setIsSubmitting(false);
-                return;
+                return; // Dejamos los items en el carrito para que el mozo pueda corregirlos
             }
 
             // Éxito: volvemos al mapa del salón
@@ -92,7 +81,7 @@ export default function MozoMenu({ searchParams }: MozoProps) {
 
         } catch (error) {
             console.error("Error al enviar el pedido:", error);
-            alert("Ocurrió un error al enviar el pedido.");
+            alert("Ocurrió un error de conexión al enviar el pedido.");
             setIsSubmitting(false);
         }
     };

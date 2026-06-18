@@ -21,7 +21,8 @@ public class ComandaMapper {
                 comanda.getNumeroComanda(),
                 comanda.getEstadoComanda(),
                 comanda.getFecha(),
-                mesaMapper.toDTO(comanda.getMesa())
+                mesaMapper.toDTO(comanda.getMesa()),
+                comanda.getComensales()
         );
     }
 
@@ -31,6 +32,7 @@ public class ComandaMapper {
                 comanda.getEstadoComanda(),
                 comanda.getFecha(),
                 mesaMapper.toDTO(comanda.getMesa()),
+                comanda.getComensales(),
                 itemPedidoMapper.toDTOList(items)
         );
     }

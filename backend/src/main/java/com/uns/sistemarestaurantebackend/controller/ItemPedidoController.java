@@ -47,6 +47,13 @@ public class ItemPedidoController {
         return ResponseEntity.ok(itemPedidoMapper.toDTO(guardado));
     }
 
+    @PostMapping("/batch")
+    public ResponseEntity<List<ItemPedidoDTO>> guardarBatch(@RequestBody List<ItemPedidoDTO> dtos) {
+        List<ItemPedido> items = dtos.stream().map(itemPedidoMapper::toEntity).toList();
+        List<ItemPedido> guardados = itemPedidoService.agregarItemsBatch(items);
+        return ResponseEntity.ok(guardados.stream().map(itemPedidoMapper::toDTO).toList());
+    }
+
     @PutMapping("/{numeroComanda}/{idPlato}/estado")
     public ResponseEntity<ItemPedidoDTO> cambiarEstado(
             @PathVariable Integer numeroComanda,

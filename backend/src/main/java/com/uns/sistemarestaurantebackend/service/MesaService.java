@@ -76,7 +76,7 @@ public class MesaService {
         mesa.setHoraDeApertura(LocalDateTime.now());
         Mesa mesaGuardada = mesaRepository.save(mesa);
 
-        comandaService.crearComandaParaMesa(mesaGuardada);
+        comandaService.crearComandaParaMesa(mesaGuardada, numeroComensales);
         //notificarCambioSalon(mesaGuardada) via WebSocket
         wSocketNotificacionService.notificarCambioSalon(mesaMapper.toDTO(mesaGuardada));
         

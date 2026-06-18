@@ -22,7 +22,9 @@ interface MozoDashboardProps {
 }
 
 export default function MozoDashboard({ initialComandas }: MozoDashboardProps) {
-  const [comandas, setComandas] = useState<ComandaResumen[]>(initialComandas);
+  const [comandas, setComandas] = useState<ComandaResumen[]>(
+    initialComandas.filter(c => c.estadoComanda !== EstadoComanda.Cerrada && c.estadoComanda !== EstadoComanda.Cancelada)
+  );
   const [comandaSeleccionada, setComandaSeleccionada] = useState<ComandaResumen | null>(null);
   const [items, setItems] = useState<Item_Pedido[]>([]);
   const [total, setTotal] = useState<number>(0);
@@ -30,6 +32,10 @@ export default function MozoDashboard({ initialComandas }: MozoDashboardProps) {
 
   const onComandaUpdate = useCallback((updatedComanda: ComandaResumen) => {
     setComandas((prevComandas) => {
+      if (updatedComanda.estadoComanda === EstadoComanda.Cerrada || updatedComanda.estadoComanda === EstadoComanda.Cancelada) {
+        return prevComandas.filter(c => c.numeroComanda !== updatedComanda.numeroComanda);
+      }
+
       const exists = prevComandas.find((c) => c.numeroComanda === updatedComanda.numeroComanda);
       if (exists) {
         return prevComandas.map((c) =>

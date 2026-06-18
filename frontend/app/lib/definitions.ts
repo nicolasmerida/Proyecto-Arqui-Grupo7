@@ -52,6 +52,7 @@ export type ComandaResumen = {
   estadoComanda: EstadoComanda;
   fecha: string;
   mesa: Mesa;
+  comensales?: number;
 };
 
 export type ComandaDetalle = {
@@ -59,6 +60,7 @@ export type ComandaDetalle = {
   estadoComanda: EstadoComanda;
   fecha: string;
   mesa: Mesa;
+  comensales?: number;
   items: Item_Pedido[];
 };
 

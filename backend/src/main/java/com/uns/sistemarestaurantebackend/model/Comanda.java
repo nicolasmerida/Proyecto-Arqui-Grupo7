@@ -43,6 +43,9 @@ public class Comanda {
     @JoinColumn(name = "numero_mesa", nullable = false)
     private Mesa mesa;
 
+    @Column(name = "comensales")
+    private Integer comensales;
+
     // Relacion N:N a traves de mozo_comanda (HU-02: mozo asignado)
     @Builder.Default
     @ManyToMany(fetch = FetchType.LAZY)
