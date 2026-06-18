@@ -3,6 +3,7 @@ package com.uns.sistemarestaurantebackend.repository;
 import com.uns.sistemarestaurantebackend.model.Ingrediente;
 import com.uns.sistemarestaurantebackend.model.MovStock;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
@@ -23,4 +24,7 @@ public interface MovStockRepository extends JpaRepository<MovStock, Integer> {
 
     // Buscar movimientos por id de usuario
     List<MovStock> findByUsuarioIdUsuario(Integer idUsuario);
+
+    @Query("SELECT m FROM MovStock m JOIN FETCH m.ingrediente JOIN FETCH m.usuario")
+    List<MovStock> findAllConRelaciones();
 }

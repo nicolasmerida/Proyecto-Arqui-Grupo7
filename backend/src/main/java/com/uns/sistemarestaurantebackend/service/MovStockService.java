@@ -17,7 +17,7 @@ public class MovStockService {
     }
 
     public List<MovStock> obtenerTodos() {
-        return movStockRepository.findAll();
+        return movStockRepository.findAllConRelaciones();
     }
 
     public List<MovStock> obtenerPorIngrediente(Integer idIngrediente) {

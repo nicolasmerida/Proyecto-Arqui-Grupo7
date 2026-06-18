@@ -21,6 +21,12 @@ interface MozoDashboardProps {
   initialComandas: ComandaResumen[];
 }
 
+// ── NUEVO: tipo del aviso flotante ──────────────────────────────
+interface AvisoComandaLista {
+  numeroComanda: number;
+  numeroMesa: number;
+}
+
 export default function MozoDashboard({ initialComandas }: MozoDashboardProps) {
   const [comandas, setComandas] = useState<ComandaResumen[]>(
     initialComandas.filter(c => c.estadoComanda !== EstadoComanda.Cerrada && c.estadoComanda !== EstadoComanda.Cancelada)
@@ -30,14 +36,44 @@ export default function MozoDashboard({ initialComandas }: MozoDashboardProps) {
   const [total, setTotal] = useState<number>(0);
   const [cerrando, setCerrando] = useState(false);
 
+  // ── NUEVO: lista de avisos flotantes activos ──────────────────
+  const [avisos, setAvisos] = useState<AvisoComandaLista[]>([]);
+
   const onComandaUpdate = useCallback((updatedComanda: ComandaResumen) => {
     setComandas((prevComandas) => {
-      if (updatedComanda.estadoComanda === EstadoComanda.Cerrada || updatedComanda.estadoComanda === EstadoComanda.Cancelada) {
+      const anterior = prevComandas.find(
+        (c) => c.numeroComanda === updatedComanda.numeroComanda
+      );
+
+      // ── NUEVO: detectar la transición a LISTA y disparar el aviso ──
+      // Se compara el estado previo en pantalla contra el que llega ahora,
+      // así el toast aparece solo en el momento exacto del cambio,
+      // no cada vez que se recibe cualquier mensaje de esa comanda.
+      const pasoALista =
+        updatedComanda.estadoComanda === EstadoComanda.Lista &&
+        anterior?.estadoComanda !== EstadoComanda.Lista;
+
+      if (pasoALista) {
+        setAvisos((prevAvisos) => {
+          if (prevAvisos.some((a) => a.numeroComanda === updatedComanda.numeroComanda)) {
+            return prevAvisos;
+          }
+          return [
+            ...prevAvisos,
+            {
+              numeroComanda: updatedComanda.numeroComanda,
+              numeroMesa: updatedComanda.mesa.numeroMesa,
+            },
+          ];
+        });
+      }
+
+      // Si la comanda se cerró o canceló, la sacamos de la lista
+      if ([EstadoComanda.Cerrada, EstadoComanda.Cancelada].includes(updatedComanda.estadoComanda)) {
         return prevComandas.filter(c => c.numeroComanda !== updatedComanda.numeroComanda);
       }
 
-      const exists = prevComandas.find((c) => c.numeroComanda === updatedComanda.numeroComanda);
-      if (exists) {
+      if (anterior) {
         return prevComandas.map((c) =>
           c.numeroComanda === updatedComanda.numeroComanda ? updatedComanda : c
         );
@@ -48,6 +84,11 @@ export default function MozoDashboard({ initialComandas }: MozoDashboardProps) {
   }, []);
 
   const { connected } = useStompClient<ComandaResumen>('/topic/comanda', onComandaUpdate);
+
+  // ── NUEVO: cerrar un aviso puntual ──────────────────────────────
+  function descartarAviso(numeroComanda: number) {
+    setAvisos((prev) => prev.filter((a) => a.numeroComanda !== numeroComanda));
+  }
 
   const abrirModal = (comanda: ComandaResumen, items: Item_Pedido[], total: number) => {
       setComandaSeleccionada(comanda);
@@ -88,6 +129,28 @@ const handleCerrarComanda = async () => {
       {!connected && (
         <div className="fixed bottom-4 right-4 bg-red-500 text-white px-3 py-1 rounded-full text-xs shadow-lg animate-pulse">
           Desconectado del servidor...
+        </div>
+      )}
+
+      {/* ── NUEVO: avisos flotantes de comandas listas ── */}
+      {avisos.length > 0 && (
+        <div className="fixed top-4 right-4 flex flex-col gap-2 z-50">
+          {avisos.map((aviso) => (
+            <div
+              key={aviso.numeroComanda}
+              className="bg-amber-100 border border-amber-400 text-amber-900 rounded-lg shadow-md px-4 py-3 flex items-center gap-3"
+            >
+              <span className="font-medium">
+                🔔 Mesa {aviso.numeroMesa} — pedido listo para retirar
+              </span>
+              <button
+                onClick={() => descartarAviso(aviso.numeroComanda)}
+                className="text-amber-700 hover:text-amber-900 text-sm font-bold"
+              >
+                ✕
+              </button>
+            </div>
+          ))}
         </div>
       )}
 
