@@ -1,3 +1,4 @@
+// app/ui/mozo/plano-salon
 'use client';
 import { EstadoMesa, Mesa } from "@/app/lib/definitions";
 import AddDiner from "@/app/ui/forms/AddDiners";
@@ -199,14 +200,14 @@ export default function PlanoSalon() {
                         {mesasOcupadas.length} ocupadas - {mesasLibres.length} libres
                     </span>
                 </div>
-                <div className="grid grid-cols-5 items-center p-1 gap-1">
+                <div className="flex flex-row items-center p-1 gap-1">
                     <button className={`border rounded-lg transition ${vista === VISTA.todas ? "text-black bg-amber-200" : "text-slate-400"}`}
                             onClick={() => setVista(VISTA.todas)}>
                         Todas
                     </button>
                     <button className={`border rounded-lg transition ${vista === VISTA.libres ? "text-black bg-amber-200" : "text-slate-400"}`}
                             onClick={() => setVista(VISTA.libres)}>
-                        mesasLibres
+                        Libres
                     </button>
                     <button className={`border rounded-lg transition ${vista === VISTA.ocupadas ? "text-black bg-amber-200" : "text-slate-400"}`}
                             onClick={() => setVista(VISTA.ocupadas)}>
@@ -223,7 +224,7 @@ export default function PlanoSalon() {
                                     disabled={cargando}
                             >
                                 <div className="flex flex-col justify-center items-center text-green-500">
-                                    <GiTable className="text-xl" />
+                                    <GiTable className="text-3xl" />
                                     <span className="text-lg font-serif">Mesa {mesa.numeroMesa}</span>
                                     <span className="text-sm">{mesa.capacidad} personas</span>
                                 </div>
