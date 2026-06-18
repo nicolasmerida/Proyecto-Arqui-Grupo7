@@ -26,7 +26,14 @@ export default function Navbar() {
         setIsMobileMenuOpen(!isMobileMenuOpen);
     };
 
-    const menuHref = session?.data?.user.role === Rol.Mozo ? '/user//mozo/menu' : '/menu';
+    const inicioPorRol = {
+        [Rol.Administrador]: '/user/admin',
+        [Rol.Cocinero]: '/user/cocinero',
+        [Rol.Mozo]: '/user/mozo'
+    };
+    const inicioHref = session?.data?.user.role ? inicioPorRol[session.data.user.role] ?? '/' : '/';
+
+    const menuHref = (session?.data?.user.role === Rol.Mozo) ? '/user/mozo/menu' : '/menu';
 
     return (
         <nav className="fixed top-0 left-0 z-auto w-full p-4">
@@ -35,7 +42,7 @@ export default function Navbar() {
 
                 {/* Menú de navegación principal para desktop */}
                 <div className="hidden md:flex justify-center space-x-6">
-                    <Link href="/" className={`${navLinkClass} ${underlineClass}`}>Inicio</Link>
+                    <Link href={inicioHref} className={`${navLinkClass} ${underlineClass}`}>Inicio</Link>
                     <Link href={menuHref} className={`${navLinkClass} ${underlineClass}`}>Menú</Link>
                 </div>
 
