@@ -3,6 +3,8 @@ import "./ui/globals.css";
 import Navbar from "./ui/navbar";
 import Footer from "./ui/footer";
 import type { Metadata } from "next";
+import { SessionProvider } from "next-auth/react";
+import { auth } from "@/auth";
 
 export const metadata: Metadata = {
   title: {
@@ -11,7 +13,8 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+  const session = await auth();
 
   return (
       <html lang="es">
@@ -20,9 +23,11 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         </head>
         
         <body className="flex flex-col min-h-screen">
-          <Navbar />
-          <main className="flex-auto">{children}</main>
-          <Footer />
+          <SessionProvider session={session}>
+            <Navbar />
+            <main className="flex-auto">{children}</main>
+            <Footer />
+          </SessionProvider>
         </body>
       </html>
   );

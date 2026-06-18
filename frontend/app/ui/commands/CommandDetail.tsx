@@ -1,7 +1,7 @@
 // app/ui/commands/CommandDetail.tsx
 import { Item_Pedido } from "@/app/lib/definitions";
 import { HiOutlineCheck } from "react-icons/hi";
-import ItemCard from "./item-card";
+import ItemCard from "@/app/ui/item/item-card";
 
 interface CommandDetailProps {
     items: Item_Pedido[];

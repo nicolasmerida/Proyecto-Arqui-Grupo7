@@ -1,8 +1,8 @@
 // app/ui/forms/LoginForm.tsx
 'use client';
-
+import { authenticate } from '@/app/lib/actions';
 import Link from 'next/link';
-import { useState } from 'react';
+import { useActionState, useState } from 'react';
 import { HiOutlineEye, HiOutlineEyeOff } from 'react-icons/hi';
 
 const navLinkClass =
@@ -18,10 +18,7 @@ export function LoginForm() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false); // Nuevo estado para mostrar/ocultar contraseña
-  //const [errorMessage, formAction, isPending] = useActionState(authenticate, undefined); Agregar funcion a invocar
-  const formAction = () => {};
-  const errorMessage = "";
-  const isPending = false;
+  const [errorMessage, formAction, isPending] = useActionState(authenticate, undefined);
 
   // Función para alternar la visibilidad de la contraseña
   const handleTogglePassword = () => {

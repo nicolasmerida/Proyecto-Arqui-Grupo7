@@ -2,7 +2,8 @@
 'use client';
 import Link from "next/link"
 import { useState } from "react";
-import { HiOutlineLogin } from "react-icons/hi";import { usePathname } from 'next/navigation';
+import { HiOutlineLogin } from "react-icons/hi";
+import { usePathname } from 'next/navigation';
 
 const navLinkClass =
   "relative text-white text-sm transition-transform duration-300 hover:scale-105";

@@ -1,6 +1,7 @@
 'use server';
-
-import { ComandaResumen, ComandaDetalle } from "./definitions";
+import { ComandaResumen, ComandaDetalle, Usuario } from "@/app/lib/definitions";
+import { signIn } from '@/auth';
+import { AuthError } from 'next-auth';
 
 // Usa la URL configurada en el entorno o un fallback local para el backend
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8080';
@@ -76,5 +77,46 @@ export async function getAlertasStock() {
   } catch (error) {
     console.error("Error en getAlertasStock action:", error);
     return [];
+  }
+}
+
+/**
+ * Obtiene el usuario correspondiente por email, si existe
+ */
+export async function getUser(email: string): Promise<Usuario | undefined> {
+  try {
+    const response = await fetch(`${BACKEND_URL}/api/usuarios/${email}`, { 
+        cache: 'no-store',
+    });
+
+    if (!response.ok) {
+      throw new Error(`Error ${response.status} al consultar usuarios`);
+    }
+
+    const user: Usuario = await response.json();
+    return user;
+  }
+  catch (error) {
+    console.error("Error en getUser action:", error);
+    return undefined;
+  }
+}
+
+export async function authenticate(
+  prevState: string | undefined,
+  formData: FormData,
+): Promise<string | undefined> {
+  try {
+    await signIn('credentials', formData);
+  } catch (error) {
+    if (error instanceof AuthError) {
+      switch (error.type) {
+        case 'CredentialsSignin':
+          return 'Email o contraseña incorrectos';
+        default:
+          return 'Ocurrió un error';
+      }
+    }
+    throw error;
   }
 }
