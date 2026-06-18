@@ -88,15 +88,15 @@ export default function PlanoSalon() {
         }
     };
 
-    // LOGA REAL DE INTEGRACIÓN CON MERCADO PAGO (REEMPLAZA AL MOCK ANTERIOR)
+    // LOGICA REAL DE INTEGRACIÓN CON MERCADO PAGO
     const handlePagarMesa = async () => {
         if (!mesaSeleccionada) return;
         setCargando(true);
         try {
             const baseUrl = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8080";
 
-            // 1. Solicitamos la creación del link de cobro al servicio de Mercado Pago en Java
-            const response = await fetch(`${baseUrl}/pagos/crear`, {
+            // ¡ACÁ ESTABA EL ERROR! Faltaba el "/api" antes de "/pagos"
+            const response = await fetch(`${baseUrl}/api/pagos/crear`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ idMesa: mesaSeleccionada.numeroMesa })
@@ -104,11 +104,10 @@ export default function PlanoSalon() {
 
             const urlPago = await response.text();
 
-            // 2. Si el Backend responde con el punto de inicio válido (InitPoint) de la API de MP, redirigimos la ventana
+            // Si el Backend responde con el punto de inicio válido (InitPoint) de la API de MP, redirigimos
             if (urlPago && urlPago.startsWith("https://")) {
                 window.location.href = urlPago;
             } else {
-                // Manejo de errores lógicos del negocio del servidor (ej: si los ítems sumaban $0.00)
                 alert("Error al generar orden: " + urlPago);
                 setCargando(false);
             }
