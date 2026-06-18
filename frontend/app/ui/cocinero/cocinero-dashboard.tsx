@@ -25,6 +25,7 @@ export default function CocineroDashboard({ initialComandas }: CocineroDashboard
 
   // 1. Suscripción a cambios en COMANDAS (ej. cuando cambia a estado lista/preparacion)
   const onComandaReceived = useCallback((comanda: ComandaResumen) => {
+    console.log('[WS] comanda recibida:', comanda);
     setComandas((prev) => {
       const idx = prev.findIndex(c => c.numeroComanda === comanda.numeroComanda);
       if (idx >= 0) {
@@ -47,15 +48,20 @@ export default function CocineroDashboard({ initialComandas }: CocineroDashboard
 
   // 2. Suscripción a la vista de cocina (Recibe la comanda detallada actualizada)
   const onItemReceived = useCallback((comandaDetalle: ComandaDetalle) => {
-    // Al recibir el detalle actualizado, reemplazamos la comanda entera
+    console.log('[WS] item recibida:', comandaDetalle);
     setComandas(prev => {
-        const idx = prev.findIndex(c => c.numeroComanda === comandaDetalle.numeroComanda);
-        if (idx >= 0) {
-            const next = [...prev];
-            next[idx] = comandaDetalle;
-            return next;
-        }
-        return [...prev, comandaDetalle];
+      // Si el detalle llega con un estado "final", la eliminamos
+      if ([EstadoComanda.Cerrada, EstadoComanda.Cancelada, EstadoComanda.Entregada].includes(comandaDetalle.estadoComanda)) {
+        return prev.filter(c => c.numeroComanda !== comandaDetalle.numeroComanda);
+      }
+
+      const idx = prev.findIndex(c => c.numeroComanda === comandaDetalle.numeroComanda);
+      if (idx >= 0) {
+        const next = [...prev];
+        next[idx] = comandaDetalle;
+        return next;
+      }
+      return [...prev, comandaDetalle];
     });
     setLastItemUpdate(Date.now());
   }, []);

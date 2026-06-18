@@ -100,8 +100,7 @@ public class MesaService {
         //             "La mesa " + numeroMesa + " no puede ser cerrada porque todavia no se han entregado todos los items.");
         // }
 
-        comanda.setEstadoComanda(EstadoComanda.CERRADA);
-        comandaService.guardar(comanda);
+        comandaService.cambiarEstado(comanda.getNumeroComanda(), "CERRADA");
 
         mesa.setEstadoMesa(EstadoMesa.LIBRE);
         mesa.setHoraDeApertura(null);
