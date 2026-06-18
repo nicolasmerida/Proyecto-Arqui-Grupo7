@@ -33,7 +33,7 @@ export default function Navbar() {
     };
     const inicioHref = session?.data?.user.role ? inicioPorRol[session.data.user.role] ?? '/' : '/';
 
-    const menuHref = (session?.data?.user.role === Rol.Mozo) ? '/user/mozo/menu' : '/menu';
+    const menuHref = (session?.data?.user.role === Rol.Mozo) ? '/user/mozo' : '/menu';
 
     return (
         <nav className="fixed top-0 left-0 z-auto w-full p-4">

@@ -117,17 +117,19 @@ export default function CocineroDashboard({ initialComandas }: CocineroDashboard
         </div>
       )}
 
-      <div className="flex flex-row justify-around items-start w-full m-10 p-5 gap-4">
+      <div className="flex flex-col lg:flex-row justify-around items-start w-full m-4 lg:m-10 p-5 gap-4">
 
-        {/* Columna: Pendientes */}
-        <div className="flex-1 flex flex-col items-center rounded-sm px-2 comanda-pendiente border-2 min-h-[50vh]">
-          <h2 className="font-bold text-lg my-2 uppercase tracking-wide">Pendientes ({pendientes.length})</h2>
-          <div className="flex flex-col py-1 w-full gap-4">
+        {/* Pendientes */}
+        <div className="relative w-full lg:flex-1 flex flex-col items-center rounded-sm px-2 comanda-pendiente border-2 min-h-[50vh]">
+          <h2 className="absolute top-2 left-2 z-10 lg:static font-bold text-lg uppercase tracking-wide">
+            Pendientes ({pendientes.length})
+          </h2>
+          <div className="flex flex-row lg:flex-col py-1 w-full gap-4 pt-10 lg:pt-1">
             {pendientes.map((comanda) => (
-              <div key={comanda.numeroComanda} className={`flex flex-col border-y-4 ${colorByState[comanda.estadoComanda]} shadow-sm`}>
+              <div key={comanda.numeroComanda} className={`flex flex-col sm:flex-row lg:flex-col border-y-4 ${colorByState[comanda.estadoComanda]} shadow-sm`}>
                 <CommandCard command={comanda} state={comanda.estadoComanda} lastUpdate={lastItemUpdate} />
                 <button
-                  className="rounded-b-md py-2 flex items-center justify-center gap-2 bg-orange-100 hover:bg-orange-200 transition-colors text-orange-800 font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="rounded-b-md sm:rounded-b-none sm:rounded-r-md lg:rounded-b-md py-2 flex items-center justify-center gap-2 bg-orange-100 hover:bg-orange-200 transition-colors text-orange-800 font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
                   onClick={() => cambiarEstado(comanda.numeroComanda, EstadoComanda.Preparacion)}
                   disabled={loading[comanda.numeroComanda]}
                 >
@@ -140,15 +142,17 @@ export default function CocineroDashboard({ initialComandas }: CocineroDashboard
           </div>
         </div>
 
-        {/* Columna: En Preparación */}
-        <div className="flex-1 flex flex-col items-center rounded-sm px-2 comanda-preparacion border-2 min-h-[50vh]">
-          <h2 className="font-bold text-lg my-2 uppercase tracking-wide">En Preparación ({enPreparacion.length})</h2>
-          <div className="flex flex-col py-1 w-full gap-4">
+        {/* En Preparación */}
+        <div className="relative w-full lg:flex-1 flex flex-col items-center rounded-sm px-2 comanda-preparacion border-2 min-h-[50vh]">
+          <h2 className="absolute top-2 left-2 z-10 lg:static font-bold text-lg uppercase tracking-wide">
+            En Preparación ({enPreparacion.length})
+          </h2>
+          <div className="flex flex-row lg:flex-col py-1 w-full gap-4 pt-10 lg:pt-1">
             {enPreparacion.map((comanda) => (
-              <div key={comanda.numeroComanda} className={`flex flex-col border-y-4 ${colorByState[comanda.estadoComanda]} shadow-sm`}>
+              <div key={comanda.numeroComanda} className={`flex flex-col sm:flex-row lg:flex-col border-y-4 ${colorByState[comanda.estadoComanda]} shadow-sm`}>
                 <CommandCard command={comanda} state={comanda.estadoComanda} lastUpdate={lastItemUpdate} />
                 <button
-                  className="rounded-b-md py-2 flex items-center justify-center gap-2 bg-green-100 hover:bg-green-200 transition-colors text-green-800 font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="rounded-b-md sm:rounded-b-none sm:rounded-r-md lg:rounded-b-md py-2 flex items-center justify-center gap-2 bg-green-100 hover:bg-green-200 transition-colors text-green-800 font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
                   onClick={() => cambiarEstado(comanda.numeroComanda, EstadoComanda.Lista)}
                   disabled={loading[comanda.numeroComanda]}
                 >
@@ -161,15 +165,17 @@ export default function CocineroDashboard({ initialComandas }: CocineroDashboard
           </div>
         </div>
 
-        {/* Columna: Listas */}
-        <div className="flex-1 flex flex-col items-center rounded-sm px-2 comanda-lista border-2 min-h-[50vh]">
-          <h2 className="font-bold text-lg my-2 uppercase tracking-wide">Listas ({listos.length})</h2>
-          <div className="flex flex-col py-1 w-full gap-4">
+        {/* Listas */}
+        <div className="relative w-full lg:flex-1 flex flex-col items-center rounded-sm px-2 comanda-lista border-2 min-h-[50vh]">
+          <h2 className="absolute top-2 left-2 z-10 lg:static font-bold text-lg uppercase tracking-wide">
+            Listas ({listos.length})
+          </h2>
+          <div className="flex flex-row lg:flex-col py-1 w-full gap-4 pt-10 lg:pt-1">
             {listos.map((comanda) => (
-              <div key={comanda.numeroComanda} className={`flex flex-col border-y-4 ${colorByState[comanda.estadoComanda]} shadow-sm`}>
+              <div key={comanda.numeroComanda} className={`flex flex-col sm:flex-row lg:flex-col border-y-4 ${colorByState[comanda.estadoComanda]} shadow-sm`}>
                 <CommandCard command={comanda} state={comanda.estadoComanda} lastUpdate={lastItemUpdate} />
                 <button
-                  className="rounded-b-md py-2 flex items-center justify-center gap-2 bg-blue-100 hover:bg-blue-200 transition-colors text-blue-800 font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="rounded-b-md sm:rounded-b-none sm:rounded-r-md lg:rounded-b-md py-2 flex items-center justify-center gap-2 bg-blue-100 hover:bg-blue-200 transition-colors text-blue-800 font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
                   onClick={() => cambiarEstado(comanda.numeroComanda, EstadoComanda.Entregada)}
                   disabled={loading[comanda.numeroComanda]}
                 >
@@ -181,7 +187,6 @@ export default function CocineroDashboard({ initialComandas }: CocineroDashboard
             {listos.length === 0 && <span className="text-gray-500 italic self-center mt-4">No hay comandas listas</span>}
           </div>
         </div>
-
       </div>
     </div>
   );
