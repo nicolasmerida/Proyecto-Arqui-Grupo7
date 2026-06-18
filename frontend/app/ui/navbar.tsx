@@ -4,6 +4,8 @@ import Link from "next/link"
 import { useState } from "react";
 import { HiOutlineLogin } from "react-icons/hi";
 import { usePathname } from 'next/navigation';
+import { useSession } from "next-auth/react";
+import { Rol } from "@/app/lib/definitions";
 
 const navLinkClass =
   "relative text-white text-sm transition-transform duration-300 hover:scale-105";
@@ -18,10 +20,13 @@ export default function Navbar() {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const pathname = usePathname();
     const isUserArea = pathname?.startsWith('/user') || false;
+    const session = useSession();
     
     const toggleMobileMenu = () => {
         setIsMobileMenuOpen(!isMobileMenuOpen);
     };
+
+    const menuHref = session?.data?.user.role === Rol.Mozo ? '/user//mozo/menu' : '/menu';
 
     return (
         <nav className="fixed top-0 left-0 z-auto w-full p-4">
@@ -31,7 +36,7 @@ export default function Navbar() {
                 {/* Menú de navegación principal para desktop */}
                 <div className="hidden md:flex justify-center space-x-6">
                     <Link href="/" className={`${navLinkClass} ${underlineClass}`}>Inicio</Link>
-                    <Link href="/menu" className={`${navLinkClass} ${underlineClass}`}>Menú</Link> {/* Detectar rol para redirigir al menu del mozo */}
+                    <Link href={menuHref} className={`${navLinkClass} ${underlineClass}`}>Menú</Link>
                 </div>
 
                 {/* Icono de login - Si hay una sesión iniciada ocultar */}
@@ -81,7 +86,7 @@ export default function Navbar() {
                     <Link href="/" className={`${navLinkClass} ${underlineClass}`} onClick={toggleMobileMenu}>
                         Inicio
                     </Link>
-                    <Link href="/menu" className={`${navLinkClass} ${underlineClass}`} onClick={toggleMobileMenu}>
+                    <Link href={menuHref} className={`${navLinkClass} ${underlineClass}`} onClick={toggleMobileMenu}>
                         Menu
                     </Link>
                 </div>

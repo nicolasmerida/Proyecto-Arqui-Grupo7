@@ -6,7 +6,7 @@ export default async function Userbar() {
     const session = await auth();
 
     return (
-        <div className="fixed top-0 right-12 md:right-4 z-50 flex items-center h-[56px] gap-4 pr-4">
+        <div className="fixed top-0 right-12 md:right-4 z-50 flex items-center h-14 gap-4 pr-4">
             <div className="text-sm text-white font-medium">
                 Hola, <span className="font-medium">{session?.user?.name}!</span>
             </div>
