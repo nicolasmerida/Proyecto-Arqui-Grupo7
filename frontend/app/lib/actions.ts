@@ -85,8 +85,8 @@ export async function getAlertasStock() {
  */
 export async function getUser(email: string): Promise<Usuario | undefined> {
   try {
-    const response = await fetch(`${BACKEND_URL}/api/usuarios/${email}`, { 
-        cache: 'no-store',
+    const response = await fetch(`${BACKEND_URL}/api/usuarios/email/${email}`, { 
+      cache: 'no-store',
     });
 
     if (!response.ok) {

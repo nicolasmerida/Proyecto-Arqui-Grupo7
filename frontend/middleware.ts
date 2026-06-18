@@ -23,8 +23,8 @@ export default auth((req) => {
     }
 
     // Usuario cocinero
-    if (role === Rol.Cocinero && !pathname.startsWith("/user/cocina")) {
-        return NextResponse.redirect(new URL("/user/cocina", req.url));
+    if (role === Rol.Cocinero && !pathname.startsWith("/user/cocinero")) {
+        return NextResponse.redirect(new URL("/user/cocinero", req.url));
     }
 
     // Usuario mozo

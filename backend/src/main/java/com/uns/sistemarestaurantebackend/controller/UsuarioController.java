@@ -29,6 +29,11 @@ public class UsuarioController {
         return ResponseEntity.ok(usuarioService.obtenerPorId(id));
     }
 
+    @GetMapping("/email/{email}")
+    public ResponseEntity<Usuario> obtenerPorEmail(@PathVariable String email) {
+        return ResponseEntity.ok(usuarioService.obtenerPorEmail(email));
+    }
+
     @PostMapping
     public ResponseEntity<Usuario> crear(@RequestBody Usuario usuario) {
         return ResponseEntity.ok(usuarioService.guardar(usuario));
