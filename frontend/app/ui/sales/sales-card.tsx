@@ -6,21 +6,19 @@ interface SalesCardProps {
 }
 
 export default function SalesCard({ sales }: SalesCardProps) {
-    var total = 0; //Consultar ganancia total desde el backend
+    const total = sales; // Usamos el valor real del backend
     const colorTotal = (total > 0) ? "text-green-500" : 
                         (total < 0) ? "text-red-500" :
                         "text-black";
 
     return (
-        <div className="flex flex-col border">
-            <div className="flex font-semibold text-base text-gray-400 justify-between">
-                Ventas <HiOutlineTrendingUp />
+        <div className="flex flex-col border p-4 rounded-md shadow-sm bg-white min-w-[200px]">
+            <div className="flex font-semibold text-base text-gray-400 justify-between items-center mb-2">
+                <span>Ventas</span>
+                <HiOutlineTrendingUp className="text-xl" />
             </div>
-            <div className="flex text-xl colorTotal font-serif">
-                {/* Ganancia total ventas
-                    Si total es > a 0, color verde
-                    Si total es = a 0, color negro
-                    Si total es < a 0, color rojo  */}
+            <div className={`flex text-3xl font-bold font-serif ${colorTotal}`}>
+                ${total.toLocaleString('es-AR')}
             </div>
         </div>
     );

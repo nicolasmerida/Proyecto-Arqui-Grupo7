@@ -9,12 +9,12 @@ interface CommandCardProps {
 export default function CommandCard({ commands }: CommandCardProps) {
 
     return (
-        <div className="flex flex-col border">
-            <div className="flex font-semibold text-base text-gray-400 justify-between">
-                Comandas <HiOutlineDocumentDuplicate />
+        <div className="flex flex-col border p-4 rounded-md shadow-sm bg-white min-w-[200px]">
+            <div className="flex font-semibold text-base text-gray-400 justify-between items-center mb-2">
+                <span>Comandas</span>
+                <HiOutlineDocumentDuplicate className="text-xl" />
             </div>
-            <div className="flex text-xl text-black font-serif">
-                {/* Cant total comandas */}
+            <div className="flex text-3xl font-bold font-serif text-black">
                 {commands.length}
             </div>
         </div>

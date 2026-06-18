@@ -12,15 +12,18 @@ export default function StaffCard({ staff }: StaffCardProps) {
     const activos = mozos.filter((a) => a.estado === EstadoUsuario.Activo);
 
     return (
-        <div className="flex flex-col border">
-            <div className="flex font-semibold text-base text-gray-400 justify-between">
-                Mozos activos <HiOutlineUserGroup />
+        <div className="flex flex-col border p-4 rounded-md shadow-sm bg-white min-w-[200px]">
+            <div className="flex font-semibold text-base text-gray-400 justify-between items-center mb-2">
+                <span>Mozos activos</span>
+                <HiOutlineUserGroup className="text-xl" />
             </div>
-            <div className="flex text-xl text-black font-serif">
-                {activos.length}
-            </div>
-            <div className="text-sm text-gray-400">
-                {mozos.length} staff total
+            <div className="flex items-baseline gap-2">
+                <span className="text-3xl font-bold font-serif text-black">
+                    {activos.length}
+                </span>
+                <span className="text-sm text-gray-400 font-medium">
+                    / {mozos.length} total
+                </span>
             </div>
         </div>
     );
