@@ -1,4 +1,4 @@
-// app/ui/stock/table-stock.tsx
+// app/ui/stock/table-stock
 'use client';
 import { Ingrediente } from "@/app/lib/definitions";
 import { useEffect, useState } from "react";

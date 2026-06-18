@@ -81,7 +81,7 @@ export function LoginForm() {
           </div>
         </div>
 
-        <input type="hidden" name="redirectTo" value="/" />
+        <input type="hidden" name="redirectTo" value="/user" />
 
         <button
           type="submit"

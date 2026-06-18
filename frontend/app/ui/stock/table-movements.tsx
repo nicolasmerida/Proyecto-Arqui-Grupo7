@@ -1,4 +1,4 @@
-// app/ui/stock/table-movements.tsx
+// app/ui/stock/table-movements
 'use client';
 import { Mov_Stock } from "@/app/lib/definitions";
 import { useEffect, useState } from "react";
