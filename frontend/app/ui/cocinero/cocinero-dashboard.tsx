@@ -1,19 +1,8 @@
-// app/ui/cocinero/cocinero-dashboard.tsx
 'use client';
 import { ComandaResumen, ComandaDetalle, EstadoComanda, Item_Pedido } from "@/app/lib/definitions";
 import CommandCard from "@/app/ui/cocinero/command-cocinero";
 import { useState, useCallback } from "react";
-import { HiOutlineBell, HiOutlineCheck, HiOutlineFire } from "react-icons/hi";
 import { useStompClient } from "@/app/lib/hooks/useStompClient";
-
-const colorByState: Record<EstadoComanda, string> = {
-  [EstadoComanda.Abierta]: "comanda-abierta",
-  [EstadoComanda.Cancelada]: "comanda-cancelada",
-  [EstadoComanda.Cerrada]: "comanda-cerrada",
-  [EstadoComanda.Entregada]: "comanda-entregada",
-  [EstadoComanda.Lista]: "comanda-lista",
-  [EstadoComanda.Preparacion]: "comanda-preparacion",
-}
 
 interface CocineroDashboardProps {
   initialComandas: ComandaDetalle[];
@@ -21,7 +10,6 @@ interface CocineroDashboardProps {
 
 export default function CocineroDashboard({ initialComandas }: CocineroDashboardProps) {
   const [comandas, setComandas] = useState<ComandaDetalle[]>(initialComandas);
-  const [lastItemUpdate, setLastItemUpdate] = useState<number>(Date.now());
 
   // 1. Suscripción a cambios en COMANDAS (ej. cuando cambia a estado lista/preparacion)
   const onComandaReceived = useCallback((comanda: ComandaResumen) => {
@@ -37,7 +25,7 @@ export default function CocineroDashboard({ initialComandas }: CocineroDashboard
         next[idx] = { ...next[idx], estadoComanda: comanda.estadoComanda };
         return next;
       } else {
-        if ([EstadoComanda.Abierta, EstadoComanda.Preparacion, EstadoComanda.Lista].includes(comanda.estadoComanda)) {
+        if ([EstadoComanda.Abierta, EstadoComanda.Preparacion].includes(comanda.estadoComanda)) {
           return [...prev, { ...comanda, items: [] as Item_Pedido[] }];
         }
         return prev;
@@ -49,15 +37,19 @@ export default function CocineroDashboard({ initialComandas }: CocineroDashboard
   const onItemReceived = useCallback((comandaDetalle: ComandaDetalle) => {
     // Al recibir el detalle actualizado, reemplazamos la comanda entera
     setComandas(prev => {
-        const idx = prev.findIndex(c => c.numeroComanda === comandaDetalle.numeroComanda);
-        if (idx >= 0) {
-            const next = [...prev];
-            next[idx] = comandaDetalle;
-            return next;
-        }
-        return [...prev, comandaDetalle];
+      const idx = prev.findIndex(c => c.numeroComanda === comandaDetalle.numeroComanda);
+      // Si la comanda cambió a estado entregada, cerrada o cancelada, la quitamos (por si el backend manda el update)
+      if ([EstadoComanda.Cerrada, EstadoComanda.Cancelada, EstadoComanda.Entregada].includes(comandaDetalle.estadoComanda)) {
+        return prev.filter(c => c.numeroComanda !== comandaDetalle.numeroComanda);
+      }
+
+      if (idx >= 0) {
+        const next = [...prev];
+        next[idx] = comandaDetalle;
+        return next;
+      }
+      return [...prev, comandaDetalle];
     });
-    setLastItemUpdate(Date.now());
   }, []);
 
   const { connected: connectedComandas } = useStompClient<ComandaResumen>('/topic/comanda', onComandaReceived);
@@ -65,44 +57,17 @@ export default function CocineroDashboard({ initialComandas }: CocineroDashboard
 
   const connected = connectedComandas && connectedCocina;
 
-  const [loading, setLoading] = useState<Record<number, boolean>>({});
-
-  // Cambia el estado de una comanda de forma segura sin race conditions
-  const cambiarEstado = async (numero: number, nuevo: EstadoComanda) => {
-    if (loading[numero]) return; // Evitar doble click
-    setLoading(prev => ({ ...prev, [numero]: true }));
-
-    try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/comandas/${numero}/estado`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          nuevoEstado: nuevo
-        })
-      });
-      if (!response.ok) {
-        throw new Error(`Error al cambiar estado a ${nuevo}`);
-      }
-      // No hacemos actualización optimista. Confiamos en el WebSocket para que mueva la comanda a la siguiente columna.
-    } catch (error) {
-      console.error(error);
-      alert(`No se pudo cambiar el estado a ${nuevo}. Es posible que alguien más ya lo haya cambiado.`);
-    } finally {
-      setLoading(prev => ({ ...prev, [numero]: false }));
-    }
-  }
-
-  const pendientes = comandas.filter((c) => c.estadoComanda === EstadoComanda.Abierta);
-  const enPreparacion = comandas.filter((c) => c.estadoComanda === EstadoComanda.Preparacion);
-  const listos = comandas.filter((c) => c.estadoComanda === EstadoComanda.Lista);
+  // Filtramos solo las que nos importan, QUE TENGAN ÍTEMS, y ordenamos por fecha de más antigua a más nueva
+  const activas = comandas
+    .filter(c => [EstadoComanda.Abierta, EstadoComanda.Preparacion].includes(c.estadoComanda))
+    .filter(c => c.items && c.items.length > 0)
+    .sort((a, b) => new Date(a.fecha).getTime() - new Date(b.fecha).getTime());
 
   return (
-    <div className="flex flex-col flex-1 items-center justify-center relative">
+    <div className="flex flex-col flex-1 items-center relative w-full pb-10">
       {/* Indicador de WebSockets */}
       {!connected && (
-        <div className="absolute top-4 right-4 flex items-center gap-2 text-red-500 font-medium">
+        <div className="absolute top-4 right-4 flex items-center gap-2 text-red-500 font-medium z-10 bg-white/80 px-3 py-1 rounded-full shadow-sm">
           <span className="relative flex h-3 w-3">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
             <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
@@ -111,71 +76,32 @@ export default function CocineroDashboard({ initialComandas }: CocineroDashboard
         </div>
       )}
 
-      <div className="flex flex-row justify-around items-start w-full m-10 p-5 gap-4">
-
-        {/* Columna: Pendientes */}
-        <div className="flex-1 flex flex-col items-center rounded-sm px-2 comanda-pendiente border-2 min-h-[50vh]">
-          <h2 className="font-bold text-lg my-2 uppercase tracking-wide">Pendientes ({pendientes.length})</h2>
-          <div className="flex flex-col py-1 w-full gap-4">
-            {pendientes.map((comanda) => (
-              <div key={comanda.numeroComanda} className={`flex flex-col border-y-4 ${colorByState[comanda.estadoComanda]} shadow-sm`}>
-                <CommandCard command={comanda} state={comanda.estadoComanda} lastUpdate={lastItemUpdate} />
-                <button
-                  className="rounded-b-md py-2 flex items-center justify-center gap-2 bg-orange-100 hover:bg-orange-200 transition-colors text-orange-800 font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
-                  onClick={() => cambiarEstado(comanda.numeroComanda, EstadoComanda.Preparacion)}
-                  disabled={loading[comanda.numeroComanda]}
-                >
-                  <HiOutlineFire className="text-xl" /> 
-                  {loading[comanda.numeroComanda] ? "Procesando..." : "Empezar a preparar"}
-                </button>
-              </div>
-            ))}
-            {pendientes.length === 0 && <span className="text-gray-500 italic self-center mt-4">No hay comandas pendientes</span>}
-          </div>
+      {/* Titulo */}
+      <div className="w-full max-w-7xl px-8 pt-8 pb-4 flex justify-between items-end">
+        <div>
+          <h1 className="text-3xl font-bold text-white">Cocina en Vivo</h1>
+          <p className="text-gray-300 mt-1">Comandas activas ordenadas por tiempo de espera</p>
         </div>
-
-        {/* Columna: En Preparación */}
-        <div className="flex-1 flex flex-col items-center rounded-sm px-2 comanda-preparacion border-2 min-h-[50vh]">
-          <h2 className="font-bold text-lg my-2 uppercase tracking-wide">En Preparación ({enPreparacion.length})</h2>
-          <div className="flex flex-col py-1 w-full gap-4">
-            {enPreparacion.map((comanda) => (
-              <div key={comanda.numeroComanda} className={`flex flex-col border-y-4 ${colorByState[comanda.estadoComanda]} shadow-sm`}>
-                <CommandCard command={comanda} state={comanda.estadoComanda} lastUpdate={lastItemUpdate} />
-                <button
-                  className="rounded-b-md py-2 flex items-center justify-center gap-2 bg-green-100 hover:bg-green-200 transition-colors text-green-800 font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
-                  onClick={() => cambiarEstado(comanda.numeroComanda, EstadoComanda.Lista)}
-                  disabled={loading[comanda.numeroComanda]}
-                >
-                  <HiOutlineCheck className="text-xl" /> 
-                  {loading[comanda.numeroComanda] ? "Procesando..." : "Todo listo"}
-                </button>
-              </div>
-            ))}
-            {enPreparacion.length === 0 && <span className="text-gray-500 italic self-center mt-4">Ninguna comanda en preparación</span>}
-          </div>
+        <div className="text-sm font-medium text-gray-300">
+          Total Activas: {activas.length}
         </div>
+      </div>
 
-        {/* Columna: Listas */}
-        <div className="flex-1 flex flex-col items-center rounded-sm px-2 comanda-lista border-2 min-h-[50vh]">
-          <h2 className="font-bold text-lg my-2 uppercase tracking-wide">Listas ({listos.length})</h2>
-          <div className="flex flex-col py-1 w-full gap-4">
-            {listos.map((comanda) => (
-              <div key={comanda.numeroComanda} className={`flex flex-col border-y-4 ${colorByState[comanda.estadoComanda]} shadow-sm`}>
-                <CommandCard command={comanda} state={comanda.estadoComanda} lastUpdate={lastItemUpdate} />
-                <button
-                  className="rounded-b-md py-2 flex items-center justify-center gap-2 bg-blue-100 hover:bg-blue-200 transition-colors text-blue-800 font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
-                  onClick={() => cambiarEstado(comanda.numeroComanda, EstadoComanda.Entregada)}
-                  disabled={loading[comanda.numeroComanda]}
-                >
-                  <HiOutlineBell className="text-xl" /> 
-                  {loading[comanda.numeroComanda] ? "Procesando..." : "Entregar al mozo"}
-                </button>
-              </div>
+      {/* Grilla principal */}
+      <div className="w-full max-w-screen-2xl px-8">
+        {activas.length > 0 ? (
+          <div className="grid grid-cols-[repeat(auto-fit,minmax(340px,1fr))] gap-6 items-start auto-rows-max">
+            {activas.map((comanda) => (
+              <CommandCard key={comanda.numeroComanda} command={comanda} />
             ))}
-            {listos.length === 0 && <span className="text-gray-500 italic self-center mt-4">No hay comandas listas</span>}
           </div>
-        </div>
-
+        ) : (
+          <div className="flex flex-col items-center justify-center w-full h-[50vh] text-gray-400">
+            <svg className="w-20 h-20 mb-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" /></svg>
+            <p className="text-xl font-medium">¡Excelente trabajo!</p>
+            <p>No hay comandas pendientes en este momento.</p>
+          </div>
+        )}
       </div>
     </div>
   );

@@ -108,7 +108,7 @@ public class ItemPedidoService {
         }
 
         item.setEstadoItem(estadoNuevo);
-        ItemPedido guardado = itemPedidoRepository.save(item);
+        ItemPedido guardado = itemPedidoRepository.saveAndFlush(item);
 
         //notificar al mozo via WebSocket cuando el item este LISTO
         if (estadoNuevo == EstadoItem.LISTO) {
@@ -163,41 +163,53 @@ public class ItemPedidoService {
     }
 
     @Transactional
+    public List<ItemPedido> agregarItemsBatch(List<ItemPedido> items) {
+        if (items == null || items.isEmpty()) return new java.util.ArrayList<>();
+        
+        List<ItemPedido> guardados = new java.util.ArrayList<>();
+        for (ItemPedido itemPedido : items) {
+            // Validación de datos requeridos por contrato antes de romper la base de datos
+            if (itemPedido.getPlato() == null || itemPedido.getPlato().getIdPlato() == null) {
+                throw new NegocioException(
+                        "PLATO_ID_REQUERIDO",
+                        "No se puede agregar el ítem a la comanda porque no se especificó un ID de plato válido."
+                );
+            }
+
+            itemPedido.setEstadoItem(EstadoItem.PENDIENTE);
+            ItemPedido guardado = itemPedidoRepository.saveAndFlush(itemPedido);
+
+            // 2. Obtener la receta del plato pedido
+            List<Receta> recetas = recetaService.obtenerPorPlato(guardado.getPlato().getIdPlato());
+            if (recetas.isEmpty()) {
+                throw new NegocioException(
+                        "PLATO_SIN_RECETA",
+                        "El plato con ID " + guardado.getPlato().getIdPlato() + " no puede ser despachado porque no tiene una receta configurada."
+                );
+            }
+
+            // 3. Descontar ingredientes de almacén/cocina
+            for (Receta receta : recetas) {
+                // cantidad requerida en receta * cantidad de platos pedidos por el cliente
+                int cantidadADescontar = receta.getCantidad() * guardado.getCantidad();
+
+                // enviamos la cantidad en negativo para que registrarMovimiento realice la resta
+                // TODO: Sistema de Login (Spring Security) - Reemplazar el 1 hardcodeado por el ID del usuario autenticado
+                gestorStockFacade.registrarMovimiento(receta.getIngrediente().getIdIngrediente(), -cantidadADescontar, 1);
+            }
+            guardados.add(guardado);
+        }
+
+        //notificar a cocina vía WebSocket de nuevo pedido pendiente (una sola vez por el lote entero)
+        Integer numeroComanda = guardados.get(0).getComanda().getNumeroComanda();
+        List<ItemPedido> itemsDb = itemPedidoRepository.findByComandaNumeroComanda(numeroComanda);
+        wsNotifiaNotificacionService.notificarNuevoPedidoCocina(comandaMapper.toDetalleDTO(guardados.get(0).getComanda(), itemsDb));
+
+        return guardados;
+    }
+
+    @Transactional
     public ItemPedido agregarItemAComanda(ItemPedido itemPedido) {
-        // Validación de datos requeridos por contrato antes de romper la base de datos
-        if (itemPedido.getPlato() == null || itemPedido.getPlato().getIdPlato() == null) {
-            throw new NegocioException(
-                    "PLATO_ID_REQUERIDO",
-                    "No se puede agregar el ítem a la comanda porque no se especificó un ID de plato válido."
-            );
-        }
-
-        itemPedido.setEstadoItem(EstadoItem.PENDIENTE);
-        ItemPedido guardado = itemPedidoRepository.save(itemPedido);
-
-        // 2. Obtener la receta del plato pedido
-        List<Receta> recetas = recetaService.obtenerPorPlato(guardado.getPlato().getIdPlato());
-        if (recetas.isEmpty()) {
-            throw new NegocioException(
-                    "PLATO_SIN_RECETA",
-                    "El plato con ID " + guardado.getPlato().getIdPlato() + " no puede ser despachado porque no tiene una receta configurada."
-            );
-        }
-
-        // 3. Descontar ingredientes de almacén/cocina
-        for (Receta receta : recetas) {
-            // cantidad requerida en receta * cantidad de platos pedidos por el cliente
-            int cantidadADescontar = receta.getCantidad() * guardado.getCantidad();
-
-            // enviamos la cantidad en negativo para que registrarMovimiento realice la resta
-            // TODO: Sistema de Login (Spring Security) - Reemplazar el 1 hardcodeado por el ID del usuario autenticado
-            gestorStockFacade.registrarMovimiento(receta.getIngrediente().getIdIngrediente(), -cantidadADescontar, 1);
-        }
-
-        //notificar a cocina vía WebSocket de nuevo pedido pendiente
-        List<ItemPedido> items = itemPedidoRepository.findByComandaNumeroComanda(guardado.getComanda().getNumeroComanda());
-        wsNotifiaNotificacionService.notificarNuevoPedidoCocina(comandaMapper.toDetalleDTO(guardado.getComanda(), items));
-
-        return guardado;
+        return agregarItemsBatch(java.util.List.of(itemPedido)).get(0);
     }
 }
