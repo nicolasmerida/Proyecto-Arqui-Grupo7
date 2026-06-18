@@ -89,36 +89,6 @@ export default function PlanoSalon() {
         }
     };
 
-    // LOGICA REAL DE INTEGRACIÓN CON MERCADO PAGO
-    const handlePagarMesa = async () => {
-        if (!mesaSeleccionada) return;
-        setCargando(true);
-        try {
-            const baseUrl = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8080";
-
-            // ¡ACÁ ESTABA EL ERROR! Faltaba el "/api" antes de "/pagos"
-            const response = await fetch(`${baseUrl}/api/pagos/crear`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ idMesa: mesaSeleccionada.numeroMesa })
-            });
-
-            const urlPago = await response.text();
-
-            // Si el Backend responde con el punto de inicio válido (InitPoint) de la API de MP, redirigimos
-            if (urlPago && urlPago.startsWith("https://")) {
-                window.location.href = urlPago;
-            } else {
-                alert("Error al generar orden: " + urlPago);
-                setCargando(false);
-            }
-        } catch (error) {
-            console.error("Error de conexión con el backend de pagos:", error);
-            alert("No se pudo establecer comunicación con el servidor. Verifique que el servicio backend esté activo.");
-            setCargando(false);
-        }
-    };
-
     const abrirMesa = async (mesa: Mesa, numeroComensales: number) => {
         if (cargando) return;
         setCargando(true);
@@ -270,7 +240,6 @@ export default function PlanoSalon() {
                     items={comandaActivaItems}
                     onClose={() => { setModalOcupadaVisible(false); setMesaSeleccionada(null); }}
                     onAgregarPlatos={() => router.push(`/user/mozo/menu?comanda=${comandaActivaId}`)}
-                    onPagar={handlePagarMesa}
                     cargando={cargando}
                 />
             )}

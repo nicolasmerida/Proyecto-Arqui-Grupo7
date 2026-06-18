@@ -9,11 +9,10 @@ interface OpcionesMesaProps {
     items: any[];
     onClose: () => void;
     onAgregarPlatos: () => void;
-    onPagar: () => Promise<void>;
     cargando: boolean;
 }
 
-export default function OpcionesMesa({ mesa, comandaId, total, items, onClose, onAgregarPlatos, onPagar, cargando }: OpcionesMesaProps) {
+export default function OpcionesMesa({ mesa, comandaId, total, items, onClose, onAgregarPlatos, cargando }: OpcionesMesaProps) {
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
             <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl text-black">
@@ -47,7 +46,7 @@ export default function OpcionesMesa({ mesa, comandaId, total, items, onClose, o
                 )}
 
                 <div className="flex flex-col items-center justify-center py-4 bg-gray-50 rounded-xl mb-6">
-                    <span className="text-sm text-gray-500 font-medium">Total a cobrar</span>
+                    <span className="text-sm text-gray-500 font-medium">Total acumulado</span>
                     <span className="text-3xl font-bold text-green-600">${total}</span>
                 </div>
 
@@ -60,15 +59,10 @@ export default function OpcionesMesa({ mesa, comandaId, total, items, onClose, o
                     >
                         Agregar más platos
                     </button>
-                    
-                    <button 
-                        type="button" 
-                        onClick={onPagar}
-                        className="w-full rounded-xl bg-blue-600 px-4 py-3 font-semibold text-white shadow-sm hover:bg-blue-700 transition-colors"
-                        disabled={cargando}
-                    >
-                        {cargando ? 'Procesando...' : 'Confirmar y cobrar (Mercado Pago)'}
-                    </button>
+
+                    <p className="text-xs text-center text-gray-400 italic">
+                        El cobro se realiza desde la comanda, una vez entregado el pedido.
+                    </p>
                 </div>
             </div>
         </div>

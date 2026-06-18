@@ -100,23 +100,30 @@ export default function MozoDashboard({ initialComandas }: MozoDashboardProps) {
     setTotal(0);
   };
 
-const handleCerrarComanda = async () => {
+const handlePagarYCerrar = async () => {
     if (!comandaSeleccionada) return;
     setCerrando(true);
     try {
-        await fetch(
-            `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/mesas/${comandaSeleccionada.mesa.numeroMesa}/estado`,
+        const response = await fetch(
+            `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/pagos/crear`,
             {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ estadoMesa: 'Libre' })
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ idMesa: comandaSeleccionada.mesa.numeroMesa })
             }
         );
-        setComandas(prev => prev.filter(c => c.numeroComanda !== comandaSeleccionada.numeroComanda));
-        cerrarModal();
+
+        const urlPago = await response.text();
+
+        if (urlPago && urlPago.startsWith("https://")) {
+            window.location.href = urlPago; // redirige a Mercado Pago
+        } else {
+            alert("Error al generar orden: " + urlPago);
+            setCerrando(false);
+        }
     } catch (error) {
-        console.error("Error al cerrar comanda:", error);
-    } finally {
+        console.error("Error de conexión con el backend de pagos:", error);
+        alert("No se pudo establecer comunicación con el servidor.");
         setCerrando(false);
     }
 };
@@ -261,12 +268,12 @@ const handleCerrarComanda = async () => {
 
               {comandaSeleccionada.estadoComanda === EstadoComanda.Entregada && (
                 <button
-                  onClick={handleCerrarComanda}
+                  onClick={handlePagarYCerrar}
                   disabled={cerrando}
                   className="w-full bg-green-500 hover:bg-green-600 disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-semibold py-2 rounded-lg flex items-center justify-center gap-2 transition"
                 >
                   <HiOutlineCash size={18} />
-                  {cerrando ? "Cerrando..." : "Confirmar y cerrar comanda"}
+                  {cerrando ? "Procesando pago..." : "Cobrar (Mercado Pago)"}
                 </button>
               )}
 
