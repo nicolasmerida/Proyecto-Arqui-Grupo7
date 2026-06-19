@@ -36,7 +36,7 @@ export default function Navbar() {
     const menuHref = (session?.data?.user.role === Rol.Mozo) ? '/user/mozo' : '/menu';
 
     return (
-        <nav className="fixed top-0 left-0 bg-blue-400 z-auto w-full p-4">
+        <nav className="fixed top-0 left-0 bg-blue-400 z-40 w-full p-4">
             <div className="grid grid-cols-3 text-slate-700 items-center">
                 <Link href="/">Gestion_Restaurante</Link>
 
@@ -48,7 +48,7 @@ export default function Navbar() {
 
                 {/* Icono de login - Si hay una sesión iniciada ocultar */}
                 <div className="flex items-center justify-end space-x-2 md:space-x-4">
-                    {!isUserArea && (
+                    {!session?.data?.user && (
                         <Link href="/login" className={`flex flex-row space-x-1 ${navLinkClass} ${underlineClass}`}>
                             <span>Iniciar sesión</span>
                             <HiOutlineLogin className="text-base" />
@@ -90,7 +90,7 @@ export default function Navbar() {
             `}
             >
                 <div className="flex flex-col space-y-4 transition-opacity duration-300 delay-100">
-                    <Link href="/" className={`${navLinkClass} ${underlineClass}`} onClick={toggleMobileMenu}>
+                    <Link href={inicioHref} className={`${navLinkClass} ${underlineClass}`} onClick={toggleMobileMenu}>
                         Inicio
                     </Link>
                     <Link href={menuHref} className={`${navLinkClass} ${underlineClass}`} onClick={toggleMobileMenu}>

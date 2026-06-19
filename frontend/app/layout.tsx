@@ -2,6 +2,7 @@
 import "./ui/globals.css";
 import Navbar from "./ui/navbar";
 import Footer from "./ui/footer";
+import Userbar from "./ui/Userbar";
 import type { Metadata } from "next";
 import { SessionProvider } from "next-auth/react";
 import { auth } from "@/auth";
@@ -24,6 +25,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
         
         <body className="flex flex-col bg-blue-500 min-h-screen">
           <SessionProvider session={session}>
+            <Userbar />
             <Navbar />
             <main className="flex-auto">{children}</main>
             <Footer />
