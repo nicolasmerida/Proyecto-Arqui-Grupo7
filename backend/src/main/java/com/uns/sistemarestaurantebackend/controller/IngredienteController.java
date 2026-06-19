@@ -54,7 +54,7 @@ public class IngredienteController {
     @PutMapping("/{id}/stock")
     public ResponseEntity<IngredienteDTO> actualizarStock(@PathVariable Integer id,
                                                           @RequestParam Integer cantidad,
-                                                          @RequestHeader(value = "X-User-Id", defaultValue = "1") Integer usuarioId) {
+                                                          @RequestHeader(value = "X-User-Id") Integer usuarioId) {
         Ingrediente actualizado = gestorStockFacade.registrarMovimiento(id, cantidad, usuarioId);
         return ResponseEntity.ok(ingredienteMapper.toDTO(actualizado));
     }

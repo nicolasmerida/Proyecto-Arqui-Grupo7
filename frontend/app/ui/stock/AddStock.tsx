@@ -26,7 +26,7 @@ export default function AddStock({ show, onClose, onStockUpdate, ingredient} : A
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",
-                    "X-User-Id": session?.user?.id || "1",
+                    "X-User-Id": session?.user?.id as string,
                 }
             });
             if (!response.ok) {

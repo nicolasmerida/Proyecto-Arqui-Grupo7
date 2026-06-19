@@ -63,7 +63,7 @@ export default function MozoMenu({ searchParams }: MozoProps) {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-User-Id': session?.user?.id || "1",
+                    'X-User-Id': session?.user?.id as string,
                 },
                 body: JSON.stringify(itemsComanda)
             });

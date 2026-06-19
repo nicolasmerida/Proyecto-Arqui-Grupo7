@@ -42,7 +42,7 @@ public class ItemPedidoController {
 
     @PostMapping
     public ResponseEntity<ItemPedidoDTO> guardar(@RequestBody ItemPedidoDTO dto,
-                                                 @RequestHeader(value = "X-User-Id", defaultValue = "1") Integer usuarioId) {
+                                                 @RequestHeader(value = "X-User-Id") Integer usuarioId) {
         ItemPedido item = itemPedidoMapper.toEntity(dto);
         ItemPedido guardado = itemPedidoService.agregarItemAComanda(item, usuarioId);
         return ResponseEntity.ok(itemPedidoMapper.toDTO(guardado));
@@ -50,7 +50,7 @@ public class ItemPedidoController {
 
     @PostMapping("/batch")
     public ResponseEntity<List<ItemPedidoDTO>> guardarLote(@RequestBody List<ItemPedidoDTO> dtos,
-                                                           @RequestHeader(value = "X-User-Id", defaultValue = "1") Integer usuarioId) {
+                                                           @RequestHeader(value = "X-User-Id") Integer usuarioId) {
         List<ItemPedido> items = dtos.stream().map(itemPedidoMapper::toEntity).collect(java.util.stream.Collectors.toList());
         List<ItemPedido> guardados = itemPedidoService.agregarItemsAComandaBatch(items, usuarioId);
         return ResponseEntity.ok(guardados.stream().map(itemPedidoMapper::toDTO).collect(java.util.stream.Collectors.toList()));
@@ -61,7 +61,7 @@ public class ItemPedidoController {
             @PathVariable Integer numeroComanda,
             @PathVariable Integer idPlato,
             @RequestBody com.uns.sistemarestaurantebackend.dto.ItemEstadoInputDTO input,
-            @RequestHeader(value = "X-User-Id", defaultValue = "1") Integer usuarioId) {
+            @RequestHeader(value = "X-User-Id") Integer usuarioId) {
         ItemPedidoId id = new ItemPedidoId(numeroComanda, idPlato);
         ItemPedido actualizado = itemPedidoService.cambiarEstado(id, input.getNuevoEstado(), usuarioId);
         return ResponseEntity.ok(itemPedidoMapper.toDTO(actualizado));

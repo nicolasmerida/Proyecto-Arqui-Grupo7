@@ -25,7 +25,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
       <body className="flex flex-col min-h-screen">
         <SessionProvider session={session}>
           <Userbar />
-          <Navbar />
+          <Navbar session={session} />
           <main className="flex-auto">{children}</main>
           <Footer />
         </SessionProvider>

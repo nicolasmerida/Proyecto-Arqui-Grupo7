@@ -32,7 +32,7 @@ export default function CommandCocinero({ command, state, lastUpdate }: CommandP
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",
-                    "X-User-Id": session?.user?.id || "1",
+                    "X-User-Id": session?.user?.id as string,
                 },
                 body: JSON.stringify({
                     nuevoEstado: nuevo

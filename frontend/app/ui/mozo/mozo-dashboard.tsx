@@ -205,7 +205,7 @@ export default function MozoDashboard({ initialComandas }: MozoDashboardProps) {
       for (const item of items) {
         await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/items-pedido/${item.numeroComanda}/${item.idPlato}/estado`, {
           method: 'PUT',
-          headers: { 'Content-Type': 'application/json', 'X-User-Id': session?.user?.id || "1" },
+          headers: { 'Content-Type': 'application/json', 'X-User-Id': session?.user?.id as string },
           body: JSON.stringify({ nuevoEstado: 'CANCELADO' })
         });
       }
@@ -241,32 +241,10 @@ export default function MozoDashboard({ initialComandas }: MozoDashboardProps) {
     }
   };
 
-  const handleEliminarComandaDefinitivamente = async () => {
+  const handleOcultarComandaVisualmente = () => {
     if (!comandaSeleccionada) return;
-    setCerrando(true);
-    try {
-      // Intentamos liberar la mesa primero por las dudas
-      await fetch(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/mesas/${comandaSeleccionada.mesa.numeroMesa}/estado`,
-        {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ estadoMesa: 'Libre' })
-        }
-      ).catch(() => {}); // Si falla no bloqueamos el borrado
-
-      await fetch(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/comandas/${comandaSeleccionada.numeroComanda}`,
-        { method: 'DELETE' }
-      );
-
-      setComandas(prev => prev.filter(c => c.numeroComanda !== comandaSeleccionada.numeroComanda));
-      cerrarModal();
-    } catch (error) {
-      console.error("Error al eliminar comanda:", error);
-    } finally {
-      setCerrando(false);
-    }
+    setComandas(prev => prev.filter(c => c.numeroComanda !== comandaSeleccionada.numeroComanda));
+    cerrarModal();
   };
 
   return (
@@ -333,7 +311,7 @@ export default function MozoDashboard({ initialComandas }: MozoDashboardProps) {
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-white rounded-xl shadow-xl w-full max-w-md mx-4 overflow-hidden">
             <div className="flex justify-between items-center p-4 border-b">
-              <h2 className="text-lg font-semibold">
+              <h2 className="text-lg font-semibold text-slate-900">
                 Mesa N°{comandaSeleccionada.mesa?.numeroMesa} — Comanda #{comandaSeleccionada.numeroComanda}
               </h2>
               <button onClick={cerrarModal} className="text-gray-400 hover:text-gray-600">
@@ -347,15 +325,15 @@ export default function MozoDashboard({ initialComandas }: MozoDashboardProps) {
               ) : (
                 <table className="w-full text-sm">
                   <thead>
-                    <tr className="text-left text-gray-500 border-b">
+                    <tr className="text-left text-slate-500 border-b">
                       <th className="pb-2">Plato</th>
                       <th className="pb-2 text-center">Cant.</th>
                       <th className="pb-2 text-right">Subtotal</th>
                     </tr>
                   </thead>
-                  <tbody>
+                  <tbody className="text-slate-800 font-medium">
                     {items.map((item, index) => (
-                      <tr key={index} className="border-b last:border-0">
+                      <tr key={index} className="border-b last:border-0 border-slate-100">
                         <td className="py-2">{item.nombrePlato}</td>
                         <td className="py-2 text-center">{item.cantidad}</td>
                         <td className="py-2 text-right">
@@ -441,15 +419,14 @@ export default function MozoDashboard({ initialComandas }: MozoDashboardProps) {
                 </button>
               )}
 
-              {/* Botón de Eliminar definitivamente si está Cerrada o Cancelada, o si no tiene items */}
+              {/* Botón de Ocultar definitivamente si está Cerrada o Cancelada, o si no tiene items */}
               {(comandaSeleccionada.estadoComanda === EstadoComanda.Cerrada || comandaSeleccionada.estadoComanda === EstadoComanda.Cancelada || items.length === 0) && (
                 <button
-                  onClick={handleEliminarComandaDefinitivamente}
-                  disabled={cerrando}
-                  className="w-full bg-red-500 hover:bg-red-600 disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-semibold py-2 rounded-lg flex items-center justify-center gap-2 transition mt-2"
+                  onClick={handleOcultarComandaVisualmente}
+                  className="w-full bg-slate-100 border border-slate-300 hover:bg-slate-200 text-slate-700 font-semibold py-2 rounded-lg flex items-center justify-center gap-2 transition mt-2"
                 >
                   <HiOutlineTrash size={18} />
-                  {cerrando ? "Eliminando..." : "Eliminar Comanda del Sistema"}
+                  Borrar Comanda
                 </button>
               )}
 
