@@ -44,4 +44,10 @@ public class PlatoController {
         platoService.eliminar(id);
         return ResponseEntity.noContent().build();
     }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<PlatoDTO> actualizar(@PathVariable Integer id, @RequestBody PlatoDTO dto) {
+        Plato actualizado = platoService.actualizar(id, platoMapper.toEntity(dto));
+        return ResponseEntity.ok(platoMapper.toDTO(actualizado));
+    }
 }

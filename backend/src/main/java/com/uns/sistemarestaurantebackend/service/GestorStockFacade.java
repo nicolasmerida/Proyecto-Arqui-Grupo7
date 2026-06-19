@@ -34,9 +34,8 @@ public class GestorStockFacade {
         // que no quede en negativo)
         Ingrediente ingrediente = ingredienteService.actualizarStockFisico(idIngrediente, cantidad);
 
-        // 2. Obtener el usuario (Actualmente recibe el ID)
-        // TODO: Sistema de Login (Spring Security) - Eliminar este Fallback en el futuro.
-        // Se deberá extraer obligatoriamente el usuario real del token JWT en vez de buscar el primero disponible.
+        // 2. Obtener el usuario
+        // El ID del usuario nos llega desde Next.js (NextAuth) a través del header X-User-Id.
         Usuario usuario = usuarioRepository.findById(idUsuario)
                 .orElseGet(() -> usuarioRepository.findAll().stream().findFirst()
                         .orElseThrow(() -> new RuntimeException("Usuario no encontrado (No hay usuarios en la BD)")));

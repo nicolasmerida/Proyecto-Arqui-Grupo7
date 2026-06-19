@@ -45,6 +45,7 @@ public class ComandaController {
                     List<ItemPedido> items = itemPedidoService.obtenerPorComanda(comanda.getNumeroComanda());
                     return comandaMapper.toDetalleDTO(comanda, items);
                 })
+                .filter(dto -> dto.getItems() != null && !dto.getItems().isEmpty()) // EVITA LAS COMANDAS FANTASMAS
                 .collect(Collectors.toList());
     }
 
