@@ -1,6 +1,7 @@
 // app/ui/stock/AddStaff.tsx
 'use client';
 import { EstadoUsuario, Rol, Usuario } from "@/app/lib/definitions";
+import bcrypt from "bcryptjs";
 import { useState } from "react";
 import { HiOutlineX } from "react-icons/hi";
 
@@ -36,7 +37,7 @@ export default function AddStaff({ show, onClose, onAddStaff } : AddStaffProps) 
                 body: JSON.stringify({
                     nombre: name,
                     email: email,
-                    password: password,
+                    password: await bcrypt.hash(password, 8),
                     rol: rol,
                     estadoUsuario: state
                 })
