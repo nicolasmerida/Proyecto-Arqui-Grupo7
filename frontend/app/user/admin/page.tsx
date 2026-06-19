@@ -5,6 +5,7 @@ import StatsBar from "@/app/ui/admin/StatsBar";
 import StockAlerts from "@/app/ui/admin/StockAlerts";
 import TopSales from "@/app/ui/admin/TopSales";
 import { getAlertasStock } from "@/app/lib/actions";
+import ExportarGoogleSheets from "@/app/ui/admin/ExportarGoogleSheets";
 
 export default async function Admin() {
   //Consultar ventas, mas vendidos, datos de comandas, tickets y mozos para las estadisticas y alertas de stock
@@ -23,6 +24,7 @@ export default async function Admin() {
         </div>
       </main>
       <StockAlerts initialAlerts={initialAlerts} />
+      <ExportarGoogleSheets />
     </div>
   );
 }
