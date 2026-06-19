@@ -15,6 +15,8 @@ export default function CommandCocinero({ command, state, lastUpdate }: CommandP
     const items = command.items || [];
     const { data: session } = useSession();
 
+    const sortedItems = [...items].sort((a, b) => a.idPlato - b.idPlato);
+
     // Calcula el estado siguiente lógico para el item
     const obtenerSiguienteEstado = (actual: EstadoItem) => {
         if (actual === EstadoItem.Pendiente) return EstadoItem.Preparacion;
@@ -60,7 +62,7 @@ export default function CommandCocinero({ command, state, lastUpdate }: CommandP
             </div>
             <div className="flex flex-col rounded-md gap-3 mt-2">
                 {
-                    items.map((item) => (
+                    sortedItems.map((item) => (
                         <div key={`${item.numeroComanda}-${item.idPlato}`} className="flex flex-row items-center justify-between p-3 border border-gray-200 rounded-lg gap-3 bg-gray-50 shadow-sm">
                             <div className="flex flex-col flex-1 gap-1">
                                 <div className="flex items-center gap-2">
@@ -72,7 +74,7 @@ export default function CommandCocinero({ command, state, lastUpdate }: CommandP
                                         className="text-sm text-gray-700 italic ml-9 bg-yellow-50 p-1.5 rounded border border-yellow-200 cursor-help"
                                         title={item.notas}
                                     >
-                                        Nota: {item.notas.length > 80 ? item.notas.substring(0, 80) + '...' : item.notas}
+                                        {"* "}{item.notas.length > 80 ? item.notas.substring(0, 80) + '...' : item.notas}
                                     </div>
                                 )}
                             </div>
