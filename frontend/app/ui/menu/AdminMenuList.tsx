@@ -30,7 +30,7 @@ export default function AdminMenuList({ items }: AdminMenuListProps) {
       <div className="flex justify-end">
         <button
           onClick={openNewCourse}
-          className="rounded-full bg-green-400 px-4 py-2 text-sm font-semibold text-white transition hover:bg-green-500"
+          className="rounded-full bg-cyan-500 px-4 py-2 text-sm font-semibold text-slate-300 transition hover:bg-sky-500"
         >
             <HiOutlinePlus />
             Agregar plato
@@ -44,7 +44,7 @@ export default function AdminMenuList({ items }: AdminMenuListProps) {
             <div className="mt-2 flex justify-end opacity-0 transition group-hover:opacity-100">
               <button
                 onClick={() => openEditCourse(course)}
-                className="inline-flex items-center gap-2 rounded-full border border-slate-300 bg-white px-3 py-1 text-sm font-medium text-slate-700 hover:bg-slate-100"
+                className="inline-flex items-center gap-2 rounded-full border border-slate-400 bg-cyan-200 px-3 py-1 text-sm font-medium text-slate-700 hover:bg-sky-400"
               >
                 <HiOutlinePencil />
                 Editar

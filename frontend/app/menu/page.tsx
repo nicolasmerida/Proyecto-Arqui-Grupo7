@@ -4,8 +4,6 @@ import Pagination from "@/app/ui/menu/pagination";
 import { Plato } from "@/app/lib/definitions";
 import { useEffect, useState, use } from "react";
 
-// metadata eliminada para permitir importación desde client components
-
 type SearchParams = {
   page?: string;
 }
@@ -50,16 +48,18 @@ export default function Menu({ searchParams, addItem }: MenuProps) {
   const totalPages = data.totalPages;
 
   return (
-    <main>  {/* Agregar margen superior segun Navbar */}
-      <h1 className="flex flex-1 items-center m-5">
-        Bienvenido al menú de nuestro restaurante 🍽️
-      </h1>
-      <div className="px-5">
-        <MenuList items={items} {...(addItem && { addItem })} />
-      </div>
-      <div className="justify-items-center mt-6">
-        <Pagination currentPage={currentPage} totalPages={totalPages} />
-      </div>
+    <main className="bg-[url('/bg_salon.jpeg')] bg-cover bg-center bg-fixed">  {/* Agregar margen superior segun Navbar */}
+      <section className="text-center px-8 py-16 mb-8 max-w-4xl w-full bg-slate-700/75 rounded-2xl">
+        <h1 className="flex flex-1 items-center text-amber-400 m-5">
+          Bienvenido al menú de nuestro restaurante 🍽️
+        </h1>
+        <div className="px-5">
+          <MenuList items={items} {...(addItem && { addItem })} />
+        </div>
+        <div className="justify-items-center mt-6">
+          <Pagination currentPage={currentPage} totalPages={totalPages} />
+        </div>
+      </section>
     </main>
   );
 }

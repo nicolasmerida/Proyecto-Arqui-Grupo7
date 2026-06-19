@@ -6,9 +6,9 @@ import { DiGithubBadge } from "react-icons/di";
 export default function Footer() {
 
   return (
-    <footer className="bg-gray-800 text-white p-2 w-full mt-auto">
+    <footer className="bg-amber-800 text-yellow-300 p-2 w-full mt-auto">
         <div className="grid grid-cols-1 sm:grid-cols-3 items-center">
-            <div className="flex flex-col m-1 sm:m-0 items-center">
+            <div className="flex flex-col m-1 sm:m-0 items-center text-yellow-300">
                 <p><strong>Arquitectura y Diseño de Sistemas</strong></p>
                 <p>DCIC - Universidad Nacional del Sur</p>
                 <p>Bahía Blanca</p>
@@ -24,68 +24,70 @@ export default function Footer() {
             </div>
             <div className="grid grid-cols-2 gap-2 justify-self-center">
                 <div className="flex flex-col justify-start m-1 sm:m-0">
-                    <div className="flex justify-start text-white hover:underline gap-1 hover:opacity-80 transition-opacity"> 
+                    <div className="flex justify-start text-yellow-300 hover:underline gap-1 hover:opacity-80 transition-opacity"> 
                         <DiGithubBadge />
                         <Link
                         href="https://github.com/Faust0g" 
                         target="_blank"
                         rel="noopener noreferrer"
+                        className="text-yellow-300 hover:underline"
                         >
                         Fausto Gonzalo
                         </Link>
                     </div>
-                    <div className="flex justify-start text-white hover:underline gap-1 hover:opacity-80 transition-opacity"> 
+                    <div className="flex justify-start text-yellow-300 hover:underline gap-1 hover:opacity-80 transition-opacity"> 
                         <DiGithubBadge />
                         <Link
                         href="https://github.com/5q8" 
                         target="_blank"
                         rel="noopener noreferrer"
+                        className="text-yellow-300 hover:underline"
                         >
                         Esteban Lartigau
                         </Link>
                     </div>
-                    <div className="flex justify-start text-white hover:underline gap-1 hover:opacity-80 transition-opacity"> 
+                    <div className="flex justify-start text-yellow-300 hover:underline gap-1 hover:opacity-80 transition-opacity"> 
                         <DiGithubBadge />
                         <Link
                         href="https://github.com/nicolasmerida" 
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-white hover:underline"
+                        className="text-yellow-300 hover:underline"
                         >
                         Nicolas Mérida
                         </Link>
                     </div>
                 </div>
                 <div className="flex flex-col justify-start m-1">
-                    <div className="flex justify-start text-white hover:underline gap-1 hover:opacity-80 transition-opacity"> 
+                    <div className="flex justify-start text-yellow-300 hover:underline gap-1 hover:opacity-80 transition-opacity"> 
                         <DiGithubBadge />
                         <Link
                         href="https://github.com/zalongope" 
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-white hover:underline"
+                        className="text-yellow-300 hover:underline"
                         >
                         Gonzalo Perez
                         </Link>
                     </div>
-                    <div className="flex justify-start text-white hover:underline gap-1 hover:opacity-80 transition-opacity"> 
+                    <div className="flex justify-start text-yellow-300 hover:underline gap-1 hover:opacity-80 transition-opacity"> 
                         <DiGithubBadge />
                         <Link
                         href="https://github.com/ellukirap" 
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-white hover:underline"
+                        className="text-yellow-300 hover:underline"
                         >
                         Lucas Solmoni
                         </Link>
                     </div>
-                    <div className="flex justify-start text-white hover:underline gap-1 hover:opacity-80 transition-opacity"> 
+                    <div className="flex justify-start text-yellow-300 hover:underline gap-1 hover:opacity-80 transition-opacity"> 
                         <DiGithubBadge />
                         <Link
                         href="https://github.com/5imontl" 
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-white hover:underline"
+                        className="text-yellow-300 hover:underline"
                         >
                         Simón Torres Luna
                         </Link>

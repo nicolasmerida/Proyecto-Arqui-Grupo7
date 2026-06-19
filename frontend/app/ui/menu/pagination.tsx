@@ -23,29 +23,29 @@ export default function Pagination({ currentPage, totalPages }: Props) {
   const isLast = currentPage === totalPages;
 
   return (
-    <nav className="flex items-center justify-center gap-4 mt-12 text-white">
+    <nav className="flex items-center justify-center gap-4 mt-12 text-amber-500">
       {/* Previous */}
       <Link
         href={getPageLink(currentPage - 1)}
         className={`flex items-center justify-center w-10 h-10 rounded-full 
-          border border-white/30 bg-white/10 shadow-md transition 
-          ${isFirst ? 'opacity-30 pointer-events-none' : 'hover:bg-white/20'}`}
+          border border-orange-400 bg-amber-600 shadow-md transition 
+          ${isFirst ? 'opacity-30 pointer-events-none' : 'hover:bg-amber-400'}`}
         aria-disabled={isFirst}
       >
         <HiArrowSmLeft className="text-xl" />
       </Link>
 
       {/* Page indicator */}
-      <div className="px-4 py-2 text-sm font-medium border border-white/20 rounded-xl bg-white/10 shadow-sm backdrop-blur-sm">
-        <span className="font-semibold">{currentPage}</span> / <span className="font-semibold">{totalPages}</span>
+      <div className="px-4 py-2 text-sm font-medium border border-orange-400 rounded-xl bg-amber-600 shadow-sm backdrop-blur-sm">
+        <span className="font-semibold text-amber-400">{currentPage} / {totalPages}</span>
       </div>
 
       {/* Next */}
       <Link
         href={getPageLink(currentPage + 1)}
         className={`flex items-center justify-center w-10 h-10 rounded-full 
-          border border-white/30 bg-white/10 shadow-md transition 
-          ${isLast ? 'opacity-30 pointer-events-none' : 'hover:bg-white/20'}`}
+          border border-orange-400 bg-amber-600 shadow-md transition 
+          ${isLast ? 'opacity-30 pointer-events-none' : 'hover:bg-amber-400'}`}
         aria-disabled={isLast}
       >
         <HiArrowSmRight className="text-xl" />
