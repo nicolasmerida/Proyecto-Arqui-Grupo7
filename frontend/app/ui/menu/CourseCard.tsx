@@ -1,11 +1,12 @@
 // app/ui/menu/CourseCard.tsx
 import { Plato } from "@/app/lib/definitions";
 import { notFound } from "next/navigation";
-import { HiOutlinePencil } from "react-icons/hi";
+import { HiOutlinePencil, HiOutlineEye } from "react-icons/hi";
 
 interface CourseCardProps {
   course: Plato;
   onSelect: () => void;
+  isAdmin?: boolean;
 }
 
 const colorByCategory: Record<string, string> = {
@@ -15,7 +16,7 @@ const colorByCategory: Record<string, string> = {
   "BEBIDA": "bg-cyan-100 text-cyan-800 border-cyan-200"
 };
 
-export default function CourseCard({ course, onSelect }: CourseCardProps) {
+export default function CourseCard({ course, onSelect, isAdmin = false }: CourseCardProps) {
   if (!course) return notFound();
 
   const rawCategoryName = typeof course.categoria === 'string' 
@@ -38,7 +39,7 @@ export default function CourseCard({ course, onSelect }: CourseCardProps) {
           {categoriaName}
         </span>
         <div className="bg-white p-2 rounded-full shadow-sm text-slate-500 opacity-0 group-hover:opacity-100 group-hover:text-blue-600 transition-all duration-300 transform translate-x-4 group-hover:translate-x-0">
-          <HiOutlinePencil size={20} />
+          {isAdmin ? <HiOutlinePencil size={20} /> : <HiOutlineEye size={20} />}
         </div>
       </div>
       

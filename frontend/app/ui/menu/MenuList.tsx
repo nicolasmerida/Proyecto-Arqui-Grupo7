@@ -27,31 +27,42 @@ export default function MenuList({ items, addItem }: MenuListProps) {
     }
   };
 
-  const filteredItems = category ? items.filter((item) => item.categoria.nombre === category) : items;
-
+  const filteredItems = !category 
+    ? items 
+    : items.filter((item) => {
+        const catName = typeof item.categoria === 'string' 
+          ? item.categoria 
+          : (item.categoria as any)?.nombre;
+        
+        if (!catName) return false;
+        
+        return catName.trim().toUpperCase() === category.trim().toUpperCase();
+      });
   return (
     <>
-      <div className="grid grid-cols-5 items-center p-1 gap-1">
-        <button className={`border rounded-lg transition ${category === null ? "text-black bg-amber-200" : "text-slate-400"}`}
-                onClick={() => setCategory(null)}>
-                  Todos
-        </button>
-        <button className={`border rounded-lg transition ${category === Category.Entrada ? "text-black bg-amber-200" : "text-slate-400"}`}
-                onClick={() => setCategory(Category.Entrada)}>
-                  Entradas
-        </button>
-        <button className={`border rounded-lg transition ${category === Category.Principal ? "text-black bg-amber-200" : "text-slate-400"}`}
-                onClick={() => setCategory(Category.Principal)}>
-                  Principales
-        </button>
-        <button className={`border rounded-lg transition ${category === Category.Postre ? "text-black bg-amber-200" : "text-slate-400"}`}
-                onClick={() => setCategory(Category.Postre)}>
-                  Postres
-        </button>
-        <button className={`border rounded-lg transition ${category === Category.Bebida ? "text-black bg-amber-200" : "text-slate-400"}`}
-                onClick={() => setCategory(Category.Bebida)}>
-                  Bebidas
-        </button>
+      <div className="flex flex-col sm:flex-row justify-center items-center bg-white p-3 sm:p-4 rounded-2xl border border-slate-200 shadow-sm gap-2 sm:gap-4 mb-8">
+        <div className="flex flex-wrap items-center justify-center gap-2">
+          <button className={`px-5 py-2.5 rounded-xl text-sm font-bold transition-all ${category === null ? 'bg-slate-800 text-white shadow-md' : 'bg-transparent text-slate-600 hover:bg-slate-100'}`}
+                  onClick={() => setCategory(null)}>
+                    Todos
+          </button>
+          <button className={`px-5 py-2.5 rounded-xl text-sm font-bold transition-all ${category === Category.Entrada ? 'bg-slate-800 text-white shadow-md' : 'bg-transparent text-slate-600 hover:bg-slate-100'}`}
+                  onClick={() => setCategory(Category.Entrada)}>
+                    Entradas
+          </button>
+          <button className={`px-5 py-2.5 rounded-xl text-sm font-bold transition-all ${category === Category.Principal ? 'bg-slate-800 text-white shadow-md' : 'bg-transparent text-slate-600 hover:bg-slate-100'}`}
+                  onClick={() => setCategory(Category.Principal)}>
+                    Principales
+          </button>
+          <button className={`px-5 py-2.5 rounded-xl text-sm font-bold transition-all ${category === Category.Postre ? 'bg-slate-800 text-white shadow-md' : 'bg-transparent text-slate-600 hover:bg-slate-100'}`}
+                  onClick={() => setCategory(Category.Postre)}>
+                    Postres
+          </button>
+          <button className={`px-5 py-2.5 rounded-xl text-sm font-bold transition-all ${category === Category.Bebida ? 'bg-slate-800 text-white shadow-md' : 'bg-transparent text-slate-600 hover:bg-slate-100'}`}
+                  onClick={() => setCategory(Category.Bebida)}>
+                    Bebidas
+          </button>
+        </div>
       </div>
       <div className="grid grid-cols-2 sm:grid-cols-1 lg:grid-cols-3 gap-6">
         {(filteredItems.length > 0) ? (
