@@ -7,16 +7,19 @@ export const metadata: Metadata = {
 };
 
 export default function Stock() {
-
     return (
-        <>
-        <div className="flex flex-col items-start m-2">
-            <span className="font-serif text-black">Stock</span>
-            <span className="text-gray-400">Inventario de ingredientes e insumos</span>
+        <div className="min-h-screen bg-slate-50/50 pb-10">
+            {/* Header Premium */}
+            <div className="bg-white border-b border-slate-200 px-8 py-8 shadow-sm">
+                <h1 className="text-3xl font-bold font-serif italic text-slate-900">Stock</h1>
+                <p className="text-slate-500 mt-1">Inventario de ingredientes e insumos</p>
+            </div>
+
+            <main className="px-8 py-6 max-w-7xl mx-auto space-y-6">
+                <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-1">
+                    <TableStock />
+                </div>
+            </main>
         </div>
-        <div className="m-2">
-            <TableStock />
-        </div>
-        </>
     );
 }

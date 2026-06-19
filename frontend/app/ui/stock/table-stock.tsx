@@ -2,7 +2,7 @@
 'use client';
 import { Ingrediente } from "@/app/lib/definitions";
 import { useEffect, useState } from "react";
-import { HiOutlinePlusSm } from "react-icons/hi";
+import { HiOutlinePlusSm, HiOutlineCube } from "react-icons/hi";
 import AddStock from "@/app/ui/stock/AddStock";
 import AddIngredient from "@/app/ui/stock/AddIngredient";
 
@@ -22,17 +22,13 @@ export default function TableStock() {
                 let errorMessage = `Error ${response.status} inesperado al consultar ingredientes`;
                 let errorCode = `ERROR_DESCONOCIDO`;
                 try {
-                    //Intento obtener el mensaje de error desde la API
                     const errorData = await response.json();
                     if (errorData?.error?.message) {
                         errorMessage = errorData.error.message;
                         errorCode = errorData.error.code || errorCode;
                     }
                 }
-                catch (e) {
-                //Se mantiene el mensaje de error por defecto
-                }
-                //Lanzo el error
+                catch (e) {}
                 throw new Error(errorMessage, { cause: errorCode });
             }
 
@@ -44,7 +40,6 @@ export default function TableStock() {
         }
     };
     
-    //Consultar ingredientes al backend
     useEffect(() => {
         fetchIngredients();
     }, [])
@@ -53,110 +48,117 @@ export default function TableStock() {
         (condicion === "regla") ? (ingredient.stock > ingredient.stockMinimo) :
         (condicion === "bajo") ? (ingredient.stock < ingredient.stockMinimo) :
         (condicion === "advertencia") ? (ingredient.stock === ingredient.stockMinimo) :
-        true //Para no filtrar y mantener todos los ingredientes
+        true 
     );
 
-    //Considerar el caso en que se cambie el filtro o cambien los ingredientes totales (useEffect) y testear
     const getCondicion = (ingrediente: Ingrediente): Condition => {
         if (ingrediente.stock > ingrediente.stockMinimo) return "regla";
         if (ingrediente.stock < ingrediente.stockMinimo) return "bajo";
         return "advertencia";
     };
 
-    //Abrir componente para modificar el stock
     const handleAddStock = (ingrediente: Ingrediente) => {
         setSelected(ingrediente);
         setShowDetail(true);
     };
 
-    //Actualizar el stock del ingrediente seleccionado
     const handleStockUpdate = (updatedIng: Ingrediente) => {
         setIngredients((prev) =>
             prev.map((ing) => (ing.idIngrediente === updatedIng.idIngrediente ? updatedIng : ing))
         );
     };
 
-    //Abrir componente para agregar/crear un nuevo ingrediente
     const handleCreateIngredient = (nuevo: Ingrediente) => {
         setIngredients((prev) => [...prev, nuevo]);
-        //Se debe agregar el nuevo ingrediente a la BD en el backend
         fetchIngredients();
     }
 
     return (
-        <>
-        <div className="flex items-center justify-between mb-2">
-            <div className="grid grid-cols-4 rounded-md p-2 space-x-3">
-                <button className={`${(condicion === "todos") ? 'text-white border border-black bg-black rounded-md' : 'text-black'}`} onClick={() => setCondicion("todos")}>Todos</button>
-                <button className={`${(condicion === "regla") ? 'text-white border border-black bg-black rounded-md' : 'text-black'}`} onClick={() => setCondicion("regla")}>En regla</button>
-                <button className={`${(condicion === "advertencia") ? 'text-white border border-black bg-black rounded-md' : 'text-black'}`} onClick={() => setCondicion("advertencia")}>Advertencia</button>
-                <button className={`${(condicion === "bajo") ? 'text-white border border-black bg-black rounded-md' : 'text-black'}`} onClick={() => setCondicion("bajo")}>Bajo</button>
+        <div className="flex flex-col space-y-6">
+            <div className="flex flex-col sm:flex-row justify-between items-center bg-white p-4 rounded-2xl gap-4">
+                <div className="flex items-center gap-2 overflow-x-auto w-full sm:w-auto pb-2 sm:pb-0">
+                    <button className={`whitespace-nowrap px-5 py-2.5 rounded-xl text-sm font-bold transition-all ${condicion === "todos" ? 'bg-slate-800 text-white shadow-md' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`} onClick={() => setCondicion("todos")}>Todos</button>
+                    <button className={`whitespace-nowrap px-5 py-2.5 rounded-xl text-sm font-bold transition-all ${condicion === "regla" ? 'bg-emerald-600 text-white shadow-md' : 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100'}`} onClick={() => setCondicion("regla")}>En regla</button>
+                    <button className={`whitespace-nowrap px-5 py-2.5 rounded-xl text-sm font-bold transition-all ${condicion === "advertencia" ? 'bg-amber-500 text-white shadow-md' : 'bg-amber-50 text-amber-700 hover:bg-amber-100'}`} onClick={() => setCondicion("advertencia")}>Advertencia</button>
+                    <button className={`whitespace-nowrap px-5 py-2.5 rounded-xl text-sm font-bold transition-all ${condicion === "bajo" ? 'bg-rose-600 text-white shadow-md' : 'bg-rose-50 text-rose-700 hover:bg-rose-100'}`} onClick={() => setCondicion("bajo")}>Bajo</button>
+                </div>
+                <button onClick={() => setShowCreate(true)}
+                        className="w-full sm:w-auto flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 px-6 py-3 text-sm font-bold text-white transition-all hover:from-blue-700 hover:to-indigo-700 shadow-md hover:shadow-lg hover:-translate-y-0.5"
+                >
+                    <HiOutlinePlusSm size={20} /> Nuevo ingrediente
+                </button>
             </div>
-            <button onClick={() => setShowCreate(true)}
-                    className="flex items-center gap-1 rounded-xl bg-green-500 text-white text-base"
-            >
-                <HiOutlinePlusSm /> Nuevo ingrediente
-            </button>
-        </div>
-        <div className="overflow-hidden rounded-lg border">
-            <table className="w-full p-2">
-                <thead>
-                    <tr className="text-center text-sm uppercase">
-                        <th>Ingrediente</th>
-                        <th>Stock actual</th>
-                        <th>Condición</th>
-                        <th>Mínimo</th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {(ingFiltrados.length > 0) ? (
-                    ingFiltrados.map((ingrediente) => {
-                        const condIngrediente = getCondicion(ingrediente);
-                        const condTexto = (condIngrediente === "regla") ? "En regla" :
-                                            (condIngrediente === "bajo") ? "Bajo" :
-                                            "Advertencia";
-                        const condEstilo = (condIngrediente === "regla") ? "text-green-500 bg-green-300 border-green-500" :
-                                            (condIngrediente === "bajo") ? "text-red-500 bg-red-300 border-red-500" :
-                                            "text-black bg-gray-500 border-black";
+            
+            <div className="overflow-x-auto bg-white rounded-2xl">
+                <table className="w-full text-left border-collapse">
+                    <thead>
+                        <tr className="bg-slate-50 border-b border-slate-200">
+                            <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Ingrediente</th>
+                            <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider text-right">Stock Actual</th>
+                            <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider text-center">Condición</th>
+                            <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider text-right">Mínimo</th>
+                            <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider text-center">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100">
+                        {(ingFiltrados.length > 0) ? (
+                        ingFiltrados.map((ingrediente) => {
+                            const condIngrediente = getCondicion(ingrediente);
+                            const condTexto = (condIngrediente === "regla") ? "En Regla" :
+                                                (condIngrediente === "bajo") ? "Bajo" :
+                                                "Advertencia";
+                            const condEstilo = (condIngrediente === "regla") ? "text-emerald-700 bg-emerald-100 border-emerald-200" :
+                                                (condIngrediente === "bajo") ? "text-rose-700 bg-rose-100 border-rose-200" :
+                                                "text-amber-700 bg-amber-100 border-amber-200";
 
-                        return (
-                        <tr key={ingrediente.idIngrediente} className="m-2">
-                            <td className="font-medium">
-                                {ingrediente.nombre}
-                            </td>
-                            <td>
-                                <span className="font-semibold font-serif">{ingrediente.stock}</span>&nbsp
-                                <span className="font-serif">{ingrediente.unidad}</span>
-                            </td>
-                            <td className={`rounded-xl border ${condEstilo}`}>
-                                {condTexto}
-                            </td>
-                            <td className="font-medium">
-                                <span>{ingrediente.stockMinimo} {ingrediente.unidad}</span>
-                            </td>
-                            <td>
-                                <button onClick={() => handleAddStock(ingrediente)}
-                                        className="flex items-center gap-1 rounded-xl border bg-green-500 text-white "
-                                >
-                                    <HiOutlinePlusSm />Ingreso
-                                </button>
-                            </td>
-                        </tr>
-                        );
-                        })
-                    ) : (
-                        <tr>
-                            <td className="text-black italic text-center" colSpan={5}>
-                                No hay ingredientes para mostrar
-                            </td>
-                        </tr>
-                    )}
-                </tbody>
-            </table>
+                            return (
+                            <tr key={ingrediente.idIngrediente} className="hover:bg-slate-50/50 transition-colors">
+                                <td className="px-6 py-4 whitespace-nowrap">
+                                    <div className="flex items-center gap-3">
+                                        <div className="p-2 bg-slate-100 text-slate-400 rounded-lg">
+                                            <HiOutlineCube size={18} />
+                                        </div>
+                                        <span className="font-semibold text-slate-800">{ingrediente.nombre}</span>
+                                    </div>
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap text-right">
+                                    <span className={`font-bold text-lg ${condIngrediente === 'bajo' ? 'text-rose-600' : 'text-slate-800'}`}>{ingrediente.stock}</span>
+                                    <span className="text-sm text-slate-500 ml-1">{ingrediente.unidad}</span>
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap text-center">
+                                    <span className={`px-3 py-1 text-xs font-bold rounded-full border uppercase tracking-wider inline-block ${condEstilo}`}>
+                                        {condTexto}
+                                    </span>
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap text-right">
+                                    <span className="font-medium text-slate-600">{ingrediente.stockMinimo}</span>
+                                    <span className="text-xs text-slate-400 ml-1">{ingrediente.unidad}</span>
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap text-center">
+                                    <button onClick={() => handleAddStock(ingrediente)}
+                                            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-bold bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors"
+                                    >
+                                        <HiOutlinePlusSm size={18} /> Ingreso
+                                    </button>
+                                </td>
+                            </tr>
+                            );
+                            })
+                        ) : (
+                            <tr>
+                                <td colSpan={5} className="px-6 py-12 text-center">
+                                    <div className="flex flex-col items-center justify-center text-slate-400">
+                                        <HiOutlineCube size={48} className="mb-3 opacity-20" />
+                                        <span className="text-slate-500 font-medium">No hay ingredientes para mostrar</span>
+                                    </div>
+                                </td>
+                            </tr>
+                        )}
+                    </tbody>
+                </table>
+            </div>
+            <AddStock show={showDetail} onClose={() => setShowDetail(false)} onStockUpdate={handleStockUpdate} ingredient={selectedIng} />
+            <AddIngredient show={showCreate} onClose={() => setShowCreate(false)} onIngredientCreate={handleCreateIngredient} />
         </div>
-        <AddStock show={showDetail} onClose={() => setShowDetail(false)} onStockUpdate={handleStockUpdate} ingredient={selectedIng} />
-        <AddIngredient show={showCreate} onClose={() => setShowCreate(false)} onIngredientCreate={handleCreateIngredient} />
-        </>
     );
 }

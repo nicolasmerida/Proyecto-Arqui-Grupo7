@@ -43,13 +43,19 @@ export default async function AdminMenu({ searchParams }: AdminProps) {
   const totalPages = data.totalPages;
 
   return (
-    <main className="px-5 py-6">
-      <h1 className="text-3xl font-semibold font-serif italic text-slate-900 mb-4">Administrar menú</h1>
-      <p className="mb-6 text-slate-600">Aquí puedes editar los platos existentes o crear nuevos.</p>
-      <AdminMenuList items={items} />
-      <div className="mt-6">
-        <Pagination currentPage={currentPage} totalPages={totalPages} />
+    <div className="min-h-screen bg-slate-50/50 pb-10">
+      {/* Header Premium */}
+      <div className="bg-white border-b border-slate-200 px-8 py-8 shadow-sm">
+        <h1 className="text-3xl font-bold font-serif italic text-slate-900">Administrar Menú</h1>
+        <p className="text-slate-500 mt-1 font-medium">Aquí puedes editar los platos existentes o crear nuevos.</p>
       </div>
-    </main>
+
+      <main className="px-8 py-6 max-w-7xl mx-auto space-y-6">
+        <AdminMenuList items={items} />
+        <div className="mt-6 flex justify-center">
+          <Pagination currentPage={currentPage} totalPages={totalPages} />
+        </div>
+      </main>
+    </div>
   );
 }
