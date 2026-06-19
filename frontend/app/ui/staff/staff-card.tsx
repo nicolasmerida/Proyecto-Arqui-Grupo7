@@ -7,20 +7,25 @@ interface StaffCardProps {
 }
 
 export default function StaffCard({ staff }: StaffCardProps) {
-    //Consultar la cantidad total y cantidad de activos
     const mozos = staff.filter((m) => m.rol === Rol.Mozo);
     const activos = mozos.filter((a) => a.estado === EstadoUsuario.Activo);
 
     return (
-        <div className="flex flex-col border">
-            <div className="flex font-semibold text-base text-gray-400 justify-between">
-                Mozos activos <HiOutlineUserGroup />
+        <div className="flex flex-col bg-white border border-slate-200 rounded-2xl p-5 shadow-sm hover:shadow-md transition-all">
+            <div className="flex font-semibold text-sm text-slate-500 justify-between items-center mb-4">
+                <span className="uppercase tracking-wider">Mozos Activos</span>
+                <div className="p-2 bg-indigo-50 text-indigo-600 rounded-lg">
+                    <HiOutlineUserGroup size={20} />
+                </div>
             </div>
-            <div className="flex text-xl text-black font-serif">
-                {activos.length}
+            <div className="flex items-baseline gap-2">
+                <span className="text-3xl font-bold text-slate-800 tracking-tight">
+                    {activos.length}
+                </span>
+                <span className="text-lg text-slate-400 font-medium">/ {mozos.length}</span>
             </div>
-            <div className="text-sm text-gray-400">
-                {mozos.length} staff total
+            <div className="mt-2">
+                <span className="text-xs text-slate-400 font-medium">staff total en el sistema</span>
             </div>
         </div>
     );

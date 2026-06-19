@@ -1,28 +1,33 @@
 // app/user/admin/page.tsx
 export const dynamic = 'force-dynamic';
-//import SalesChart from "@/app/ui/admin/SalesChart";
 import StatsBar from "@/app/ui/admin/StatsBar";
 import StockAlerts from "@/app/ui/admin/StockAlerts";
 import TopSales from "@/app/ui/admin/TopSales";
 import { getAlertasStock } from "@/app/lib/actions";
 
 export default async function Admin() {
-  //Consultar ventas, mas vendidos, datos de comandas, tickets y mozos para las estadisticas y alertas de stock
   const initialAlerts = await getAlertasStock();
 
   return (
-    <div className="min-h-screen m-5">  {/* Agregar margen superior segun Userbar */}
-      <main className=" p-4"> {/* Ajustar margen superior e izquierdo segun panel y barra  */}
-        <div className="flex flex-col gap-2 w-full">
-          <h1 className="text-xl m-1">Bienvenido Admin</h1>
-          <StatsBar />
-          <div className="flex flex-row m-1 justify-between">
-            {/*<SalesChart /> Pensar que mostrar para el resumen de ventas*/}
+    <div className="min-h-screen bg-slate-50/50 pb-10">
+      {/* Header Premium */}
+      <div className="bg-white border-b border-slate-200 px-8 py-8 shadow-sm">
+        <h1 className="text-3xl font-bold font-serif italic text-slate-900">Dashboard</h1>
+        <p className="text-slate-500 mt-1">Resumen general y métricas del restaurante</p>
+      </div>
+
+      <main className="px-8 py-6 max-w-7xl mx-auto space-y-6">
+        <StatsBar />
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-2">
             <TopSales />
+          </div>
+          <div className="lg:col-span-1">
+            <StockAlerts initialAlerts={initialAlerts} />
           </div>
         </div>
       </main>
-      <StockAlerts initialAlerts={initialAlerts} />
     </div>
   );
 }
