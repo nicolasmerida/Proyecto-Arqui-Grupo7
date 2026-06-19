@@ -21,7 +21,7 @@ export default function SalesCard({ sales }: SalesCardProps) {
             </div>
             <div className="flex items-baseline gap-2">
                 <span className="text-3xl font-bold text-slate-800 tracking-tight">
-                    {sales}
+                    ${sales.toLocaleString('es-AR')}
                 </span>
             </div>
             {/* Si quisieras mostrar ganancias:

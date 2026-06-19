@@ -8,7 +8,7 @@ interface StaffCardProps {
 
 export default function StaffCard({ staff }: StaffCardProps) {
     const mozos = staff.filter((m) => m.rol === Rol.Mozo);
-    const activos = mozos.filter((a) => a.estado === EstadoUsuario.Activo);
+    const activos = mozos.filter((a) => (a.estado ?? EstadoUsuario.Activo) === EstadoUsuario.Activo);
 
     return (
         <div className="flex flex-col bg-white border border-slate-200 rounded-2xl p-5 shadow-sm hover:shadow-md transition-all">
@@ -25,7 +25,7 @@ export default function StaffCard({ staff }: StaffCardProps) {
                 <span className="text-lg text-slate-400 font-medium">/ {mozos.length}</span>
             </div>
             <div className="mt-2">
-                <span className="text-xs text-slate-400 font-medium">staff total en el sistema</span>
+                <span className="text-xs text-slate-400 font-medium">mozos registrados en el sistema</span>
             </div>
         </div>
     );

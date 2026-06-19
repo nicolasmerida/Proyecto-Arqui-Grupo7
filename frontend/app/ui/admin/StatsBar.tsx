@@ -54,8 +54,16 @@ export default function StatsBar() {
 
     if (!stats)
         return (
-            <div className="flex-col gap-4 w-full flex items-center justify-center">
-                <span className="text-sm text-gray-400 animate-pulse">Cargando estadísticas...</span>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                {[...Array(4)].map((_, i) => (
+                    <div key={i} className="flex flex-col bg-white/50 border border-slate-200/60 rounded-2xl p-5 shadow-sm h-[130px] justify-center gap-4 animate-pulse">
+                        <div className="flex items-center gap-3">
+                            <div className="w-12 h-12 rounded-xl bg-slate-200/80"></div>
+                            <div className="h-4 bg-slate-200/80 rounded-full w-24"></div>
+                        </div>
+                        <div className="h-8 bg-slate-200/80 rounded-xl w-2/3 ml-1"></div>
+                    </div>
+                ))}
             </div>
         );
 
