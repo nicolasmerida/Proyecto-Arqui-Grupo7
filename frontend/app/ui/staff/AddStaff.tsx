@@ -2,7 +2,7 @@
 'use client';
 import { EstadoUsuario, Rol, Usuario } from "@/app/lib/definitions";
 import { useState } from "react";
-import { HiOutlineXCircle } from "react-icons/hi";
+import { HiOutlineX } from "react-icons/hi";
 
 const ROL_OPTIONS = Object.values(Rol) as Rol[];
 
@@ -45,21 +45,16 @@ export default function AddStaff({ show, onClose, onAddStaff } : AddStaffProps) 
                 let errorMessage = `Error ${response.status} inesperado al registrar un nuevo usuario`;
                 let errorCode = `ERROR_DESCONOCIDO`;
                 try {
-                //Intento obtener el mensaje de error desde la API
-                const errorData = await response.json();
-                if (errorData?.error?.message) {
-                    errorMessage = errorData.error.message;
-                    errorCode = errorData.error.code || errorCode;
-                }
-                }
-                catch (e) {
-                //Se mantiene el mensaje de error por defecto
-                }
-                //Lanzo el error
+                    const errorData = await response.json();
+                    if (errorData?.error?.message) {
+                        errorMessage = errorData.error.message;
+                        errorCode = errorData.error.code || errorCode;
+                    }
+                } catch (e) {}
                 throw new Error(errorMessage, { cause: errorCode });
             }
             const data = await response.json();
-            onAddStaff(data);//El parametro es el usuario a agregar
+            onAddStaff(data);
             onClose();
         }
         catch (error) {
@@ -72,94 +67,106 @@ export default function AddStaff({ show, onClose, onAddStaff } : AddStaffProps) 
     };
 
     return (
-        <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm z-50 items-start justify-center transition-opacity duration-300 ease-in-out">
-            <div className="w-full max-w-full mx-auto bg-opacity-95 text-black transition-all duration-300 ease-in-out transform absolute shadow-md">
-                <div className="flex flex-col justify-between border rounded-xl m-2">
-                    <span className="text-xl font-serif font-semibold text-black">
-                        Registrar nuevo usuario
-                    </span>
-                    <button onClick={onClose}>
-                        <HiOutlineXCircle className="text-xl" />
+        <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in duration-200">
+            <div className="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden transform transition-all animate-in zoom-in-95 duration-200">
+                <div className="px-6 py-5 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+                    <div>
+                        <h3 className="text-xl font-bold font-serif italic text-slate-800">
+                            Nuevo Usuario
+                        </h3>
+                        <p className="text-sm text-slate-500 mt-1">Ingresa los datos del nuevo integrante</p>
+                    </div>
+                    <button onClick={onClose} className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-full transition-colors">
+                        <HiOutlineX size={20} />
                     </button>
                 </div>
-                <div className="flex flex-col">
-                    <div className="flex flex-col m-1">
-                        <label htmlFor="name" className="block mb-2 text-sm font-medium text-white/70">
+                
+                <div className="p-6 space-y-4">
+                    <div className="space-y-1">
+                        <label htmlFor="name" className="text-sm font-bold text-slate-700">
                             Nombre
                         </label>
                         <input
                             id="name"
                             name="name"
                             type="text"
-                            placeholder="Nombre de usuario"
-                            className="w-full px-4 py-2 rounded-lg bg-white/10 text-white placeholder-white/50 border border-white/20 focus:outline-none focus:ring-2 focus:ring-white/60"
+                            placeholder="Ej. Juan Pérez"
+                            className="w-full px-4 py-2.5 rounded-xl bg-slate-50 text-slate-900 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all placeholder:text-slate-400"
                             value={name}
                             onChange={(e) => setName(e.target.value)}
                             required
                         />
                     </div>
-                    <div className="flex flex-col m-1">
-                        <label htmlFor="email" className="block text-sm font-medium mb-1">
-                            Email
+                    
+                    <div className="space-y-1">
+                        <label htmlFor="email" className="text-sm font-bold text-slate-700">
+                            Correo Electrónico
                         </label>
                         <input
                             id="email"
                             type="email"
                             name="email"
-                            className="w-full px-4 py-2 rounded-md bg-white/20 text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-white"
-                            placeholder="Ingrese su email"
+                            placeholder="juan@restaurante.com"
+                            className="w-full px-4 py-2.5 rounded-xl bg-slate-50 text-slate-900 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all placeholder:text-slate-400"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                             required
                         />
                     </div>
-                    <div className="flex flex-col m-1">
-                        <label htmlFor="password" className="block mb-2 text-sm font-medium text-white/70">
-                            Contraseña
+                    
+                    <div className="space-y-1">
+                        <label htmlFor="password" className="text-sm font-bold text-slate-700">
+                            Contraseña temporal
                         </label>
                         <input
                             id="password"
                             name="password"
                             type="password"
                             minLength={8}
-                            className="w-full px-4 py-2 rounded-lg bg-white/10 text-white placeholder-white/50 border border-white/20 focus:outline-none focus:ring-2 focus:ring-white/60"
+                            placeholder="••••••••"
+                            className="w-full px-4 py-2.5 rounded-xl bg-slate-50 text-slate-900 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all placeholder:text-slate-400"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             required
                         />
                     </div>
-                    <div className="flex flex-col m-1">
-                        <label className="text-sm font-medium text-white/70 mb-1 block">
-                            Rol
+                    
+                    <div className="space-y-2 pt-2">
+                        <label className="text-sm font-bold text-slate-700">
+                            Rol del Usuario
                         </label>
-                        <div className="flex gap-6 mb-6">
+                        <div className="grid grid-cols-2 gap-3">
                         {ROL_OPTIONS.map(option => (
-                            <label key={option} className="flex items-center gap-2 text-white/80 cursor-pointer">
-                            <input
-                                type="radio"
-                                name="role"
-                                value={option}
-                                checked={rol === option}
-                                onChange={() => setRol(option)}
-                                className="h-4 w-4 bg-white/10 border-white/30 focus:ring-white/60 transition"
-                                required
-                            />
-                            <span className="text-sm capitalize">{option}</span>
+                            <label key={option} className={`flex items-center justify-center py-2.5 px-3 border rounded-xl cursor-pointer transition-all ${rol === option ? 'border-blue-500 bg-blue-50 text-blue-700 font-bold shadow-sm' : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50'}`}>
+                                <input
+                                    type="radio"
+                                    name="role"
+                                    value={option}
+                                    checked={rol === option}
+                                    onChange={() => setRol(option)}
+                                    className="hidden"
+                                    required
+                                />
+                                <span className="text-sm capitalize">{option}</span>
                             </label>
                         ))}
                         </div>
                     </div>
 
-                    {error && <p className="text-red-500 text-sm">{error}</p>}
+                    {error && (
+                        <div className="p-3 bg-rose-50 border border-rose-200 text-rose-600 rounded-xl text-sm font-medium">
+                            {error}
+                        </div>
+                    )}
+                </div>
 
-                    <div className="flex justify-end gap-2 mt-2">
-                        <button className="px-4 py-2 text-center rounded-lg text-white bg-green-500 hover:bg-green-600" onClick={handleAdd} disabled={loading}>
-                            {loading ? "Guardando..." : "Crear"}
-                        </button>
-                        <button className="px-4 py-2 text-center rounded-lg text-white bg-gray-500 hover:bg-gray-600" onClick={onClose} disabled={loading}>
-                            Cancelar
-                        </button>
-                    </div>
+                <div className="px-6 py-4 bg-slate-50 border-t border-slate-100 flex justify-end gap-3">
+                    <button className="px-5 py-2.5 text-sm font-bold rounded-xl text-slate-600 hover:bg-slate-200 transition-colors" onClick={onClose} disabled={loading}>
+                        Cancelar
+                    </button>
+                    <button className={`px-6 py-2.5 text-sm font-bold rounded-xl text-white shadow-md transition-all ${loading || !name || !email || !password || !rol ? 'bg-blue-400 cursor-not-allowed opacity-70' : 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 hover:shadow-lg hover:-translate-y-0.5'}`} onClick={handleAdd} disabled={loading || !name || !email || !password || !rol}>
+                        {loading ? "Creando..." : "Crear Usuario"}
+                    </button>
                 </div>
             </div>
         </div>

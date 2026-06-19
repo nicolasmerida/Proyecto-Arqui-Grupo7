@@ -127,12 +127,12 @@ export default function CocineroDashboard({ initialComandas }: CocineroDashboard
               <div key={comanda.numeroComanda} className={`flex flex-col border-y-4 ${colorByState[comanda.estadoComanda]} shadow-sm`}>
                 <CommandCard command={comanda} state={comanda.estadoComanda} lastUpdate={lastItemUpdate} />
                 <button
-                  className="rounded-b-md py-2 flex items-center justify-center gap-2 bg-orange-100 hover:bg-orange-200 transition-colors text-orange-800 font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="rounded-b-md py-2 flex items-center justify-center gap-2 bg-orange-100 hover:bg-orange-200 transition-colors text-orange-800 font-bold disabled:opacity-50 disabled:cursor-not-allowed"
                   onClick={() => cambiarEstado(comanda.numeroComanda, EstadoComanda.Preparacion)}
                   disabled={loading[comanda.numeroComanda]}
                 >
                   <HiOutlineFire className="text-xl" /> 
-                  {loading[comanda.numeroComanda] ? "Procesando..." : "Empezar a preparar"}
+                  {loading[comanda.numeroComanda] ? "Procesando..." : "Preparar Todo"}
                 </button>
               </div>
             ))}
@@ -148,12 +148,12 @@ export default function CocineroDashboard({ initialComandas }: CocineroDashboard
               <div key={comanda.numeroComanda} className={`flex flex-col border-y-4 ${colorByState[comanda.estadoComanda]} shadow-sm`}>
                 <CommandCard command={comanda} state={comanda.estadoComanda} lastUpdate={lastItemUpdate} />
                 <button
-                  className="rounded-b-md py-2 flex items-center justify-center gap-2 bg-green-100 hover:bg-green-200 transition-colors text-green-800 font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="rounded-b-md py-2 flex items-center justify-center gap-2 bg-green-100 hover:bg-green-200 transition-colors text-green-800 font-bold disabled:opacity-50 disabled:cursor-not-allowed"
                   onClick={() => cambiarEstado(comanda.numeroComanda, EstadoComanda.Lista)}
                   disabled={loading[comanda.numeroComanda]}
                 >
                   <HiOutlineCheck className="text-xl" /> 
-                  {loading[comanda.numeroComanda] ? "Procesando..." : "Todo listo"}
+                  {loading[comanda.numeroComanda] ? "Procesando..." : "Terminar Todo"}
                 </button>
               </div>
             ))}

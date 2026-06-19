@@ -1,11 +1,12 @@
 // app/ui/mozo/mozo-dashboard.tsx
 'use client';
 import { useState, useCallback } from "react";
-import { ComandaResumen, EstadoComanda, Item_Pedido } from "@/app/lib/definitions";
+import { ComandaResumen, EstadoComanda, Item_Pedido, EstadoItem } from "@/app/lib/definitions";
 import CommandDetailCard from "@/app/ui/mozo/command-mozo";
 import PlanoSalon from "@/app/ui/mozo/plano-salon";
 import { useStompClient } from "@/app/lib/hooks/useStompClient";
-import { HiX, HiOutlineCash, HiOutlineBell } from "react-icons/hi";
+import { HiX, HiOutlineCash, HiOutlineBell, HiOutlineTrash } from "react-icons/hi";
+import { useSession } from "next-auth/react";
 
 const colorByState: Record<EstadoComanda, string> = {
   [EstadoComanda.Abierta]: "comanda-abierta",
@@ -32,6 +33,7 @@ export default function MozoDashboard({ initialComandas }: MozoDashboardProps) {
   const [items, setItems] = useState<Item_Pedido[]>([]);
   const [total, setTotal] = useState<number>(0);
   const [cerrando, setCerrando] = useState(false);
+  const { data: session } = useSession();
 
   // ── NUEVO: lista de avisos flotantes activos ──────────────────
   const [avisos, setAvisos] = useState<AvisoComandaLista[]>([]);
@@ -65,10 +67,10 @@ export default function MozoDashboard({ initialComandas }: MozoDashboardProps) {
         });
       }
 
-      // Si la comanda se cerró o canceló, la sacamos de la lista
-      if ([EstadoComanda.Cerrada, EstadoComanda.Cancelada].includes(updatedComanda.estadoComanda)) {
-        return prevComandas.filter(c => c.numeroComanda !== updatedComanda.numeroComanda);
-      }
+      // NUEVO: No sacamos la comanda automáticamente para que el mozo pueda verla y eliminarla manualmente.
+      // if ([EstadoComanda.Cerrada, EstadoComanda.Cancelada].includes(updatedComanda.estadoComanda)) {
+      //  return prevComandas.filter(c => c.numeroComanda !== updatedComanda.numeroComanda);
+      // }
 
       if (anterior) {
         return prevComandas.map((c) =>
@@ -104,6 +106,17 @@ const handleCerrarComanda = async () => {
     if (!comandaSeleccionada) return;
     setCerrando(true);
     try {
+        // Cerrar la comanda en el backend
+        await fetch(
+            `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/comandas/${comandaSeleccionada.numeroComanda}/estado`,
+            {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ nuevoEstado: 'CERRADA' })
+            }
+        );
+
+        // Liberar la mesa
         await fetch(
             `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/mesas/${comandaSeleccionada.mesa.numeroMesa}/estado`,
             {
@@ -112,10 +125,73 @@ const handleCerrarComanda = async () => {
                 body: JSON.stringify({ estadoMesa: 'Libre' })
             }
         );
+        // Se actualiza localmente en vez de filtrarla para que aparezca como CERRADA
+        setComandas(prev => prev.map(c => c.numeroComanda === comandaSeleccionada.numeroComanda ? { ...c, estadoComanda: EstadoComanda.Cerrada } : c));
+        setComandaSeleccionada({ ...comandaSeleccionada, estadoComanda: EstadoComanda.Cerrada });
+        // No cerramos el modal para que el mozo vea el cambio y pueda eliminarla si quiere
+    } catch (error) {
+        console.error("Error al cerrar comanda:", error);
+    } finally {
+        setCerrando(false);
+    }
+};
+
+const handleCancelarComanda = async () => {
+    if (!comandaSeleccionada) return;
+    setCerrando(true);
+    try {
+        // 1. Cancelar cada item para que el stock vuelva al almacén/cocina
+        for (const item of items) {
+            await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/items-pedido/${item.numeroComanda}/${item.idPlato}/estado`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json', 'X-User-Id': session?.user?.id || "1" },
+                body: JSON.stringify({ nuevoEstado: 'CANCELADO' })
+            });
+        }
+
+        // 2. Cancelar la comanda (el backend notificará vía WS para quitarla de Cocina)
+        await fetch(
+            `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/comandas/${comandaSeleccionada.numeroComanda}/estado`,
+            {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ nuevoEstado: 'CANCELADA' })
+            }
+        );
+
+        // 3. Liberar la mesa
+        await fetch(
+            `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/mesas/${comandaSeleccionada.mesa.numeroMesa}/estado`,
+            {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ estadoMesa: 'Libre' })
+            }
+        );
+
+        // Se actualiza localmente para que aparezca como CANCELADA
+        setComandas(prev => prev.map(c => c.numeroComanda === comandaSeleccionada.numeroComanda ? { ...c, estadoComanda: EstadoComanda.Cancelada } : c));
+        setComandaSeleccionada({ ...comandaSeleccionada, estadoComanda: EstadoComanda.Cancelada });
+        // No cerramos el modal
+    } catch (error) {
+        console.error("Error al cancelar comanda:", error);
+    } finally {
+        setCerrando(false);
+    }
+};
+
+const handleEliminarComandaDefinitivamente = async () => {
+    if (!comandaSeleccionada) return;
+    setCerrando(true);
+    try {
+        await fetch(
+            `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/comandas/${comandaSeleccionada.numeroComanda}`,
+            { method: 'DELETE' }
+        );
         setComandas(prev => prev.filter(c => c.numeroComanda !== comandaSeleccionada.numeroComanda));
         cerrarModal();
     } catch (error) {
-        console.error("Error al cerrar comanda:", error);
+        console.error("Error al eliminar comanda:", error);
     } finally {
         setCerrando(false);
     }
@@ -263,17 +339,44 @@ const handleCerrarComanda = async () => {
                 <button
                   onClick={handleCerrarComanda}
                   disabled={cerrando}
-                  className="w-full bg-green-500 hover:bg-green-600 disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-semibold py-2 rounded-lg flex items-center justify-center gap-2 transition"
+                  className="w-full bg-green-500 hover:bg-green-600 disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-semibold py-2 rounded-lg flex items-center justify-center gap-2 transition mb-2"
                 >
                   <HiOutlineCash size={18} />
                   {cerrando ? "Cerrando..." : "Confirmar y cerrar comanda"}
                 </button>
               )}
 
+              {/* Botón de Cancelar Comanda si la cocina no la tocó todavía */}
+              {comandaSeleccionada.estadoComanda === EstadoComanda.Abierta && items.length > 0 && items.every(item => item.estadoItem === EstadoItem.Pendiente) && (
+                <button
+                  onClick={handleCancelarComanda}
+                  disabled={cerrando}
+                  className="w-full bg-red-100 border border-red-300 hover:bg-red-200 disabled:opacity-50 text-red-700 font-semibold py-2 rounded-lg flex items-center justify-center gap-2 transition"
+                >
+                  <HiOutlineTrash size={18} />
+                  {cerrando ? "Cancelando..." : "Cancelar Comanda"}
+                </button>
+              )}
+
+              {/* Botón de Eliminar definitivamente si está Cerrada o Cancelada */}
+              {(comandaSeleccionada.estadoComanda === EstadoComanda.Cerrada || comandaSeleccionada.estadoComanda === EstadoComanda.Cancelada) && (
+                <button
+                  onClick={handleEliminarComandaDefinitivamente}
+                  disabled={cerrando}
+                  className="w-full bg-red-500 hover:bg-red-600 disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-semibold py-2 rounded-lg flex items-center justify-center gap-2 transition mt-2"
+                >
+                  <HiOutlineTrash size={18} />
+                  {cerrando ? "Eliminando..." : "Eliminar Comanda del Sistema"}
+                </button>
+              )}
+
               {comandaSeleccionada.estadoComanda !== EstadoComanda.Lista &&
-              comandaSeleccionada.estadoComanda !== EstadoComanda.Entregada && (
+              comandaSeleccionada.estadoComanda !== EstadoComanda.Entregada &&
+              comandaSeleccionada.estadoComanda !== EstadoComanda.Cerrada &&
+              comandaSeleccionada.estadoComanda !== EstadoComanda.Cancelada &&
+              !(comandaSeleccionada.estadoComanda === EstadoComanda.Abierta && items.length > 0 && items.every(item => item.estadoItem === EstadoItem.Pendiente)) && (
                 <p className="text-xs text-center text-gray-400 italic mt-2">
-                  La comanda aún no está lista para entregar.
+                  La comanda aún no está lista para entregar ni puede ser eliminada.
                 </p>
               )}
             </div>
