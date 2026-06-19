@@ -1,11 +1,12 @@
 // app/ui/stock/table-movements
 'use client';
 import { Mov_Stock } from "@/app/lib/definitions";
-import { useEffect, useState } from "react";
-import { HiOutlineArrowSmDown, HiOutlineArrowSmUp, HiOutlineSwitchHorizontal } from "react-icons/hi";
+import { useEffect, useState, useMemo } from "react";
+import { HiOutlineArrowSmDown, HiOutlineArrowSmUp, HiOutlineSwitchHorizontal, HiOutlineSelector, HiOutlineChevronUp, HiOutlineChevronDown } from "react-icons/hi";
 
 export default function TableMovements() {
     const [movements, setMovements] = useState<Mov_Stock[]>([]);
+    const [sortConfig, setSortConfig] = useState<{ key: keyof Mov_Stock, direction: 'asc' | 'desc' } | null>({ key: 'fecha', direction: 'desc' });
 
     useEffect(() => {
         const fetchMovements = async () => {
@@ -36,21 +37,60 @@ export default function TableMovements() {
         fetchMovements();
     }, [])
 
+    const sortedMovements = useMemo(() => {
+        let sortableItems = [...movements];
+        if (sortConfig !== null) {
+            sortableItems.sort((a, b) => {
+                if (a[sortConfig.key] < b[sortConfig.key]) {
+                    return sortConfig.direction === 'asc' ? -1 : 1;
+                }
+                if (a[sortConfig.key] > b[sortConfig.key]) {
+                    return sortConfig.direction === 'asc' ? 1 : -1;
+                }
+                return 0;
+            });
+        }
+        return sortableItems;
+    }, [movements, sortConfig]);
+
+    const requestSort = (key: keyof Mov_Stock) => {
+        let direction: 'asc' | 'desc' = 'asc';
+        if (sortConfig && sortConfig.key === key && sortConfig.direction === 'asc') {
+            direction = 'desc';
+        }
+        setSortConfig({ key, direction });
+    };
+
+    const getSortIcon = (key: keyof Mov_Stock) => {
+        if (!sortConfig || sortConfig.key !== key) return <HiOutlineSelector className="inline ml-1 opacity-40" size={16} />;
+        return sortConfig.direction === 'asc' ? <HiOutlineChevronUp className="inline ml-1 text-slate-800" size={16} /> : <HiOutlineChevronDown className="inline ml-1 text-slate-800" size={16} />;
+    };
+
     return (
         <div className="overflow-x-auto bg-white rounded-2xl">
             <table className="w-full text-left border-collapse">
                 <thead>
                     <tr className="bg-slate-50 border-b border-slate-200">
-                        <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Fecha</th>
-                        <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Ingrediente</th>
-                        <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Tipo</th>
-                        <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider text-right">Cantidad</th>
-                        <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Usuario</th>
+                        <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider cursor-pointer hover:bg-slate-100 transition-colors" onClick={() => requestSort('fecha')}>
+                            Fecha {getSortIcon('fecha')}
+                        </th>
+                        <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider cursor-pointer hover:bg-slate-100 transition-colors" onClick={() => requestSort('nombreIngrediente')}>
+                            Ingrediente {getSortIcon('nombreIngrediente')}
+                        </th>
+                        <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider cursor-pointer hover:bg-slate-100 transition-colors" onClick={() => requestSort('cantidad')}>
+                            Tipo {getSortIcon('cantidad')}
+                        </th>
+                        <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider text-right cursor-pointer hover:bg-slate-100 transition-colors" onClick={() => requestSort('cantidad')}>
+                            Cantidad {getSortIcon('cantidad')}
+                        </th>
+                        <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider cursor-pointer hover:bg-slate-100 transition-colors" onClick={() => requestSort('nombreUsuario')}>
+                            Usuario {getSortIcon('nombreUsuario')}
+                        </th>
                     </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
-                    {(movements.length > 0) ? (
-                        movements.map((mov) => {
+                    {(sortedMovements.length > 0) ? (
+                        sortedMovements.map((mov) => {
                             const isIngreso = mov.cantidad > 0;
                             const condEstilo = isIngreso ?
                                 "text-emerald-700 bg-emerald-50 border-emerald-200" :

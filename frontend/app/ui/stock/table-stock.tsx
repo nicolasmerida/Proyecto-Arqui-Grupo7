@@ -1,8 +1,8 @@
 // app/ui/stock/table-stock
 'use client';
 import { Ingrediente } from "@/app/lib/definitions";
-import { useEffect, useState } from "react";
-import { HiOutlinePlusSm, HiOutlineCube } from "react-icons/hi";
+import { useEffect, useState, useMemo } from "react";
+import { HiOutlinePlusSm, HiOutlineCube, HiOutlineSelector, HiOutlineChevronUp, HiOutlineChevronDown } from "react-icons/hi";
 import AddStock from "@/app/ui/stock/AddStock";
 import AddIngredient from "@/app/ui/stock/AddIngredient";
 
@@ -14,6 +14,7 @@ export default function TableStock() {
     const [showDetail, setShowDetail] = useState(false);
     const [showCreate, setShowCreate] = useState(false);
     const [selectedIng, setSelected] = useState<Ingrediente>();
+    const [sortConfig, setSortConfig] = useState<{ key: keyof Ingrediente | 'condicion', direction: 'asc' | 'desc' } | null>({ key: 'nombre', direction: 'asc' });
 
     const fetchIngredients = async () => {
         try {
@@ -57,6 +58,52 @@ export default function TableStock() {
         return "advertencia";
     };
 
+    const getCondicionValue = (cond: Condition): number => {
+        if (cond === 'bajo') return 1;
+        if (cond === 'advertencia') return 2;
+        return 3; // regla
+    };
+
+    const sortedIngredients = useMemo(() => {
+        let sortableItems = [...ingFiltrados];
+        if (sortConfig !== null) {
+            sortableItems.sort((a, b) => {
+                let aValue: any = a[sortConfig.key as keyof Ingrediente];
+                let bValue: any = b[sortConfig.key as keyof Ingrediente];
+
+                if (sortConfig.key === 'condicion') {
+                    aValue = getCondicionValue(getCondicion(a));
+                    bValue = getCondicionValue(getCondicion(b));
+                } else if (typeof aValue === 'string') {
+                    aValue = aValue.toLowerCase();
+                    bValue = bValue.toLowerCase();
+                }
+
+                if (aValue < bValue) {
+                    return sortConfig.direction === 'asc' ? -1 : 1;
+                }
+                if (aValue > bValue) {
+                    return sortConfig.direction === 'asc' ? 1 : -1;
+                }
+                return 0;
+            });
+        }
+        return sortableItems;
+    }, [ingFiltrados, sortConfig]);
+
+    const requestSort = (key: keyof Ingrediente | 'condicion') => {
+        let direction: 'asc' | 'desc' = 'asc';
+        if (sortConfig && sortConfig.key === key && sortConfig.direction === 'asc') {
+            direction = 'desc';
+        }
+        setSortConfig({ key, direction });
+    };
+
+    const getSortIcon = (key: keyof Ingrediente | 'condicion') => {
+        if (!sortConfig || sortConfig.key !== key) return <HiOutlineSelector className="inline ml-1 opacity-40" size={16} />;
+        return sortConfig.direction === 'asc' ? <HiOutlineChevronUp className="inline ml-1 text-slate-800" size={16} /> : <HiOutlineChevronDown className="inline ml-1 text-slate-800" size={16} />;
+    };
+
     const handleAddStock = (ingrediente: Ingrediente) => {
         setSelected(ingrediente);
         setShowDetail(true);
@@ -93,16 +140,24 @@ export default function TableStock() {
                 <table className="w-full text-left border-collapse">
                     <thead>
                         <tr className="bg-slate-50 border-b border-slate-200">
-                            <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Ingrediente</th>
-                            <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider text-right">Stock Actual</th>
-                            <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider text-center">Condición</th>
-                            <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider text-right">Mínimo</th>
+                            <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider cursor-pointer hover:bg-slate-100 transition-colors" onClick={() => requestSort('nombre')}>
+                                Ingrediente {getSortIcon('nombre')}
+                            </th>
+                            <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider text-right cursor-pointer hover:bg-slate-100 transition-colors" onClick={() => requestSort('stock')}>
+                                Stock Actual {getSortIcon('stock')}
+                            </th>
+                            <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider text-center cursor-pointer hover:bg-slate-100 transition-colors" onClick={() => requestSort('condicion')}>
+                                Condición {getSortIcon('condicion')}
+                            </th>
+                            <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider text-right cursor-pointer hover:bg-slate-100 transition-colors" onClick={() => requestSort('stockMinimo')}>
+                                Mínimo {getSortIcon('stockMinimo')}
+                            </th>
                             <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider text-center">Acciones</th>
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-100">
-                        {(ingFiltrados.length > 0) ? (
-                        ingFiltrados.map((ingrediente) => {
+                        {(sortedIngredients.length > 0) ? (
+                        sortedIngredients.map((ingrediente) => {
                             const condIngrediente = getCondicion(ingrediente);
                             const condTexto = (condIngrediente === "regla") ? "En Regla" :
                                                 (condIngrediente === "bajo") ? "Bajo" :
