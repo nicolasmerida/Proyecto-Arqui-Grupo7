@@ -90,10 +90,10 @@ export default function MozoDashboard({ initialComandas }: MozoDashboardProps) {
   }
 
   const abrirModal = (comanda: ComandaResumen, items: Item_Pedido[], total: number) => {
-      setComandaSeleccionada(comanda);
-      setItems(items);
-      setTotal(total);
-      
+    setComandaSeleccionada(comanda);
+    setItems(items);
+    setTotal(total);
+
   };
 
   const cerrarModal = () => {
@@ -102,124 +102,172 @@ export default function MozoDashboard({ initialComandas }: MozoDashboardProps) {
     setTotal(0);
   };
 
-const handlePagarYCerrar = async () => {
+  const handlePagarYCerrar = async () => {
     if (!comandaSeleccionada) return;
     setCerrando(true);
     try {
-        const baseUrl = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8080";
+      const baseUrl = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8080";
 
-        // 1. Generamos el link de pago
-        const response = await fetch(`${baseUrl}/api/pagos/crear`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ idMesa: comandaSeleccionada.mesa.numeroMesa })
+      // 1. Generamos el link de pago
+      const response = await fetch(`${baseUrl}/api/pagos/crear`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ idMesa: comandaSeleccionada.mesa.numeroMesa })
+      });
+
+      const urlPago = await response.text();
+
+      if (!urlPago || !urlPago.startsWith("https://")) {
+        alert("Error al generar orden: " + urlPago);
+        setCerrando(false);
+        return;
+      }
+
+      // 2. Cerramos la comanda en el backend para que deje de estar activa
+      await fetch(
+        `${baseUrl}/api/comandas/${comandaSeleccionada.numeroComanda}/estado`,
+        {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ nuevoEstado: 'CERRADA' })
+        }
+      );
+
+      // 3. Liberamos la mesa
+      await fetch(
+        `${baseUrl}/api/mesas/${comandaSeleccionada.mesa.numeroMesa}/estado`,
+        {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ estadoMesa: 'Libre' })
+        }
+      );
+
+      // Se actualiza localmente en vez de filtrarla para que aparezca como CERRADA
+      setComandas(prev => prev.map(c => c.numeroComanda === comandaSeleccionada.numeroComanda ? { ...c, estadoComanda: EstadoComanda.Cerrada } : c));
+      setComandaSeleccionada({ ...comandaSeleccionada, estadoComanda: EstadoComanda.Cerrada });
+      // No cerramos el modal para que el mozo vea el cambio y pueda eliminarla si quiere
+
+      // 4. Redirigimos a Mercado Pago
+      window.location.href = urlPago;
+
+    } catch (error) {
+      console.error("Error al pagar y cerrar comanda:", error);
+      alert("No se pudo completar la operación de pago.");
+    } finally {
+      setCerrando(false);
+    }
+  };
+
+  const handlePagarEfectivo = async () => {
+    if (!comandaSeleccionada) return;
+    setCerrando(true);
+    try {
+      const baseUrl = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8080";
+
+      // 1. Cerramos la comanda en el backend para que deje de estar activa
+      await fetch(
+        `${baseUrl}/api/comandas/${comandaSeleccionada.numeroComanda}/estado`,
+        {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ nuevoEstado: 'CERRADA' })
+        }
+      );
+
+      // 2. Liberamos la mesa
+      await fetch(
+        `${baseUrl}/api/mesas/${comandaSeleccionada.mesa.numeroMesa}/estado`,
+        {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ estadoMesa: 'Libre' })
+        }
+      );
+
+      // Se actualiza localmente en vez de filtrarla para que aparezca como CERRADA
+      setComandas(prev => prev.map(c => c.numeroComanda === comandaSeleccionada.numeroComanda ? { ...c, estadoComanda: EstadoComanda.Cerrada } : c));
+      setComandaSeleccionada({ ...comandaSeleccionada, estadoComanda: EstadoComanda.Cerrada });
+      // No cerramos el modal para que el mozo vea el cambio y pueda eliminarla si quiere
+    } catch (error) {
+      console.error("Error al pagar en efectivo:", error);
+      alert("No se pudo completar la operación de pago.");
+    } finally {
+      setCerrando(false);
+    }
+  };
+
+  const handleCancelarComanda = async () => {
+    if (!comandaSeleccionada) return;
+    setCerrando(true);
+    try {
+      // 1. Cancelar cada item para que el stock vuelva al almacén/cocina
+      for (const item of items) {
+        await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/items-pedido/${item.numeroComanda}/${item.idPlato}/estado`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json', 'X-User-Id': session?.user?.id || "1" },
+          body: JSON.stringify({ nuevoEstado: 'CANCELADO' })
         });
+      }
 
-        const urlPago = await response.text();
-
-        if (!urlPago || !urlPago.startsWith("https://")) {
-            alert("Error al generar orden: " + urlPago);
-            setCerrando(false);
-            return;
+      // 2. Cancelar la comanda (el backend notificará vía WS para quitarla de Cocina)
+      await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/comandas/${comandaSeleccionada.numeroComanda}/estado`,
+        {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ nuevoEstado: 'CANCELADA' })
         }
+      );
 
-        // 2. Cerramos la comanda en el backend para que deje de estar activa
-        await fetch(
-            `${baseUrl}/api/comandas/${comandaSeleccionada.numeroComanda}/estado`,
-            {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ nuevoEstado: 'CERRADA' })
-            }
-        );
+      // 3. Liberar la mesa
+      await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/mesas/${comandaSeleccionada.mesa.numeroMesa}/estado`,
+        {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ estadoMesa: 'Libre' })
+        }
+      );
 
-        // 3. Liberamos la mesa
-        await fetch(
-            `${baseUrl}/api/mesas/${comandaSeleccionada.mesa.numeroMesa}/estado`,
-            {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ estadoMesa: 'Libre' })
-            }
-        );
-
-        // Se actualiza localmente en vez de filtrarla para que aparezca como CERRADA
-        setComandas(prev => prev.map(c => c.numeroComanda === comandaSeleccionada.numeroComanda ? { ...c, estadoComanda: EstadoComanda.Cerrada } : c));
-        setComandaSeleccionada({ ...comandaSeleccionada, estadoComanda: EstadoComanda.Cerrada });
-        // No cerramos el modal para que el mozo vea el cambio y pueda eliminarla si quiere
-
-        // 4. Redirigimos a Mercado Pago
-        window.location.href = urlPago;
-
+      // Se actualiza localmente para que aparezca como CANCELADA
+      setComandas(prev => prev.map(c => c.numeroComanda === comandaSeleccionada.numeroComanda ? { ...c, estadoComanda: EstadoComanda.Cancelada } : c));
+      setComandaSeleccionada({ ...comandaSeleccionada, estadoComanda: EstadoComanda.Cancelada });
+      // No cerramos el modal
     } catch (error) {
-        console.error("Error al pagar y cerrar comanda:", error);
-        alert("No se pudo completar la operación de pago.");
+      console.error("Error al cancelar comanda:", error);
     } finally {
-        setCerrando(false);
+      setCerrando(false);
     }
-};
+  };
 
-const handleCancelarComanda = async () => {
+  const handleEliminarComandaDefinitivamente = async () => {
     if (!comandaSeleccionada) return;
     setCerrando(true);
     try {
-        // 1. Cancelar cada item para que el stock vuelva al almacén/cocina
-        for (const item of items) {
-            await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/items-pedido/${item.numeroComanda}/${item.idPlato}/estado`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json', 'X-User-Id': session?.user?.id || "1" },
-                body: JSON.stringify({ nuevoEstado: 'CANCELADO' })
-            });
+      // Intentamos liberar la mesa primero por las dudas
+      await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/mesas/${comandaSeleccionada.mesa.numeroMesa}/estado`,
+        {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ estadoMesa: 'Libre' })
         }
+      ).catch(() => {}); // Si falla no bloqueamos el borrado
 
-        // 2. Cancelar la comanda (el backend notificará vía WS para quitarla de Cocina)
-        await fetch(
-            `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/comandas/${comandaSeleccionada.numeroComanda}/estado`,
-            {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ nuevoEstado: 'CANCELADA' })
-            }
-        );
+      await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/comandas/${comandaSeleccionada.numeroComanda}`,
+        { method: 'DELETE' }
+      );
 
-        // 3. Liberar la mesa
-        await fetch(
-            `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/mesas/${comandaSeleccionada.mesa.numeroMesa}/estado`,
-            {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ estadoMesa: 'Libre' })
-            }
-        );
-
-        // Se actualiza localmente para que aparezca como CANCELADA
-        setComandas(prev => prev.map(c => c.numeroComanda === comandaSeleccionada.numeroComanda ? { ...c, estadoComanda: EstadoComanda.Cancelada } : c));
-        setComandaSeleccionada({ ...comandaSeleccionada, estadoComanda: EstadoComanda.Cancelada });
-        // No cerramos el modal
+      setComandas(prev => prev.filter(c => c.numeroComanda !== comandaSeleccionada.numeroComanda));
+      cerrarModal();
     } catch (error) {
-        console.error("Error al cancelar comanda:", error);
+      console.error("Error al eliminar comanda:", error);
     } finally {
-        setCerrando(false);
+      setCerrando(false);
     }
-};
-
-const handleEliminarComandaDefinitivamente = async () => {
-    if (!comandaSeleccionada) return;
-    setCerrando(true);
-    try {
-        await fetch(
-            `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/comandas/${comandaSeleccionada.numeroComanda}`,
-            { method: 'DELETE' }
-        );
-        
-        setComandas(prev => prev.filter(c => c.numeroComanda !== comandaSeleccionada.numeroComanda));
-        cerrarModal();
-    } catch (error) {
-        console.error("Error al eliminar comanda:", error);
-    } finally {
-        setCerrando(false);
-    }
-};
+  };
 
   return (
     <div className="flex flex-row flex-1 items-start p-4 gap-6">
@@ -270,10 +318,10 @@ const handleEliminarComandaDefinitivamente = async () => {
                 key={comanda.numeroComanda}
                 className={`flex flex-col border-l-4 rounded-r-md shadow-sm bg-white overflow-hidden transition-all duration-300 hover:shadow-md hover:translate-y-0.5 ${colorByState[comanda.estadoComanda]}`}
               >
-              <CommandDetailCard
+                <CommandDetailCard
                   command={comanda}
                   onSelect={(items, total) => abrirModal(comanda, items, total)}
-              />
+                />
               </div>
             ))
           )}
@@ -333,7 +381,7 @@ const handleEliminarComandaDefinitivamente = async () => {
                     try {
                       const response = await fetch(
                         `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/comandas/${comandaSeleccionada.numeroComanda}/estado`,
-                        { 
+                        {
                           method: 'PUT',
                           headers: { 'Content-Type': 'application/json' },
                           body: JSON.stringify({ nuevoEstado: 'ENTREGADA' })
@@ -360,14 +408,25 @@ const handleEliminarComandaDefinitivamente = async () => {
               )}
 
               {comandaSeleccionada.estadoComanda === EstadoComanda.Entregada && (
-                <button
-                  onClick={handlePagarYCerrar}
-                  disabled={cerrando}
-                  className="w-full bg-green-500 hover:bg-green-600 disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-semibold py-2 rounded-lg flex items-center justify-center gap-2 transition mb-2"
-                >
-                  <HiOutlineCash size={18} />
-                  {cerrando ? "Procesando pago..." : "Cobrar (Mercado Pago)"}
-                </button>
+                <div className="flex flex-col gap-2 mb-2">
+                  <button
+                    onClick={handlePagarYCerrar}
+                    disabled={cerrando}
+                    className="w-full bg-blue-500 hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-semibold py-2 rounded-lg flex items-center justify-center gap-2 transition"
+                  >
+                    <HiOutlineCash size={18} />
+                    {cerrando ? "Procesando pago..." : "Cobrar (Mercado Pago)"}
+                  </button>
+
+                  <button
+                    onClick={handlePagarEfectivo}
+                    disabled={cerrando}
+                    className="w-full bg-green-500 hover:bg-green-600 disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-semibold py-2 rounded-lg flex items-center justify-center gap-2 transition"
+                  >
+                    <HiOutlineCash size={18} />
+                    {cerrando ? "Procesando pago..." : "Cobrar (Efectivo)"}
+                  </button>
+                </div>
               )}
 
               {/* Botón de Cancelar Comanda si la cocina no la tocó todavía */}
@@ -382,8 +441,8 @@ const handleEliminarComandaDefinitivamente = async () => {
                 </button>
               )}
 
-              {/* Botón de Eliminar definitivamente si está Cerrada o Cancelada */}
-              {(comandaSeleccionada.estadoComanda === EstadoComanda.Cerrada || comandaSeleccionada.estadoComanda === EstadoComanda.Cancelada) && (
+              {/* Botón de Eliminar definitivamente si está Cerrada o Cancelada, o si no tiene items */}
+              {(comandaSeleccionada.estadoComanda === EstadoComanda.Cerrada || comandaSeleccionada.estadoComanda === EstadoComanda.Cancelada || items.length === 0) && (
                 <button
                   onClick={handleEliminarComandaDefinitivamente}
                   disabled={cerrando}
@@ -395,14 +454,15 @@ const handleEliminarComandaDefinitivamente = async () => {
               )}
 
               {comandaSeleccionada.estadoComanda !== EstadoComanda.Lista &&
-              comandaSeleccionada.estadoComanda !== EstadoComanda.Entregada &&
-              comandaSeleccionada.estadoComanda !== EstadoComanda.Cerrada &&
-              comandaSeleccionada.estadoComanda !== EstadoComanda.Cancelada &&
-              !(comandaSeleccionada.estadoComanda === EstadoComanda.Abierta && items.length > 0 && items.every(item => item.estadoItem === EstadoItem.Pendiente)) && (
-                <p className="text-xs text-center text-gray-400 italic mt-2">
-                  La comanda aún no está lista para entregar ni puede ser eliminada.
-                </p>
-              )}
+                comandaSeleccionada.estadoComanda !== EstadoComanda.Entregada &&
+                comandaSeleccionada.estadoComanda !== EstadoComanda.Cerrada &&
+                comandaSeleccionada.estadoComanda !== EstadoComanda.Cancelada &&
+                items.length > 0 &&
+                !(comandaSeleccionada.estadoComanda === EstadoComanda.Abierta && items.every(item => item.estadoItem === EstadoItem.Pendiente)) && (
+                  <p className="text-xs text-center text-gray-400 italic mt-2">
+                    La comanda aún no está lista para entregar ni puede ser eliminada.
+                  </p>
+                )}
             </div>
           </div>
         </div>

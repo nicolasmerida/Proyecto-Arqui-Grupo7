@@ -20,7 +20,8 @@ export default function CommandMozo({ command, onSelect }: CommandCardProps) {
             const data = await response.json();
             setItems(data);
         } catch (error) {
-            console.error("Error al obtener los items:", error);
+            console.warn("Error al obtener los items (puede estar vacía):", error);
+            setItems([]);
         }
     };
 
@@ -31,7 +32,8 @@ export default function CommandMozo({ command, onSelect }: CommandCardProps) {
             const data = await response.json();
             setTotal(data);
         } catch (error) {
-            console.error("Error al obtener el total:", error);
+            console.warn("Error al obtener el total (asumiendo $0):", error);
+            setTotal(0);
         }
     };
 
