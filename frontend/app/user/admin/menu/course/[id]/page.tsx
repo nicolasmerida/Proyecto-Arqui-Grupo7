@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 };
 
 interface CourseEditPageProps {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 
 async function fetchCourse(id: string): Promise<Plato> {
@@ -42,7 +42,8 @@ async function fetchCourse(id: string): Promise<Plato> {
 }
 
 export default async function CourseEditPage({ params }: CourseEditPageProps) {
-  const course = await fetchCourse(params.id);
+  const resolvedParams = await params;
+  const course = await fetchCourse(resolvedParams.id);
 
   return (
     <main className="px-5 py-6">

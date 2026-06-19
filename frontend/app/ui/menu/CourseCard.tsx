@@ -1,31 +1,53 @@
 // app/ui/menu/CourseCard.tsx
 import { Plato } from "@/app/lib/definitions";
 import { notFound } from "next/navigation";
+import { HiOutlinePencil } from "react-icons/hi";
 
 interface CourseCardProps {
   course: Plato;
   onSelect: () => void;
 }
 
+const colorByCategory: Record<string, string> = {
+  "ENTRADA": "bg-emerald-100 text-emerald-800 border-emerald-200",
+  "PRINCIPAL": "bg-blue-100 text-blue-800 border-blue-200",
+  "POSTRE": "bg-fuchsia-100 text-fuchsia-800 border-fuchsia-200",
+  "BEBIDA": "bg-cyan-100 text-cyan-800 border-cyan-200"
+};
+
 export default function CourseCard({ course, onSelect }: CourseCardProps) {
-  if (!course)
-    return notFound();
+  if (!course) return notFound();
+
+  const rawCategoryName = typeof course.categoria === 'string' 
+    ? course.categoria 
+    : (course.categoria as any)?.nombre || "";
+
+  const categoriaName = rawCategoryName.trim().toUpperCase();
+
+  const categoryColor = colorByCategory[categoriaName] || "bg-gray-100 text-gray-800 border-gray-200";
 
   return (
-    <button
+    <div 
       onClick={onSelect}
-      className="h-full border border-slate-300 rounded-lg p-4 hover:shadow-lg transition-shadow text-left bg-white hover:bg-slate-50 cursor-pointer"
+      className="group relative flex flex-col h-full bg-white rounded-2xl p-5 border border-slate-200 shadow-sm hover:shadow-xl transition-all duration-300 cursor-pointer overflow-hidden transform hover:-translate-y-1"
     >
-      <div className="flex flex-col gap-2">
-        <span className="text-xs font-medium text-slate-500 uppercase">
-            {course.categoria.nombre}
+      <div className="absolute inset-0 bg-gradient-to-br from-slate-50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+      
+      <div className="flex justify-between items-start mb-4 z-10">
+        <span className={`px-3 py-1 text-xs font-bold rounded-full border ${categoryColor} uppercase tracking-wider`}>
+          {categoriaName}
         </span>
-        <h3 className="text-lg font-semibold font-serif text-slate-900">{course.nombre}</h3>
-        <p className="text-sm text-slate-600">{course.descripcion}</p>
-        <div className="flex justify-between items-center pt-2 border-t border-slate-200">
-          <span className="text-lg font-bold text-slate-900">${course.precio}</span>
+        <div className="bg-white p-2 rounded-full shadow-sm text-slate-500 opacity-0 group-hover:opacity-100 group-hover:text-blue-600 transition-all duration-300 transform translate-x-4 group-hover:translate-x-0">
+          <HiOutlinePencil size={20} />
         </div>
       </div>
-    </button>
+      
+      <h3 className="text-xl font-bold text-slate-800 mb-2 leading-tight z-10 group-hover:text-blue-600 transition-colors">{course.nombre}</h3>
+      <p className="text-sm text-slate-700 flex-grow mb-4 line-clamp-3 z-10">{course.descripcion}</p>
+      
+      <div className="flex justify-between items-center pt-4 border-t border-slate-100 z-10">
+        <span className="text-2xl font-black text-slate-900 tracking-tight">${course.precio.toFixed(2)}</span>
+      </div>
+    </div>
   );
 }

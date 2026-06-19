@@ -17,17 +17,18 @@ export default auth((req) => {
     const role = session.user.role;
     const pathname = req.nextUrl.pathname;
 
-    // Usuario administrador
-    if (role === Rol.Administrador && !pathname.startsWith("/user/admin")) {
-        return NextResponse.redirect(new URL("/user/admin", req.url));
+    // Redirección inicial post-login desde la ruta base "/user"
+    if (pathname === "/user" || pathname === "/user/") {
+        if (role === Rol.Administrador) return NextResponse.redirect(new URL("/user/admin", req.url));
+        if (role === Rol.Cocinero) return NextResponse.redirect(new URL("/user/cocinero", req.url));
+        if (role === Rol.Mozo) return NextResponse.redirect(new URL("/user/mozo", req.url));
     }
 
-    // Usuario cocinero
+    // Restricciones de seguridad para roles inferiores (el Administrador tiene acceso libre a todo)
     if (role === Rol.Cocinero && !pathname.startsWith("/user/cocinero")) {
         return NextResponse.redirect(new URL("/user/cocinero", req.url));
     }
 
-    // Usuario mozo
     if (role === Rol.Mozo && !pathname.startsWith("/user/mozo")) {
         return NextResponse.redirect( new URL("/user/mozo", req.url));
     }
