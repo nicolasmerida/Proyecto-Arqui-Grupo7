@@ -24,19 +24,22 @@ public class ItemPedidoService {
     private final WebSocketNotificacionService wsNotifiaNotificacionService;
     private final com.uns.sistemarestaurantebackend.dto.mapper.ComandaMapper comandaMapper;
     private final com.uns.sistemarestaurantebackend.dto.mapper.ItemPedidoMapper itemPedidoMapper;
+    private final com.uns.sistemarestaurantebackend.repository.ComandaRepository comandaRepository;
 
     public ItemPedidoService(ItemPedidoRepository itemPedidoRepository,
                              RecetaService recetaService,
                              GestorStockFacade gestorStockFacade,
                              WebSocketNotificacionService wsNotifiaNotificacionService,
                              com.uns.sistemarestaurantebackend.dto.mapper.ComandaMapper comandaMapper,
-                             com.uns.sistemarestaurantebackend.dto.mapper.ItemPedidoMapper itemPedidoMapper) {
+                             com.uns.sistemarestaurantebackend.dto.mapper.ItemPedidoMapper itemPedidoMapper,
+                             com.uns.sistemarestaurantebackend.repository.ComandaRepository comandaRepository) {
         this.itemPedidoRepository = itemPedidoRepository;
         this.recetaService = recetaService;
         this.gestorStockFacade = gestorStockFacade;
         this.wsNotifiaNotificacionService = wsNotifiaNotificacionService;
         this.comandaMapper = comandaMapper;
         this.itemPedidoMapper = itemPedidoMapper;
+        this.comandaRepository = comandaRepository;
     }
 
     public List<ItemPedido> obtenerPorComanda(Integer numeroComanda) {
@@ -81,7 +84,7 @@ public class ItemPedidoService {
     }
 
     @Transactional
-    public ItemPedido cambiarEstado(ItemPedido.ItemPedidoId id, String nuevoEstado) {
+    public ItemPedido cambiarEstado(ItemPedido.ItemPedidoId id, String nuevoEstado, Integer idUsuario) {
         // Si la clave compuesta no existe, devolvemos un 404 estructurado
         ItemPedido item = itemPedidoRepository.findById(id)
                 .orElseThrow(() -> new RecursoNoEncontradoException(
@@ -101,14 +104,43 @@ public class ItemPedidoService {
             for (Receta receta : recetas) {
                 int cantidadADevolver = receta.getCantidad() * item.getCantidad();
                 // cantidad positiva = sumar al stock (inverso de agregarItemAComanda)
-                // TODO: Sistema de Login (Spring Security) - Reemplazar el 1 hardcodeado por el ID del usuario autenticado
                 gestorStockFacade.registrarMovimiento(
-                        receta.getIngrediente().getIdIngrediente(), cantidadADevolver, 1);
+                        receta.getIngrediente().getIdIngrediente(), cantidadADevolver, idUsuario);
             }
         }
 
         item.setEstadoItem(estadoNuevo);
         ItemPedido guardado = itemPedidoRepository.save(item);
+
+        // Evaluar auto-promoción de la Comanda
+        com.uns.sistemarestaurantebackend.model.Comanda comanda = guardado.getComanda();
+        List<ItemPedido> items = itemPedidoRepository.findByComandaNumeroComanda(comanda.getNumeroComanda());
+        
+        List<ItemPedido> activos = items.stream()
+            .filter(i -> i.getEstadoItem() != EstadoItem.CANCELADO)
+            .collect(Collectors.toList());
+
+        if (!activos.isEmpty()) {
+            boolean todosListos = activos.stream()
+                .allMatch(i -> i.getEstadoItem() == EstadoItem.LISTO || i.getEstadoItem() == EstadoItem.ENTREGADO);
+                
+            boolean todosEnPreparacion = activos.stream()
+                .allMatch(i -> i.getEstadoItem() == EstadoItem.EN_PREPARACION || i.getEstadoItem() == EstadoItem.LISTO || i.getEstadoItem() == EstadoItem.ENTREGADO);
+
+            boolean cambioComanda = false;
+            if (todosListos && comanda.getEstadoComanda() == com.uns.sistemarestaurantebackend.model.enums.EstadoComanda.EN_PREPARACION) {
+                comanda.setEstadoComanda(com.uns.sistemarestaurantebackend.model.enums.EstadoComanda.LISTA);
+                cambioComanda = true;
+            } else if (todosEnPreparacion && comanda.getEstadoComanda() == com.uns.sistemarestaurantebackend.model.enums.EstadoComanda.ABIERTA) {
+                comanda.setEstadoComanda(com.uns.sistemarestaurantebackend.model.enums.EstadoComanda.EN_PREPARACION);
+                cambioComanda = true;
+            }
+
+            if (cambioComanda) {
+                comandaRepository.save(comanda);
+                wsNotifiaNotificacionService.notificarCambioEstadoComanda(comandaMapper.toResumenDTO(comanda));
+            }
+        }
 
         //notificar al mozo via WebSocket cuando el item este LISTO
         if (estadoNuevo == EstadoItem.LISTO) {
@@ -116,8 +148,7 @@ public class ItemPedidoService {
         }
 
         // Notificar a cocina del cambio de estado para que React recargue la tarjeta automáticamente
-        List<ItemPedido> items = itemPedidoRepository.findByComandaNumeroComanda(guardado.getComanda().getNumeroComanda());
-        wsNotifiaNotificacionService.notificarNuevoPedidoCocina(comandaMapper.toDetalleDTO(guardado.getComanda(), items));
+        wsNotifiaNotificacionService.notificarNuevoPedidoCocina(comandaMapper.toDetalleDTO(comanda, items));
 
         return guardado;
     }
@@ -163,7 +194,34 @@ public class ItemPedidoService {
     }
 
     @Transactional
-    public ItemPedido agregarItemAComanda(ItemPedido itemPedido) {
+    public ItemPedido agregarItemAComanda(ItemPedido itemPedido, Integer idUsuario) {
+        ItemPedido guardado = procesarYGuardarItem(itemPedido, idUsuario);
+
+        //notificar a cocina vía WebSocket de nuevo pedido pendiente
+        List<ItemPedido> items = itemPedidoRepository.findByComandaNumeroComanda(guardado.getComanda().getNumeroComanda());
+        wsNotifiaNotificacionService.notificarNuevoPedidoCocina(comandaMapper.toDetalleDTO(guardado.getComanda(), items));
+
+        return guardado;
+    }
+
+    @Transactional
+    public List<ItemPedido> agregarItemsAComandaBatch(List<ItemPedido> itemsPedido, Integer idUsuario) {
+        if (itemsPedido == null || itemsPedido.isEmpty()) return List.of();
+
+        // Procesamos y descontamos stock de todos los items en la misma transacción
+        List<ItemPedido> guardados = itemsPedido.stream()
+                .map(item -> procesarYGuardarItem(item, idUsuario))
+                .collect(Collectors.toList());
+
+        // Notificar a cocina UNA sola vez al final del batch
+        Integer numeroComanda = guardados.get(0).getComanda().getNumeroComanda();
+        List<ItemPedido> items = itemPedidoRepository.findByComandaNumeroComanda(numeroComanda);
+        wsNotifiaNotificacionService.notificarNuevoPedidoCocina(comandaMapper.toDetalleDTO(guardados.get(0).getComanda(), items));
+
+        return guardados;
+    }
+
+    private ItemPedido procesarYGuardarItem(ItemPedido itemPedido, Integer idUsuario) {
         // Validación de datos requeridos por contrato antes de romper la base de datos
         if (itemPedido.getPlato() == null || itemPedido.getPlato().getIdPlato() == null) {
             throw new NegocioException(
@@ -190,13 +248,8 @@ public class ItemPedidoService {
             int cantidadADescontar = receta.getCantidad() * guardado.getCantidad();
 
             // enviamos la cantidad en negativo para que registrarMovimiento realice la resta
-            // TODO: Sistema de Login (Spring Security) - Reemplazar el 1 hardcodeado por el ID del usuario autenticado
-            gestorStockFacade.registrarMovimiento(receta.getIngrediente().getIdIngrediente(), -cantidadADescontar, 1);
+            gestorStockFacade.registrarMovimiento(receta.getIngrediente().getIdIngrediente(), -cantidadADescontar, idUsuario);
         }
-
-        //notificar a cocina vía WebSocket de nuevo pedido pendiente
-        List<ItemPedido> items = itemPedidoRepository.findByComandaNumeroComanda(guardado.getComanda().getNumeroComanda());
-        wsNotifiaNotificacionService.notificarNuevoPedidoCocina(comandaMapper.toDetalleDTO(guardado.getComanda(), items));
 
         return guardado;
     }

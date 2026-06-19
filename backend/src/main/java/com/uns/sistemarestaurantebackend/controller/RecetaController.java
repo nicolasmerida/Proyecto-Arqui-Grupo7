@@ -12,15 +12,18 @@ import java.util.List;
 public class RecetaController {
 
     private final RecetaService recetaService;
+    private final com.uns.sistemarestaurantebackend.dto.mapper.RecetaMapper recetaMapper;
 
     // Inyección por constructor
-    public RecetaController(RecetaService recetaService) {
+    public RecetaController(RecetaService recetaService, com.uns.sistemarestaurantebackend.dto.mapper.RecetaMapper recetaMapper) {
         this.recetaService = recetaService;
+        this.recetaMapper = recetaMapper;
     }
 
     @GetMapping("/plato/{idPlato}")
-    public ResponseEntity<List<Receta>> obtenerPorPlato(@PathVariable Integer idPlato) {
-        return ResponseEntity.ok(recetaService.obtenerPorPlato(idPlato));
+    public ResponseEntity<List<com.uns.sistemarestaurantebackend.dto.RecetaDTO>> obtenerPorPlato(@PathVariable Integer idPlato) {
+        List<Receta> recetas = recetaService.obtenerPorPlato(idPlato);
+        return ResponseEntity.ok(recetaMapper.toDTOList(recetas));
     }
 
     @PostMapping

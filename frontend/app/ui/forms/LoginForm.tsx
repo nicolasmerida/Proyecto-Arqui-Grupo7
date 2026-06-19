@@ -58,8 +58,7 @@ export function LoginForm() {
               id="password"
               type={showPassword ? 'text' : 'password'} // Cambia el tipo según el estado `showPassword`
               name="password"
-              className="w-full px-4 py-2 rounded-md bg-white/20 text-white placeholder-white/60
-                         focus:outline-none focus:ring-2 focus:ring-white pr-10"
+              className="w-full px-4 py-2 rounded-md bg-white/20 text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-white pr-10"
               placeholder="Ingrese su contraseña"
               value={password}
               minLength={8}

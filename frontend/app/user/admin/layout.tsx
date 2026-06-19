@@ -9,14 +9,18 @@ export const metadata: Metadata = {
   },
 };
 
+import { GoogleExportProvider } from "@/app/ui/admin/GoogleExportProvider";
+
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
 
     return (
-        <div className="min-h-screen">
-          <FunctionsPanel />
-          <main className="border-l pl-36 pt-10">
-            {children}
-          </main>
-        </div>
+        <GoogleExportProvider>
+            <div className="min-h-screen">
+              <FunctionsPanel />
+              <main className="border-l pl-36 pt-10">
+                {children}
+              </main>
+            </div>
+        </GoogleExportProvider>
     );
 }

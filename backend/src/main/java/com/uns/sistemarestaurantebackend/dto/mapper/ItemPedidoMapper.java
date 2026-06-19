@@ -15,7 +15,8 @@ public class ItemPedidoMapper {
                 item.getPlato() != null ? item.getPlato().getNombre() : null,
                 item.getCantidad(),
                 item.getNotas(),
-                item.getEstadoItem()
+                item.getEstadoItem(),
+                item.getPlato() != null ? item.getPlato().getPrecio() : null
         );
     }
 

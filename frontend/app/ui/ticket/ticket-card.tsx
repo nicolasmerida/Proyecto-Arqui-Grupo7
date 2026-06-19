@@ -6,18 +6,22 @@ interface TicketCardProps {
 }
 
 export default function TicketCard({ ticket }: TicketCardProps) {
-// Pensar que recibe para saber como mostrarlo en la pantalla
     return (
-        <div className="flex flex-col border">
-            <div className="flex font-semibold text-base text-gray-400 justify-between">
-                Ticket promedio <HiOutlineCash />
+        <div className="flex flex-col bg-white border border-slate-200 rounded-2xl p-5 shadow-sm hover:shadow-md transition-all">
+            <div className="flex font-semibold text-sm text-slate-500 justify-between items-center mb-4">
+                <span className="uppercase tracking-wider">Ticket Promedio</span>
+                <div className="p-2 bg-amber-50 text-amber-600 rounded-lg">
+                    <HiOutlineCash size={20} />
+                </div>
             </div>
-            <div className="flex text-xl text-black font-serif">
-                {ticket}
+            <div className="flex items-baseline gap-2">
+                <span className="text-3xl font-bold text-slate-800 tracking-tight">
+                    ${ticket.toFixed(2)}
+                </span>
             </div>
-            <span className="text-sm text-gray-400">
-                por mesa
-            </span>
+            <div className="mt-2">
+                <span className="text-xs text-slate-400 font-medium">por mesa atendida</span>
+            </div>
         </div>
     ); 
 }

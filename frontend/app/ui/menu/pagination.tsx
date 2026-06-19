@@ -23,29 +23,31 @@ export default function Pagination({ currentPage, totalPages }: Props) {
   const isLast = currentPage === totalPages;
 
   return (
-    <nav className="flex items-center justify-center gap-4 mt-12 text-amber-500">
+    <nav className="flex items-center justify-center gap-4 mt-8">
       {/* Previous */}
       <Link
         href={getPageLink(currentPage - 1)}
-        className={`flex items-center justify-center w-10 h-10 rounded-full 
-          border border-orange-400 bg-amber-600 shadow-md transition 
-          ${isFirst ? 'opacity-30 pointer-events-none' : 'hover:bg-amber-400'}`}
+        className={`flex items-center justify-center w-10 h-10 rounded-xl 
+          border border-amber-300 bg-white/90 backdrop-blur-sm shadow-sm transition-all duration-200 text-amber-600
+          ${isFirst ? 'opacity-40 pointer-events-none' : 'hover:bg-amber-50 hover:border-amber-400 hover:shadow-md hover:-translate-y-0.5'}`}
         aria-disabled={isFirst}
       >
         <HiArrowSmLeft className="text-xl" />
       </Link>
 
       {/* Page indicator */}
-      <div className="px-4 py-2 text-sm font-medium border border-orange-400 rounded-xl bg-amber-600 shadow-sm backdrop-blur-sm">
-        <span className="font-semibold text-amber-400">{currentPage} / {totalPages}</span>
+      <div className="px-5 py-2 text-sm font-medium border border-amber-300 rounded-xl bg-white/90 backdrop-blur-sm shadow-sm">
+        <span className="font-bold text-slate-800">{currentPage}</span> 
+        <span className="text-amber-500 mx-1">/</span> 
+        <span className="font-bold text-slate-800">{totalPages}</span>
       </div>
 
       {/* Next */}
       <Link
         href={getPageLink(currentPage + 1)}
-        className={`flex items-center justify-center w-10 h-10 rounded-full 
-          border border-orange-400 bg-amber-600 shadow-md transition 
-          ${isLast ? 'opacity-30 pointer-events-none' : 'hover:bg-amber-400'}`}
+        className={`flex items-center justify-center w-10 h-10 rounded-xl 
+          border border-amber-300 bg-white/90 backdrop-blur-sm shadow-sm transition-all duration-200 text-amber-600
+          ${isLast ? 'opacity-40 pointer-events-none' : 'hover:bg-amber-50 hover:border-amber-400 hover:shadow-md hover:-translate-y-0.5'}`}
         aria-disabled={isLast}
       >
         <HiArrowSmRight className="text-xl" />

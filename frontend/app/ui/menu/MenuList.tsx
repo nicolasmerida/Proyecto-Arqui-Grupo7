@@ -27,31 +27,44 @@ export default function MenuList({ items, addItem }: MenuListProps) {
     }
   };
 
-  const filteredItems = category ? items.filter((item) => item.categoria.nombre === category) : items;
+  const filteredItems = !category 
+    ? items 
+    : items.filter((item) => {
+        const catName = typeof item.categoria === 'string' 
+          ? item.categoria 
+          : (item.categoria as any)?.nombre;
+        
+        if (!catName) return false;
+        
+        return catName.trim().toUpperCase() === category.trim().toUpperCase();
+      });
+  const isInteractive = !!addItem;
 
   return (
     <>
-      <div className="grid grid-cols-5 items-center p-1 gap-1">
-        <button className={`border rounded-lg transition ${category === null ? "text-slate-400 bg-sky-400" : "text-blue-400"}`}
-                onClick={() => setCategory(null)}>
-                  Todos
-        </button>
-        <button className={`border rounded-lg transition ${category === Category.Entrada ? "text-slate-400 bg-sky-400" : "text-blue-400"}`}
-                onClick={() => setCategory(Category.Entrada)}>
-                  Entradas
-        </button>
-        <button className={`border rounded-lg transition ${category === Category.Principal ? "text-slate-400 bg-sky-400" : "text-blue-400"}`}
-                onClick={() => setCategory(Category.Principal)}>
-                  Principales
-        </button>
-        <button className={`border rounded-lg transition ${category === Category.Postre ? "text-slate-400 bg-sky-400" : "text-blue-400"}`}
-                onClick={() => setCategory(Category.Postre)}>
-                  Postres
-        </button>
-        <button className={`border rounded-lg transition ${category === Category.Bebida ? "text-slate-400 bg-sky-400" : "text-blue-400"}`}
-                onClick={() => setCategory(Category.Bebida)}>
-                  Bebidas
-        </button>
+      <div className="flex flex-col sm:flex-row justify-center items-center bg-white/80 backdrop-blur-sm p-3 sm:p-4 rounded-2xl border border-blue-200 shadow-sm gap-2 sm:gap-4 mb-8">
+        <div className="flex flex-wrap items-center justify-center gap-2">
+          <button className={`px-5 py-2.5 rounded-xl text-sm font-bold transition-all ${category === null ? 'bg-sky-500 text-white shadow-md' : 'bg-transparent text-slate-700 hover:bg-sky-100'}`}
+                  onClick={() => setCategory(null)}>
+                    Todos
+          </button>
+          <button className={`px-5 py-2.5 rounded-xl text-sm font-bold transition-all ${category === Category.Entrada ? 'bg-sky-500 text-white shadow-md' : 'bg-transparent text-slate-700 hover:bg-sky-100'}`}
+                  onClick={() => setCategory(Category.Entrada)}>
+                    Entradas
+          </button>
+          <button className={`px-5 py-2.5 rounded-xl text-sm font-bold transition-all ${category === Category.Principal ? 'bg-sky-500 text-white shadow-md' : 'bg-transparent text-slate-700 hover:bg-sky-100'}`}
+                  onClick={() => setCategory(Category.Principal)}>
+                    Principales
+          </button>
+          <button className={`px-5 py-2.5 rounded-xl text-sm font-bold transition-all ${category === Category.Postre ? 'bg-sky-500 text-white shadow-md' : 'bg-transparent text-slate-700 hover:bg-sky-100'}`}
+                  onClick={() => setCategory(Category.Postre)}>
+                    Postres
+          </button>
+          <button className={`px-5 py-2.5 rounded-xl text-sm font-bold transition-all ${category === Category.Bebida ? 'bg-sky-500 text-white shadow-md' : 'bg-transparent text-slate-700 hover:bg-sky-100'}`}
+                  onClick={() => setCategory(Category.Bebida)}>
+                    Bebidas
+          </button>
+        </div>
       </div>
       <div className="grid grid-cols-2 sm:grid-cols-1 lg:grid-cols-3 gap-6">
         {(filteredItems.length > 0) ? (
@@ -59,23 +72,24 @@ export default function MenuList({ items, addItem }: MenuListProps) {
             <CourseCard
               key={item.idPlato}
               course={item}
-              onSelect={() => setSelectedCourse(item)}
+              onSelect={isInteractive ? () => setSelectedCourse(item) : undefined}
+              isInteractive={isInteractive}
             />
           ))
         ) : (
-          <p className="col-span-full text-center italic text-slate-700">
-            No hay platos disponibles.
+          <p className="col-span-full text-center italic text-slate-200 text-lg font-medium bg-slate-800/50 py-8 rounded-xl border border-slate-600/50">
+            No hay platos disponibles en esta categoría.
           </p>
         )}
       </div>
 
-      {selectedCourse && (
+      {isInteractive && selectedCourse && (
         <CourseDetail
           isVisible={true}
           course={selectedCourse}
           notes={notes}
           onNotesChange={setNotes}
-          onAddToCommand={addItem ? handleAddToCommand : undefined}
+          onAddToCommand={handleAddToCommand}
           onClose={handleCloseModal}
         />
       )}

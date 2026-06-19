@@ -1,6 +1,7 @@
 // app/user/mozo/menu/page.tsx
 'use client';
 import { EstadoItem, Item_Pedido, Plato } from "@/app/lib/definitions";
+import { useSession } from "next-auth/react";
 import Menu from "@/app/menu/page";
 import CommandDetail from "@/app/ui/commands/CommandDetail";
 import CourseDetail from "@/app/ui/menu/CourseDetail";
@@ -21,6 +22,7 @@ export default function MozoMenu({ searchParams }: MozoProps) {
     const [itemsComanda, setItemsComanda] = useState<Item_Pedido[]>([]); // Lista de platos seleccionados localmente
     const [isSubmitting, setIsSubmitting] = useState(false);
     const router = useRouter();
+    const { data: session } = useSession();
 
     const agregarItem = (plato: Plato, nota?: string) => {
         const notas = nota ?? "";
@@ -56,43 +58,35 @@ export default function MozoMenu({ searchParams }: MozoProps) {
         try {
             const baseUrl = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8080";
 
-            // Enviamos cada item al backend
-            const requests = itemsComanda.map(item =>
-                fetch(`${baseUrl}/api/items-pedido`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(item)
-                })
-            );
+            // Enviamos TODOS los items juntos al nuevo endpoint "batch" (transaccional)
+            const response = await fetch(`${baseUrl}/api/items-pedido/batch`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-User-Id': session?.user?.id as string,
+                },
+                body: JSON.stringify(itemsComanda)
+            });
 
-            const responses = await Promise.all(requests);
-
-            const itemsFallidos = itemsComanda.filter((_, index) => !responses[index].ok);
-
-            if (itemsFallidos.length > 0) {
-                // Actualizamos el carrito para dejar SOLO los que fallaron, 
-                // así no re-enviamos duplicados a la cocina en el próximo intento.
-                setItemsComanda(itemsFallidos);
-                
+            if (!response.ok) {
+                // Si la transacción falla (ej. algún plato sin stock), el backend hace ROLLBACK
+                // de TODO y nos devuelve el error.
                 try {
-                    const errorResponse = responses.find(res => !res.ok);
-                    const errorData = await errorResponse!.json();
+                    const errorData = await response.json();
                     alert(`Error del sistema: ${errorData.error?.message || 'Error desconocido'}`);
-                } catch(e) {
-                    alert("Hubo un error al enviar algunos ítems a la cocina. Por favor, reintente.");
+                } catch (e) {
+                    alert("Hubo un error al enviar el pedido a la cocina (Posible falta de stock). Por favor, revise el menú.");
                 }
                 setIsSubmitting(false);
                 return;
             }
 
-            // Éxito: volvemos al mapa del salón
+            // Éxito total: volvemos al mapa del salón
             router.push('/user/mozo');
 
         } catch (error) {
             console.error("Error al enviar el pedido:", error);
-            alert("Ocurrió un error al enviar el pedido.");
+            alert("Ocurrió un error al intentar conectarse con el servidor.");
             setIsSubmitting(false);
         }
     };
@@ -151,6 +145,21 @@ export default function MozoMenu({ searchParams }: MozoProps) {
         }
     };
 
+    if (!numeroComanda || isNaN(numeroComanda)) {
+        return (
+            <div className="flex flex-col items-center justify-center h-screen bg-gray-50 w-full">
+                <h2 className="text-2xl font-bold text-red-600 mb-2">Error: Comanda no especificada</h2>
+                <p className="text-gray-600 mb-6">Debe seleccionar una mesa desde el plano del salón para poder tomar un pedido.</p>
+                <button
+                    onClick={() => router.push('/user/mozo')}
+                    className="bg-black text-white px-6 py-2 rounded-lg hover:bg-gray-800"
+                >
+                    Volver al Salón
+                </button>
+            </div>
+        );
+    }
+
     return (
         <div className="flex flex-row relative h-screen">
             <div className="flex-1 overflow-y-auto">
@@ -172,7 +181,7 @@ export default function MozoMenu({ searchParams }: MozoProps) {
                     course={editPlatoData}
                     notes={editNotes}
                     onNotesChange={setEditNotes}
-                    onAddToCommand={saveEditItem} 
+                    onAddToCommand={saveEditItem}
                     onClose={() => { setSelectedEditIndex(null); setEditPlatoData(null); }}
                 />
             )}

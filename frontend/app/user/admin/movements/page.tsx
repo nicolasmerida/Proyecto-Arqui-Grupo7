@@ -5,21 +5,28 @@ import ExportarGoogleSheets from "@/app/ui/admin/ExportarGoogleSheets";
 
 
 export const metadata: Metadata = {
-    title: 'Stock',
+    title: 'Movimientos de Stock',
 };
 
 export default function Movements() {
-
     return (
-        <>
-        <div className="flex flex-col justify-start m-2">
-            <span className="text-xl text-black font-serif">Movimientos de stock</span>
-            <span className="text-sm text-gray-400">Historial de ingresos y consumos</span>
+        <div className="min-h-screen bg-slate-50/50 pb-10">
+            {/* Header Premium */}
+            <div className="bg-white border-b border-slate-200 px-8 py-8 shadow-sm flex justify-between items-center">
+                <div>
+                    <h1 className="text-3xl font-bold font-serif italic text-slate-900">Historial de Movimientos</h1>
+                    <p className="text-slate-500 mt-1">Registro de ingresos y consumos de inventario</p>
+                </div>
+                <div>
+                    <ExportarGoogleSheets />
+                </div>
+            </div>
+
+            <main className="px-8 py-6 max-w-7xl mx-auto space-y-6">
+                <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-1">
+                    <TableMovements />
+                </div>
+            </main>
         </div>
-        <div className="m-2">
-            <TableMovements />
-        </div>
-        <ExportarGoogleSheets />
-        </>
     );
 }

@@ -3,6 +3,7 @@ import MenuList from "@/app/ui/menu/MenuList";
 import Pagination from "@/app/ui/menu/pagination";
 import { Plato } from "@/app/lib/definitions";
 import { useEffect, useState, use } from "react";
+import { usePathname } from 'next/navigation';
 
 type SearchParams = {
   page?: string;
@@ -17,6 +18,9 @@ export default function Menu({ searchParams, addItem }: MenuProps) {
   const currentPage = Number(params?.page) || 1;
   const [data, setData] = useState<{ content: Plato[], totalPages: number }>({ content: [], totalPages: 1 });
   const [error, setError] = useState<string | null>(null);
+  const pathname = usePathname();
+  const isPublicMenu = pathname === '/menu';
+
   useEffect(() => {
     const fetchMenu = async () => {
       try {
@@ -48,18 +52,23 @@ export default function Menu({ searchParams, addItem }: MenuProps) {
   const totalPages = data.totalPages;
 
   return (
-    <main className="bg-[url('/bg_salon.jpeg')] bg-cover bg-center bg-fixed">  {/* Agregar margen superior segun Navbar */}
-      <section className="text-center px-8 py-16 mb-8 max-w-4xl w-full bg-slate-700/75 rounded-2xl">
-        <h1 className="flex flex-1 items-center text-amber-400 m-5">
-          Bienvenido al menú de nuestro restaurante 🍽️
-        </h1>
-        <div className="px-5">
+    <main className={`flex-1 flex flex-col items-center px-4 w-full min-h-screen bg-[url('/bg_salon.jpeg')] bg-cover bg-center bg-fixed ${isPublicMenu ? 'pt-24 pb-12' : 'pt-6 pb-6'}`}>
+      <div className={`w-full max-w-7xl bg-slate-800/80 backdrop-blur-sm shadow-2xl p-6 sm:p-10 border border-slate-600 ${isPublicMenu ? 'rounded-[2rem]' : 'rounded-xl'}`}>
+
+        {isPublicMenu && (
+          <h1 className="text-3xl sm:text-4xl font-black text-amber-400 text-center mb-8 tracking-tight drop-shadow-md">
+            Bienvenido al menú de nuestro restaurante 🍽️
+          </h1>
+        )}
+
+        <div className="w-full px-2 sm:px-5">
           <MenuList items={items} {...(addItem && { addItem })} />
         </div>
-        <div className="justify-items-center mt-6">
+
+        <div className="flex justify-center mt-12">
           <Pagination currentPage={currentPage} totalPages={totalPages} />
         </div>
-      </section>
+      </div>
     </main>
   );
 }

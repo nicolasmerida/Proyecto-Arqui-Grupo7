@@ -57,7 +57,7 @@ export default function CourseDetail({ isVisible, course, notes, onNotesChange, 
             <div
                 ref={modalRef}
                 onClick={(e) => e.stopPropagation()}
-                className="bg-cyan-500 rounded-lg shadow-xl w-full max-w-md p-6 max-h-[90vh] overflow-y-auto"
+                className="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-md p-6 max-h-[90vh] overflow-y-auto"
             >
                 {/* Header */}
                 <div className="flex justify-between items-start mb-4">
@@ -82,15 +82,15 @@ export default function CourseDetail({ isVisible, course, notes, onNotesChange, 
                 </div>
 
                 {/* Precio */}
-                <div className="mb-6 flex items-center justify-between bg-slate-500 p-3 rounded-lg">
-                    <span className="text-slate-700 font-medium">Precio:</span>
+                <div className="mb-6 flex items-center justify-between bg-slate-50 p-3 rounded-lg border border-slate-100">
+                    <span className="text-slate-600 font-medium">Precio:</span>
                     <span className="text-2xl font-bold text-slate-900">${course.precio}</span>
                 </div>
 
                 {/* Notas */}
                 {onAddToCommand && (
                     <div className="mb-6">
-                        <label htmlFor="notas" className="block text-sm font-medium text-black mb-2">
+                        <label htmlFor="notas" className="block text-sm font-medium text-slate-700 mb-2">
                             Notas de la comanda (opcional)
                         </label>
                         <textarea
@@ -98,7 +98,7 @@ export default function CourseDetail({ isVisible, course, notes, onNotesChange, 
                             value={notes}
                             onChange={(e) => onNotesChange(e.target.value)}
                             placeholder="Notas del plato para la preparación"
-                            className="w-full px-3 py-2 text-slate-400 border border-sky-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent resize-none"
+                            className="w-full px-3 py-2 text-slate-900 bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent resize-none shadow-sm"
                             rows={3}
                         />
                     </div>
@@ -109,13 +109,13 @@ export default function CourseDetail({ isVisible, course, notes, onNotesChange, 
                     <div className="flex gap-3">
                         <button
                             onClick={onAddToCommand}
-                            className="flex-1 px-4 py-2 bg-sky-500 text-slate-400 font-medium rounded-lg hover:bg-blue-500 transition"
+                            className="flex-1 px-4 py-2 bg-amber-500 text-amber-50 font-medium rounded-lg hover:bg-amber-600 transition shadow-sm"
                         >
                             Agregar a comanda
                         </button>
                         <button
                             onClick={onClose}
-                            className="flex-1 px-4 py-2 border border-slate-500 text-slate-700 font-medium rounded-lg hover:bg-slate-50 transition"
+                            className="flex-1 px-4 py-2 bg-white border border-slate-300 text-slate-700 font-medium rounded-lg hover:bg-slate-50 transition shadow-sm"
                         >
                             Cancelar
                         </button>
@@ -124,7 +124,7 @@ export default function CourseDetail({ isVisible, course, notes, onNotesChange, 
                     <div className="flex gap-3">
                         <button
                             onClick={onClose}
-                            className="w-full px-4 py-2 bg-slate-600 text-white font-medium rounded-lg hover:bg-slate-700 transition"
+                            className="w-full px-4 py-2 bg-slate-800 text-white font-medium rounded-lg hover:bg-slate-900 transition shadow-sm"
                         >
                             Cerrar
                         </button>

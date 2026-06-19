@@ -117,65 +117,71 @@ export default function CocineroDashboard({ initialComandas }: CocineroDashboard
         </div>
       )}
 
-      <div className="flex flex-col lg:flex-row justify-around items-start w-full m-4 lg:m-10 p-5 gap-4">
+      <div className="flex flex-col lg:flex-row w-full h-[calc(100vh-120px)] p-4 lg:p-6 gap-6 overflow-x-auto">
 
         {/* Pendientes */}
-        <div className="relative w-full lg:flex-1 flex flex-col items-center rounded-sm px-2 comanda-pendiente border-2 min-h-[50vh]">
-          <h2 className="absolute top-2 left-2 z-10 lg:static font-bold text-lg uppercase tracking-wide">
-            Pendientes ({pendientes.length})
-          </h2>
-          <div className="flex flex-row flex-wrap lg:flex-col py-1 w-full gap-4 pt-10 lg:pt-1 overflow-y-auto overflow-x-hidden lg:overflow-x-auto lg:overflow-y-hidden">
+        <div className="w-full lg:flex-1 min-w-[300px] flex flex-col bg-slate-100/90 backdrop-blur-sm rounded-xl border border-slate-300 shadow-md overflow-hidden">
+          <div className="p-4 bg-white/50 border-b border-slate-200">
+            <h2 className="font-bold text-lg uppercase tracking-wide text-slate-800">
+              Pendientes ({pendientes.length})
+            </h2>
+          </div>
+          <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-4">
             {pendientes.map((comanda) => (
-              <div key={comanda.numeroComanda} className={`flex flex-col sm:flex-row lg:flex-col border-y-4 ${colorByState[comanda.estadoComanda]} shadow-sm`}>
+              <div key={comanda.numeroComanda} className={`flex flex-col border-l-4 rounded-md bg-white ${colorByState[comanda.estadoComanda]} shadow-sm`}>
                 <CommandCard command={comanda} state={comanda.estadoComanda} lastUpdate={lastItemUpdate} />
                 <button
-                  className="rounded-b-md sm:rounded-b-none sm:rounded-r-md lg:rounded-b-md py-2 flex items-center justify-center gap-2 bg-orange-100 hover:bg-orange-200 transition-colors text-orange-800 font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="rounded-b-md py-2.5 flex items-center justify-center gap-2 bg-orange-100 hover:bg-orange-200 transition-colors text-orange-800 font-bold disabled:opacity-50 disabled:cursor-not-allowed border-t border-orange-200"
                   onClick={() => cambiarEstado(comanda.numeroComanda, EstadoComanda.Preparacion)}
                   disabled={loading[comanda.numeroComanda]}
                 >
                   <HiOutlineFire className="text-xl" /> 
-                  {loading[comanda.numeroComanda] ? "Procesando..." : "Empezar a preparar"}
+                  {loading[comanda.numeroComanda] ? "Procesando..." : "Preparar Todo"}
                 </button>
               </div>
             ))}
-            {pendientes.length === 0 && <span className="text-gray-500 italic self-center mt-4">No hay comandas pendientes</span>}
+            {pendientes.length === 0 && <div className="text-slate-400 italic text-center mt-10">No hay comandas pendientes</div>}
           </div>
         </div>
 
         {/* En Preparación */}
-        <div className="relative w-full lg:flex-1 flex flex-col items-center rounded-sm px-2 comanda-preparacion border-2 min-h-[50vh]">
-          <h2 className="absolute top-2 left-2 z-10 lg:static font-bold text-lg uppercase tracking-wide">
-            En Preparación ({enPreparacion.length})
-          </h2>
-          <div className="flex flex-row flex-wrap lg:flex-col py-1 w-full gap-4 pt-10 lg:pt-1 overflow-y-auto overflow-x-hidden lg:overflow-x-auto lg:overflow-y-hidden">
+        <div className="w-full lg:flex-1 min-w-[300px] flex flex-col bg-slate-100/90 backdrop-blur-sm rounded-xl border border-slate-300 shadow-md overflow-hidden">
+          <div className="p-4 bg-white/50 border-b border-slate-200">
+            <h2 className="font-bold text-lg uppercase tracking-wide text-slate-800">
+              En Preparación ({enPreparacion.length})
+            </h2>
+          </div>
+          <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-4">
             {enPreparacion.map((comanda) => (
-              <div key={comanda.numeroComanda} className={`flex flex-col sm:flex-row lg:flex-col border-y-4 ${colorByState[comanda.estadoComanda]} shadow-sm`}>
+              <div key={comanda.numeroComanda} className={`flex flex-col border-l-4 rounded-md bg-white ${colorByState[comanda.estadoComanda]} shadow-sm`}>
                 <CommandCard command={comanda} state={comanda.estadoComanda} lastUpdate={lastItemUpdate} />
                 <button
-                  className="rounded-b-md sm:rounded-b-none sm:rounded-r-md lg:rounded-b-md py-2 flex items-center justify-center gap-2 bg-green-100 hover:bg-green-200 transition-colors text-green-800 font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="rounded-b-md py-2.5 flex items-center justify-center gap-2 bg-amber-100 hover:bg-amber-200 transition-colors text-amber-800 font-bold disabled:opacity-50 disabled:cursor-not-allowed border-t border-amber-200"
                   onClick={() => cambiarEstado(comanda.numeroComanda, EstadoComanda.Lista)}
                   disabled={loading[comanda.numeroComanda]}
                 >
                   <HiOutlineCheck className="text-xl" /> 
-                  {loading[comanda.numeroComanda] ? "Procesando..." : "Todo listo"}
+                  {loading[comanda.numeroComanda] ? "Procesando..." : "Terminar Todo"}
                 </button>
               </div>
             ))}
-            {enPreparacion.length === 0 && <span className="text-gray-500 italic self-center mt-4">Ninguna comanda en preparación</span>}
+            {enPreparacion.length === 0 && <div className="text-slate-400 italic text-center mt-10">Ninguna comanda en preparación</div>}
           </div>
         </div>
 
         {/* Listas */}
-        <div className="relative w-full lg:flex-1 flex flex-col items-center rounded-sm px-2 comanda-lista border-2 min-h-[50vh]">
-          <h2 className="absolute top-2 left-2 z-10 lg:static font-bold text-lg uppercase tracking-wide">
-            Listas ({listos.length})
-          </h2>
-          <div className="flex flex-row flex-wrap lg:flex-col py-1 w-full gap-4 pt-10 lg:pt-1 overflow-y-auto overflow-x-hidden lg:overflow-x-auto lg:overflow-y-hidden">
+        <div className="w-full lg:flex-1 min-w-[300px] flex flex-col bg-slate-100/90 backdrop-blur-sm rounded-xl border border-slate-300 shadow-md overflow-hidden">
+          <div className="p-4 bg-white/50 border-b border-slate-200">
+            <h2 className="font-bold text-lg uppercase tracking-wide text-slate-800">
+              Listas ({listos.length})
+            </h2>
+          </div>
+          <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-4">
             {listos.map((comanda) => (
-              <div key={comanda.numeroComanda} className={`flex flex-col sm:flex-row lg:flex-col border-y-4 ${colorByState[comanda.estadoComanda]} shadow-sm`}>
+              <div key={comanda.numeroComanda} className={`flex flex-col border-l-4 rounded-md bg-white ${colorByState[comanda.estadoComanda]} shadow-sm`}>
                 <CommandCard command={comanda} state={comanda.estadoComanda} lastUpdate={lastItemUpdate} />
                 <button
-                  className="rounded-b-md sm:rounded-b-none sm:rounded-r-md lg:rounded-b-md py-2 flex items-center justify-center gap-2 bg-blue-100 hover:bg-blue-200 transition-colors text-blue-800 font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="rounded-b-md py-2.5 flex items-center justify-center gap-2 bg-green-100 hover:bg-green-200 transition-colors text-green-800 font-semibold disabled:opacity-50 disabled:cursor-not-allowed border-t border-green-200"
                   onClick={() => cambiarEstado(comanda.numeroComanda, EstadoComanda.Entregada)}
                   disabled={loading[comanda.numeroComanda]}
                 >
@@ -184,7 +190,7 @@ export default function CocineroDashboard({ initialComandas }: CocineroDashboard
                 </button>
               </div>
             ))}
-            {listos.length === 0 && <span className="text-gray-500 italic self-center mt-4">No hay comandas listas</span>}
+            {listos.length === 0 && <div className="text-slate-400 italic text-center mt-10">No hay comandas listas</div>}
           </div>
         </div>
       </div>

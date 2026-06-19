@@ -29,6 +29,11 @@ export const authConfig = {
       return !!auth?.user;
     },
     async redirect({ baseUrl, url }) {
+      // Permite URLs relativas (ej. "/user")
+      if (url.startsWith("/")) {
+        return new URL(url, baseUrl).toString();
+      }
+      // Permite URLs del mismo origen
       if (url.startsWith(baseUrl)) {
         return url;
       }
