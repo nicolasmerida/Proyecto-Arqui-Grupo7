@@ -36,8 +36,8 @@ export default function Navbar() {
     const menuHref = (session?.data?.user.role === Rol.Mozo) ? '/user/mozo' : '/menu';
 
     return (
-        <nav className="fixed top-0 left-0 bg-blue-400 text-slate-600 z-auto w-full p-4">
-            <div className="grid grid-cols-3 items-center">
+        <nav className="fixed top-0 left-0 bg-blue-400 z-auto w-full p-4">
+            <div className="grid grid-cols-3 text-slate-700 items-center">
                 <Link href="/">Gestion_Restaurante</Link>
 
                 {/* Menú de navegación principal para desktop */}
