@@ -22,7 +22,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
           <link rel="icon" href="/logo.png" />
         </head>
         
-        <body className="flex flex-col min-h-screen">
+        <body className="flex flex-col bg-blue-500 min-h-screen">
           <SessionProvider session={session}>
             <Navbar />
             <main className="flex-auto">{children}</main>

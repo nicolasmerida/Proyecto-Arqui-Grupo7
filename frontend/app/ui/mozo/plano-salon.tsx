@@ -89,37 +89,6 @@ export default function PlanoSalon() {
         }
     };
 
-    // LOGA REAL DE INTEGRACIÓN CON MERCADO PAGO (REEMPLAZA AL MOCK ANTERIOR)
-    const handlePagarMesa = async () => {
-        if (!mesaSeleccionada) return;
-        setCargando(true);
-        try {
-            const baseUrl = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8080";
-
-            // 1. Solicitamos la creación del link de cobro al servicio de Mercado Pago en Java
-            const response = await fetch(`${baseUrl}/pagos/crear`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ idMesa: mesaSeleccionada.numeroMesa })
-            });
-
-            const urlPago = await response.text();
-
-            // 2. Si el Backend responde con el punto de inicio válido (InitPoint) de la API de MP, redirigimos la ventana
-            if (urlPago && urlPago.startsWith("https://")) {
-                window.location.href = urlPago;
-            } else {
-                // Manejo de errores lógicos del negocio del servidor (ej: si los ítems sumaban $0.00)
-                alert("Error al generar orden: " + urlPago);
-                setCargando(false);
-            }
-        } catch (error) {
-            console.error("Error de conexión con el backend de pagos:", error);
-            alert("No se pudo establecer comunicación con el servidor. Verifique que el servicio backend esté activo.");
-            setCargando(false);
-        }
-    };
-
     const abrirMesa = async (mesa: Mesa, numeroComensales: number) => {
         if (cargando) return;
         setCargando(true);
@@ -271,7 +240,6 @@ export default function PlanoSalon() {
                     items={comandaActivaItems}
                     onClose={() => { setModalOcupadaVisible(false); setMesaSeleccionada(null); }}
                     onAgregarPlatos={() => router.push(`/user/mozo/menu?comanda=${comandaActivaId}`)}
-                    onPagar={handlePagarMesa}
                     cargando={cargando}
                 />
             )}

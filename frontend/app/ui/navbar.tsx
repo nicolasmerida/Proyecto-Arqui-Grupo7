@@ -26,16 +26,23 @@ export default function Navbar() {
         setIsMobileMenuOpen(!isMobileMenuOpen);
     };
 
-    const menuHref = session?.data?.user.role === Rol.Mozo ? '/user//mozo/menu' : '/menu';
+    const inicioPorRol = {
+        [Rol.Administrador]: '/user/admin',
+        [Rol.Cocinero]: '/user/cocinero',
+        [Rol.Mozo]: '/user/mozo'
+    };
+    const inicioHref = session?.data?.user.role ? inicioPorRol[session.data.user.role] ?? '/' : '/';
+
+    const menuHref = (session?.data?.user.role === Rol.Mozo) ? '/user/mozo' : '/menu';
 
     return (
-        <nav className="fixed top-0 left-0 z-auto w-full p-4">
-            <div className="grid grid-cols-3 items-center">
+        <nav className="fixed top-0 left-0 bg-blue-400 z-auto w-full p-4">
+            <div className="grid grid-cols-3 text-slate-700 items-center">
                 <Link href="/">Gestion_Restaurante</Link>
 
                 {/* Menú de navegación principal para desktop */}
                 <div className="hidden md:flex justify-center space-x-6">
-                    <Link href="/" className={`${navLinkClass} ${underlineClass}`}>Inicio</Link>
+                    <Link href={inicioHref} className={`${navLinkClass} ${underlineClass}`}>Inicio</Link>
                     <Link href={menuHref} className={`${navLinkClass} ${underlineClass}`}>Menú</Link>
                 </div>
 
@@ -77,7 +84,7 @@ export default function Navbar() {
             <div
             className={`
                 md:hidden overflow-hidden transition-all duration-500 ease-in-out
-                bg-dcic_darkGray bg-opacity-70 px-6 border-dcic_darkGray
+                bg-blue-400 bg-opacity-70 px-6 border-cyan-400
                 backdrop-blur-md z-50 shadow-md
                 ${isMobileMenuOpen ? 'max-h-64 py-4 opacity-100' : 'max-h-0 py-0 opacity-0'}
             `}

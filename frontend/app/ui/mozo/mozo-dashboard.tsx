@@ -102,13 +102,30 @@ export default function MozoDashboard({ initialComandas }: MozoDashboardProps) {
     setTotal(0);
   };
 
-const handleCerrarComanda = async () => {
+const handlePagarYCerrar = async () => {
     if (!comandaSeleccionada) return;
     setCerrando(true);
     try {
-        // Cerrar la comanda en el backend
+        const baseUrl = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8080";
+
+        // 1. Generamos el link de pago
+        const response = await fetch(`${baseUrl}/api/pagos/crear`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ idMesa: comandaSeleccionada.mesa.numeroMesa })
+        });
+
+        const urlPago = await response.text();
+
+        if (!urlPago || !urlPago.startsWith("https://")) {
+            alert("Error al generar orden: " + urlPago);
+            setCerrando(false);
+            return;
+        }
+
+        // 2. Cerramos la comanda en el backend para que deje de estar activa
         await fetch(
-            `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/comandas/${comandaSeleccionada.numeroComanda}/estado`,
+            `${baseUrl}/api/comandas/${comandaSeleccionada.numeroComanda}/estado`,
             {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
@@ -116,21 +133,27 @@ const handleCerrarComanda = async () => {
             }
         );
 
-        // Liberar la mesa
+        // 3. Liberamos la mesa
         await fetch(
-            `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/mesas/${comandaSeleccionada.mesa.numeroMesa}/estado`,
+            `${baseUrl}/api/mesas/${comandaSeleccionada.mesa.numeroMesa}/estado`,
             {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ estadoMesa: 'Libre' })
             }
         );
+
         // Se actualiza localmente en vez de filtrarla para que aparezca como CERRADA
         setComandas(prev => prev.map(c => c.numeroComanda === comandaSeleccionada.numeroComanda ? { ...c, estadoComanda: EstadoComanda.Cerrada } : c));
         setComandaSeleccionada({ ...comandaSeleccionada, estadoComanda: EstadoComanda.Cerrada });
         // No cerramos el modal para que el mozo vea el cambio y pueda eliminarla si quiere
+
+        // 4. Redirigimos a Mercado Pago
+        window.location.href = urlPago;
+
     } catch (error) {
-        console.error("Error al cerrar comanda:", error);
+        console.error("Error al pagar y cerrar comanda:", error);
+        alert("No se pudo completar la operación de pago.");
     } finally {
         setCerrando(false);
     }
@@ -188,6 +211,7 @@ const handleEliminarComandaDefinitivamente = async () => {
             `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/comandas/${comandaSeleccionada.numeroComanda}`,
             { method: 'DELETE' }
         );
+        
         setComandas(prev => prev.filter(c => c.numeroComanda !== comandaSeleccionada.numeroComanda));
         cerrarModal();
     } catch (error) {
@@ -337,12 +361,12 @@ const handleEliminarComandaDefinitivamente = async () => {
 
               {comandaSeleccionada.estadoComanda === EstadoComanda.Entregada && (
                 <button
-                  onClick={handleCerrarComanda}
+                  onClick={handlePagarYCerrar}
                   disabled={cerrando}
                   className="w-full bg-green-500 hover:bg-green-600 disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-semibold py-2 rounded-lg flex items-center justify-center gap-2 transition mb-2"
                 >
                   <HiOutlineCash size={18} />
-                  {cerrando ? "Cerrando..." : "Confirmar y cerrar comanda"}
+                  {cerrando ? "Procesando pago..." : "Cobrar (Mercado Pago)"}
                 </button>
               )}
 

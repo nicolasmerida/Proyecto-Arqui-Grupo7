@@ -16,7 +16,7 @@ export default function CommandDetail({ items, onConfirm, isSubmitting, onUpdate
     const total = items.reduce((acc, item) => acc + ((item.precio || 0) * item.cantidad), 0);
 
     return (
-        <div className="flex flex-col w-[380px] bg-[#F9F6EE] border-l border-[#EBE5D9] h-screen sticky top-0 shadow-sm font-sans">
+        <div className="flex flex-col w-96 bg-[#F9F6EE] border-l border-[#EBE5D9] h-screen sticky top-0 shadow-sm font-sans">
             <div className="p-6 border-b border-[#EBE5D9]">
                 <h2 className="text-2xl font-serif font-bold text-gray-900 tracking-tight">
                     Pedido Actual

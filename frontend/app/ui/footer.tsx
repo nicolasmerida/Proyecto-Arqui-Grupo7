@@ -6,7 +6,7 @@ import { DiGithubBadge } from "react-icons/di";
 export default function Footer() {
 
   return (
-    <footer className="bg-gray-800 text-white p-2 w-full mt-auto">
+    <footer className="bg-blue-800 text-white p-2 w-full mt-auto">
         <div className="grid grid-cols-1 sm:grid-cols-3 items-center">
             <div className="flex flex-col m-1 sm:m-0 items-center">
                 <p><strong>Arquitectura y Diseño de Sistemas</strong></p>
