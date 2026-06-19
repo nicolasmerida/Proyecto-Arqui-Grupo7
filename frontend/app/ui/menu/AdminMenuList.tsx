@@ -58,7 +58,7 @@ export default function AdminMenuList({ items }: AdminMenuListProps) {
 
         <button
           onClick={openNewCourse}
-          className="w-full sm:w-auto flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 px-6 py-3 text-sm font-bold text-white transition-all hover:from-blue-700 hover:to-indigo-700 shadow-md hover:shadow-lg hover:-translate-y-0.5"
+          className="w-full sm:w-auto flex items-center justify-center gap-2 rounded-xl bg-cyan-600 px-6 py-3 text-sm font-bold text-white transition-all hover:bg-sky-500 shadow-md hover:shadow-lg hover:-translate-y-0.5"
         >
           <HiOutlinePlus size={20} />
           Nuevo Plato
@@ -66,10 +66,10 @@ export default function AdminMenuList({ items }: AdminMenuListProps) {
       </div>
 
       {filteredCourses.length === 0 ? (
-         <div className="flex flex-col items-center justify-center py-20 bg-slate-50 border-2 border-dashed border-slate-300 rounded-3xl">
-           <HiOutlineViewGrid size={48} className="text-slate-300 mb-4" />
-           <p className="text-xl font-bold text-slate-500">No hay platos en esta categoría.</p>
-           <p className="text-slate-400 mt-2">Prueba seleccionar otra categoría o crear uno nuevo.</p>
+         <div className="flex flex-col items-center justify-center py-20 bg-white/50 backdrop-blur-sm border-2 border-dashed border-sky-300 rounded-3xl">
+           <HiOutlineViewGrid size={48} className="text-sky-300 mb-4" />
+           <p className="text-xl font-bold text-slate-700">No hay platos en esta categoría.</p>
+           <p className="text-slate-500 mt-2">Prueba seleccionar otra categoría o crear uno nuevo.</p>
          </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">

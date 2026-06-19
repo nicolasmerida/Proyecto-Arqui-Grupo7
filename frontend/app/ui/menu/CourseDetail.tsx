@@ -57,19 +57,19 @@ export default function CourseDetail({ isVisible, course, notes, onNotesChange, 
             <div
                 ref={modalRef}
                 onClick={(e) => e.stopPropagation()}
-                className="bg-white rounded-lg shadow-xl w-full max-w-md p-6 max-h-[90vh] overflow-y-auto"
+                className="bg-cyan-500 rounded-lg shadow-xl w-full max-w-md p-6 max-h-[90vh] overflow-y-auto"
             >
                 {/* Header */}
                 <div className="flex justify-between items-start mb-4">
                     <div className="flex flex-col justify-start">
                         <h2 className="text-2xl font-bold text-slate-900">{course.nombre}</h2>
-                        <p className="text-sm text-slate-500 mt-1">
+                        <p className="text-sm text-slate-700 mt-1">
                             {course.categoria.nombre}
                         </p>
                     </div>
                     <button
                         onClick={onClose}
-                        className="text-slate-400 hover:text-slate-600 transition"
+                        className="text-slate-500 hover:text-slate-700 transition"
                         aria-label="Cerrar"
                     >
                         <HiOutlineX size={24} />
@@ -77,13 +77,13 @@ export default function CourseDetail({ isVisible, course, notes, onNotesChange, 
                 </div>
 
                 {/* Descripción */}
-                <div className="mb-4 pb-4 border-b border-slate-200">
+                <div className="mb-4 pb-4 border-b border-slate-500">
                     <p className="text-slate-700">{course.descripcion}</p>
                 </div>
 
                 {/* Precio */}
-                <div className="mb-6 flex items-center justify-between bg-slate-50 p-3 rounded-lg">
-                    <span className="text-slate-600 font-medium">Precio:</span>
+                <div className="mb-6 flex items-center justify-between bg-slate-500 p-3 rounded-lg">
+                    <span className="text-slate-700 font-medium">Precio:</span>
                     <span className="text-2xl font-bold text-slate-900">${course.precio}</span>
                 </div>
 
@@ -98,7 +98,7 @@ export default function CourseDetail({ isVisible, course, notes, onNotesChange, 
                             value={notes}
                             onChange={(e) => onNotesChange(e.target.value)}
                             placeholder="Notas del plato para la preparación"
-                            className="w-full px-3 py-2 text-black border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent resize-none"
+                            className="w-full px-3 py-2 text-slate-400 border border-sky-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent resize-none"
                             rows={3}
                         />
                     </div>
@@ -109,13 +109,13 @@ export default function CourseDetail({ isVisible, course, notes, onNotesChange, 
                     <div className="flex gap-3">
                         <button
                             onClick={onAddToCommand}
-                            className="flex-1 px-4 py-2 bg-green-500 text-white font-medium rounded-lg hover:bg-green-600 transition"
+                            className="flex-1 px-4 py-2 bg-sky-500 text-slate-400 font-medium rounded-lg hover:bg-blue-500 transition"
                         >
                             Agregar a comanda
                         </button>
                         <button
                             onClick={onClose}
-                            className="flex-1 px-4 py-2 border border-slate-300 text-slate-700 font-medium rounded-lg hover:bg-slate-50 transition"
+                            className="flex-1 px-4 py-2 border border-slate-500 text-slate-700 font-medium rounded-lg hover:bg-slate-50 transition"
                         >
                             Cancelar
                         </button>

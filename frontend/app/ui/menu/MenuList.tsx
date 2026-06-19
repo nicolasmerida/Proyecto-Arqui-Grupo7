@@ -40,25 +40,25 @@ export default function MenuList({ items, addItem }: MenuListProps) {
       });
   return (
     <>
-      <div className="flex flex-col sm:flex-row justify-center items-center bg-white p-3 sm:p-4 rounded-2xl border border-slate-200 shadow-sm gap-2 sm:gap-4 mb-8">
+      <div className="flex flex-col sm:flex-row justify-center items-center bg-white/80 backdrop-blur-sm p-3 sm:p-4 rounded-2xl border border-blue-200 shadow-sm gap-2 sm:gap-4 mb-8">
         <div className="flex flex-wrap items-center justify-center gap-2">
-          <button className={`px-5 py-2.5 rounded-xl text-sm font-bold transition-all ${category === null ? 'bg-slate-800 text-white shadow-md' : 'bg-transparent text-slate-600 hover:bg-slate-100'}`}
+          <button className={`px-5 py-2.5 rounded-xl text-sm font-bold transition-all ${category === null ? 'bg-sky-500 text-white shadow-md' : 'bg-transparent text-slate-700 hover:bg-sky-100'}`}
                   onClick={() => setCategory(null)}>
                     Todos
           </button>
-          <button className={`px-5 py-2.5 rounded-xl text-sm font-bold transition-all ${category === Category.Entrada ? 'bg-slate-800 text-white shadow-md' : 'bg-transparent text-slate-600 hover:bg-slate-100'}`}
+          <button className={`px-5 py-2.5 rounded-xl text-sm font-bold transition-all ${category === Category.Entrada ? 'bg-sky-500 text-white shadow-md' : 'bg-transparent text-slate-700 hover:bg-sky-100'}`}
                   onClick={() => setCategory(Category.Entrada)}>
                     Entradas
           </button>
-          <button className={`px-5 py-2.5 rounded-xl text-sm font-bold transition-all ${category === Category.Principal ? 'bg-slate-800 text-white shadow-md' : 'bg-transparent text-slate-600 hover:bg-slate-100'}`}
+          <button className={`px-5 py-2.5 rounded-xl text-sm font-bold transition-all ${category === Category.Principal ? 'bg-sky-500 text-white shadow-md' : 'bg-transparent text-slate-700 hover:bg-sky-100'}`}
                   onClick={() => setCategory(Category.Principal)}>
                     Principales
           </button>
-          <button className={`px-5 py-2.5 rounded-xl text-sm font-bold transition-all ${category === Category.Postre ? 'bg-slate-800 text-white shadow-md' : 'bg-transparent text-slate-600 hover:bg-slate-100'}`}
+          <button className={`px-5 py-2.5 rounded-xl text-sm font-bold transition-all ${category === Category.Postre ? 'bg-sky-500 text-white shadow-md' : 'bg-transparent text-slate-700 hover:bg-sky-100'}`}
                   onClick={() => setCategory(Category.Postre)}>
                     Postres
           </button>
-          <button className={`px-5 py-2.5 rounded-xl text-sm font-bold transition-all ${category === Category.Bebida ? 'bg-slate-800 text-white shadow-md' : 'bg-transparent text-slate-600 hover:bg-slate-100'}`}
+          <button className={`px-5 py-2.5 rounded-xl text-sm font-bold transition-all ${category === Category.Bebida ? 'bg-sky-500 text-white shadow-md' : 'bg-transparent text-slate-700 hover:bg-sky-100'}`}
                   onClick={() => setCategory(Category.Bebida)}>
                     Bebidas
           </button>
@@ -74,7 +74,7 @@ export default function MenuList({ items, addItem }: MenuListProps) {
             />
           ))
         ) : (
-          <p className="col-span-full text-center italic text-slate-500">
+          <p className="col-span-full text-center italic text-slate-700">
             No hay platos disponibles.
           </p>
         )}

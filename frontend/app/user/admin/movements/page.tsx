@@ -1,6 +1,8 @@
 // app/user/admin/movements/page.tsx
 import TableMovements from "@/app/ui/stock/table-movements";
 import { Metadata } from "next";
+import ExportarGoogleSheets from "@/app/ui/admin/ExportarGoogleSheets";
+
 
 export const metadata: Metadata = {
     title: 'Movimientos de Stock',
@@ -21,5 +23,13 @@ export default function Movements() {
                 </div>
             </main>
         </div>
+<<<<<<< HEAD
+=======
+        <div className="m-2">
+            <TableMovements />
+        </div>
+        <ExportarGoogleSheets />
+        </>
+>>>>>>> f4091dd2a37b03ec9350652e62b64a5b2dacd1e2
     );
 }

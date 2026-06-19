@@ -4,6 +4,7 @@ import StatsBar from "@/app/ui/admin/StatsBar";
 import StockAlerts from "@/app/ui/admin/StockAlerts";
 import TopSales from "@/app/ui/admin/TopSales";
 import { getAlertasStock } from "@/app/lib/actions";
+import ExportarGoogleSheets from "@/app/ui/admin/ExportarGoogleSheets";
 
 export default async function Admin() {
   const initialAlerts = await getAlertasStock();
@@ -28,6 +29,11 @@ export default async function Admin() {
           </div>
         </div>
       </main>
-    </div>
+<<<<<<< HEAD
+=======
+      <StockAlerts initialAlerts={initialAlerts} />
+      <ExportarGoogleSheets />
+>>>>>>> f4091dd2a37b03ec9350652e62b64a5b2dacd1e2
+    </div >
   );
 }
