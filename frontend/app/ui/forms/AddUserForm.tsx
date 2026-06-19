@@ -13,9 +13,6 @@ export function AddUserForm() {
     const [rol, setRol] = useState<'' | Rol>('');
     const [estadoUsuario, setEstadoUsuario] = useState<EstadoUsuario>(EstadoUsuario.Activo)
 
-    // TODO: Restaurar esto cuando addUser esté implementado
-    //const initialState: StateUser = { message: null, errors: {} };
-    //const [formState, formAction] = useActionState(addUser, initialState); Agregar funcion a invocar
     const formState: any = {};
     const formAction = () => {};
 

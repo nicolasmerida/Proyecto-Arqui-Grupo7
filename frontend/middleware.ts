@@ -19,23 +19,26 @@ export default auth((req) => {
 
     // Redirección inicial post-login desde la ruta base "/user"
     if (pathname === "/user" || pathname === "/user/") {
-        if (role === Rol.Administrador) return NextResponse.redirect(new URL("/user/admin", req.url));
-        if (role === Rol.Cocinero) return NextResponse.redirect(new URL("/user/cocinero", req.url));
-        if (role === Rol.Mozo) return NextResponse.redirect(new URL("/user/mozo", req.url));
+        if (role === "ADMINISTRADOR") return NextResponse.redirect(new URL("/user/admin", req.url));
+        if (role === "COCINERO") return NextResponse.redirect(new URL("/user/cocinero", req.url));
+        if (role === "MOZO") return NextResponse.redirect(new URL("/user/mozo", req.url));
+
+        // Fallback por si acaso el rol es null
+        return NextResponse.redirect(new URL("/user/admin", req.url));
     }
 
     // Restricciones de seguridad para roles inferiores (el Administrador tiene acceso libre a todo)
-    if (role === Rol.Cocinero && !pathname.startsWith("/user/cocinero")) {
+    if (role === "COCINERO" && !pathname.startsWith("/user/cocinero")) {
         return NextResponse.redirect(new URL("/user/cocinero", req.url));
     }
 
-    if (role === Rol.Mozo && !pathname.startsWith("/user/mozo")) {
-        return NextResponse.redirect( new URL("/user/mozo", req.url));
+    if (role === "MOZO" && !pathname.startsWith("/user/mozo")) {
+        return NextResponse.redirect(new URL("/user/mozo", req.url));
     }
 
     return NextResponse.next();
 });
 
 export const config = {
-    matcher: ["/user/:path*"],
+    matcher: ["/user", "/user/:path*"],
 };
