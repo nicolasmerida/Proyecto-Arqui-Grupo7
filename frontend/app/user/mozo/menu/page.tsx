@@ -74,7 +74,7 @@ export default function MozoMenu({ searchParams }: MozoProps) {
                 try {
                     const errorData = await response.json();
                     alert(`Error del sistema: ${errorData.error?.message || 'Error desconocido'}`);
-                } catch(e) {
+                } catch (e) {
                     alert("Hubo un error al enviar el pedido a la cocina (Posible falta de stock). Por favor, revise el menú.");
                 }
                 setIsSubmitting(false);
@@ -150,7 +150,7 @@ export default function MozoMenu({ searchParams }: MozoProps) {
             <div className="flex flex-col items-center justify-center h-screen bg-gray-50 w-full">
                 <h2 className="text-2xl font-bold text-red-600 mb-2">Error: Comanda no especificada</h2>
                 <p className="text-gray-600 mb-6">Debe seleccionar una mesa desde el plano del salón para poder tomar un pedido.</p>
-                <button 
+                <button
                     onClick={() => router.push('/user/mozo')}
                     className="bg-black text-white px-6 py-2 rounded-lg hover:bg-gray-800"
                 >
@@ -181,7 +181,7 @@ export default function MozoMenu({ searchParams }: MozoProps) {
                     course={editPlatoData}
                     notes={editNotes}
                     onNotesChange={setEditNotes}
-                    onAddToCommand={saveEditItem} 
+                    onAddToCommand={saveEditItem}
                     onClose={() => { setSelectedEditIndex(null); setEditPlatoData(null); }}
                 />
             )}

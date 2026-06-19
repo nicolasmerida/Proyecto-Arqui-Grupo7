@@ -38,6 +38,8 @@ export default function MenuList({ items, addItem }: MenuListProps) {
         
         return catName.trim().toUpperCase() === category.trim().toUpperCase();
       });
+  const isInteractive = !!addItem;
+
   return (
     <>
       <div className="flex flex-col sm:flex-row justify-center items-center bg-white/80 backdrop-blur-sm p-3 sm:p-4 rounded-2xl border border-blue-200 shadow-sm gap-2 sm:gap-4 mb-8">
@@ -70,23 +72,24 @@ export default function MenuList({ items, addItem }: MenuListProps) {
             <CourseCard
               key={item.idPlato}
               course={item}
-              onSelect={() => setSelectedCourse(item)}
+              onSelect={isInteractive ? () => setSelectedCourse(item) : undefined}
+              isInteractive={isInteractive}
             />
           ))
         ) : (
-          <p className="col-span-full text-center italic text-slate-700">
-            No hay platos disponibles.
+          <p className="col-span-full text-center italic text-slate-200 text-lg font-medium bg-slate-800/50 py-8 rounded-xl border border-slate-600/50">
+            No hay platos disponibles en esta categoría.
           </p>
         )}
       </div>
 
-      {selectedCourse && (
+      {isInteractive && selectedCourse && (
         <CourseDetail
           isVisible={true}
           course={selectedCourse}
           notes={notes}
           onNotesChange={setNotes}
-          onAddToCommand={addItem ? handleAddToCommand : undefined}
+          onAddToCommand={handleAddToCommand}
           onClose={handleCloseModal}
         />
       )}

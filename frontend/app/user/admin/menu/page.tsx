@@ -3,6 +3,7 @@ import AdminMenuList from "@/app/ui/menu/AdminMenuList";
 import Pagination from "@/app/ui/menu/pagination";
 import { Plato } from "@/app/lib/definitions";
 import { Metadata } from "next";
+import ExportarGoogleSheets from "@/app/ui/admin/ExportarGoogleSheets";
 
 export const metadata: Metadata = {
   title: 'Menú',
@@ -45,9 +46,14 @@ export default async function AdminMenu({ searchParams }: AdminProps) {
   return (
     <div className="min-h-screen bg-slate-50/50 pb-10">
       {/* Header Premium */}
-      <div className="bg-white border-b border-slate-200 px-8 py-8 shadow-sm">
-        <h1 className="text-3xl font-bold font-serif italic text-slate-900">Administrar Menú</h1>
-        <p className="text-slate-500 mt-1 font-medium">Aquí puedes editar los platos existentes o crear nuevos.</p>
+      <div className="bg-white border-b border-slate-200 px-8 py-8 shadow-sm flex justify-between items-center">
+        <div>
+          <h1 className="text-3xl font-bold font-serif italic text-slate-900">Administrar Menú</h1>
+          <p className="text-slate-500 mt-1 font-medium">Aquí puedes editar los platos existentes o crear nuevos.</p>
+        </div>
+        <div>
+          <ExportarGoogleSheets />
+        </div>
       </div>
 
       <main className="px-8 py-6 max-w-7xl mx-auto space-y-6">
