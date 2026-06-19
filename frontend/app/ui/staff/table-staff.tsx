@@ -67,7 +67,7 @@ export default function TableStaff() {
             <AddStaff show={showAdd} onClose={() => setShowAdd(false)} onAddStaff={handleAddStaff} />
             <div className="flex justify-end">
                 <button onClick={() => setShowAdd(true)}
-                        className="flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 px-6 py-3 text-sm font-bold text-white transition-all hover:from-blue-700 hover:to-indigo-700 shadow-md hover:shadow-lg hover:-translate-y-0.5"
+                        className="flex items-center justify-center gap-2 rounded-xl bg-linear-to-r from-blue-600 to-indigo-600 px-6 py-3 text-sm font-bold text-white transition-all hover:from-blue-700 hover:to-indigo-700 shadow-md hover:shadow-lg hover:-translate-y-0.5"
                 >
                     <HiOutlinePlusSm size={20} /> Nuevo usuario
                 </button>

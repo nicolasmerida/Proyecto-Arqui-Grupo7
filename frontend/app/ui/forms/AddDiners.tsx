@@ -19,20 +19,20 @@ export default function AddDiner({ mesa, comensales, setComensales, onClose, onS
     };
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-            <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-700/75 p-4">
+            <div className="w-full max-w-md rounded-2xl p-6 shadow-xl">
                 <div className="mb-4 flex items-center justify-between">
                     <div>
-                        <h2 className="text-xl font-semibold">Abrir mesa #{mesa.numeroMesa}</h2>
-                        <p className="text-sm text-slate-500">Ingrese la cantidad de comensales para la mesa.</p>
+                        <h2 className="text-xl text-amber-400 font-semibold">Abrir mesa #{mesa.numeroMesa}</h2>
+                        <p className="text-sm text-amber-400">Ingrese la cantidad de comensales para la mesa.</p>
                     </div>
-                    <button type="button" className="rounded-full bg-slate-200 px-3 py-1 text-sm" onClick={onClose}>
-                        <HiOutlineXCircle />
+                    <button type="button" className="rounded-full bg-amber-200 border border-orange-400 px-3 py-1 text-sm" onClick={onClose}>
+                        <HiOutlineXCircle className="text-lg text-amber-400"/>
                     </button>
                 </div>
 
                 <form onSubmit={handleSubmitComensales} className="space-y-4">
-                    <label className="block text-sm font-medium text-slate-700">
+                    <label className="block text-sm font-medium text-amber-400">
                         Comensales
                         <input
                             type="number"
@@ -40,7 +40,7 @@ export default function AddDiner({ mesa, comensales, setComensales, onClose, onS
                             max={mesa.capacidad}
                             value={comensales}
                             onChange={(e) => setComensales(Number(e.target.value))}
-                            className="mt-2 w-full rounded-xl border border-slate-300 px-3 py-2 focus:border-amber-400 focus:outline-none"
+                            className="mt-2 w-full rounded-xl border border-amber-300 px-3 py-2 focus:border-yellow-400 focus:outline-none"
                             required
                         />
                     </label>
@@ -49,7 +49,7 @@ export default function AddDiner({ mesa, comensales, setComensales, onClose, onS
                         <button type="button" onClick={onClose} className="rounded-xl border border-slate-300 px-4 py-2 text-slate-700">
                             Cancelar
                         </button>
-                        <button type="submit" className="rounded-xl bg-amber-400 px-4 py-2 font-semibold text-white shadow-sm hover:bg-amber-500" disabled={cargando}>
+                        <button type="submit" className="rounded-xl bg-orange-300 hover:bg-orange-500 text-lg text-yellow-300 px-4 py-2 font-semibold" disabled={cargando}>
                             {cargando ? 'Abriendo...' : 'Abrir mesa'}
                         </button>
                     </div>

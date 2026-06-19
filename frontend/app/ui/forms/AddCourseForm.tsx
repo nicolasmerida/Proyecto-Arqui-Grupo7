@@ -209,11 +209,11 @@ export default function AddCourseForm({ course }: AddCourseFormProps) {
     <>
       <div className="flex items-center justify-start gap-4">
         <button type="button" onClick={() => router.back()}
-          className="items-center gap-2 rounded-xl px-4 py-2 bg-amber-200 border border-black text-slate-500 transition hover:text-black hover:bg-slate-500">
-          <HiOutlineArrowSmLeft />
+          className="items-center gap-2 rounded-xl px-4 py-2 bg-amber-200 border border-orange-400 text-amber-400 transition hover:text-amber-600 hover:bg-amber-300">
+          <HiOutlineArrowSmLeft className='text-lg text-amber-400' />
           <span>Volver</span>
         </button>
-        <span className="text-2xl font-serif italic text-black ">
+        <span className="text-2xl font-serif italic text-amber-400">
           Completa los datos del plato para {course?.idPlato ? 'editar plato' : 'crear un nuevo plato'}.
         </span>
       </div>
@@ -224,12 +224,12 @@ export default function AddCourseForm({ course }: AddCourseFormProps) {
         <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-4">
           <h3 className="text-lg font-bold text-slate-800 border-b pb-2">Información Básica</h3>
 
-          <label className="block space-y-2 text-sm font-medium text-slate-700">
+          <label className="block space-y-2 text-sm font-medium text-amber-400">
             Nombre del plato
             <input
               value={nombre}
               onChange={(event) => setNombre(event.target.value)}
-              className="w-full rounded-xl border border-slate-300 px-3 py-2 text-slate-900 focus:border-blue-500 focus:outline-none"
+              className="w-full rounded-xl border border-amber-300 text-amber-400 focus:border-yellow-400 px-3 py-2 focus:outline-none resize-none"
               placeholder="Ej: Ensalada caprese"
               required
             />
@@ -241,7 +241,7 @@ export default function AddCourseForm({ course }: AddCourseFormProps) {
               value={descripcion}
               onChange={(event) => setDescripcion(event.target.value)}
               rows={3}
-              className="w-full rounded-xl border border-slate-300 px-3 py-2 text-slate-900 focus:border-blue-500 focus:outline-none resize-none"
+              className="w-full rounded-xl border border-amber-300 text-amber-400 focus:border-yellow-400 px-3 py-2 focus:outline-none resize-none"
               placeholder="Ej: Tomate, mozzarella, albahaca y un toque de oliva"
             />
           </label>
@@ -255,7 +255,7 @@ export default function AddCourseForm({ course }: AddCourseFormProps) {
                 step={5.00}
                 value={precio}
                 onChange={(event) => setPrecio(Number(event.target.value))}
-                className="w-full rounded-xl border border-slate-300 px-3 py-2 text-slate-900 focus:border-blue-500 focus:outline-none"
+                className="w-full rounded-xl border border-amber-300 text-amber-400 focus:border-yellow-400 px-3 py-2 focus:outline-none resize-none"
                 required
               />
             </label>
@@ -265,7 +265,7 @@ export default function AddCourseForm({ course }: AddCourseFormProps) {
               <select
                 value={categoria}
                 onChange={(event) => setCategoria(event.target.value as Category)}
-                className="w-full rounded-xl border border-slate-300 px-3 py-2 text-slate-900 focus:border-blue-500 focus:outline-none"
+                className="w-full rounded-xl border border-amber-300 text-amber-400 focus:border-yellow-400 px-3 py-2 focus:outline-none resize-none"
                 required
               >
                 {CATEGORY_OPTIONS.map((option) => (
@@ -279,8 +279,7 @@ export default function AddCourseForm({ course }: AddCourseFormProps) {
         </div>
 
         {/* Receta Section */}
-        {/* Receta Section */}
-        <div className="bg-gradient-to-br from-slate-50 to-slate-100 p-6 rounded-xl border border-slate-200 shadow-inner space-y-5">
+        <div className="bg-linear-to-br from-slate-50 to-slate-100 p-6 rounded-xl border border-slate-200 shadow-inner space-y-5">
           <div>
             <h3 className="text-xl font-bold text-slate-800">Receta / Ingredientes</h3>
             <p className="text-sm text-slate-500 mt-1">Añade los ingredientes necesarios para preparar este plato. El stock se descontará automáticamente.</p>
@@ -292,7 +291,7 @@ export default function AddCourseForm({ course }: AddCourseFormProps) {
               <select
                 value={selectedIngredienteId}
                 onChange={(e) => setSelectedIngredienteId(e.target.value ? Number(e.target.value) : '')}
-                className="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-slate-800 bg-slate-50 focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all outline-none"
+                className="w-full rounded-xl border border-amber-300 text-amber-400 focus:border-yellow-400 px-3 py-2 focus:outline-none resize-none"
               >
                 <option value="">-- Buscar ingrediente --</option>
                 {availableIngredientes.map(ing => (
@@ -310,37 +309,46 @@ export default function AddCourseForm({ course }: AddCourseFormProps) {
                 step={0.1}
                 value={ingredienteCantidad}
                 onChange={(e) => setIngredienteCantidad(Number(e.target.value))}
-                className="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-slate-800 bg-slate-50 focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all outline-none"
+                className="w-full rounded-xl border border-amber-300 text-amber-400 focus:border-yellow-400 px-3 py-2 focus:outline-none resize-none transition-all outline-none"
               />
             </label>
             <button
               type="button"
               onClick={handleAddIngrediente}
               disabled={selectedIngredienteId === ''}
-              className="h-[46px] px-6 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold rounded-lg hover:from-blue-700 hover:to-indigo-700 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-md w-full sm:w-auto"
+              className="flex items-center justify-center h-11 px-4 bg-amber-400 text-white rounded-xl hover:bg-amber-600 border border-orange-400 transition gap-2 disabled:opacity-50"
             >
-              <HiOutlinePlus size={20} /> Añadir
+              <HiOutlinePlus className='text-white text-lg'/> Añadir
             </button>
           </div>
 
-          <div className="mt-6">
+          <div className="mt-4 border rounded-xl overflow-hidden bg-white">
             {receta.length === 0 ? (
               <div className="p-8 flex flex-col items-center justify-center bg-white rounded-xl border-2 border-dashed border-slate-300">
                 <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mb-3">
                   <span className="text-2xl text-slate-300">🍲</span>
                 </div>
-                <span className="text-slate-500 font-medium">Aún no hay ingredientes agregados.</span>
+                <span className="text-slate-500 font-medium">Aún no hay ingredientes agregados</span>
                 <span className="text-slate-400 text-sm">¡Comenzá a armar la receta para este plato!</span>
               </div>
             ) : (
-              <div className="grid gap-3">
-                {receta.map((item) => (
+              <table className="w-full text-sm text-left text-slate-600">
+                <thead className="bg-slate-100 text-slate-700 uppercase">
+                  <tr>
+                    <th className="px-4 py-3">Ingrediente</th>
+                    <th className="px-4 py-3">Unidad</th>
+                    <th className="px-4 py-3 text-right">Cantidad</th>
+                    <th className="px-4 py-3 text-center">Acción</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y">
+                  {receta.map((item) => (
                   <div 
                     key={item.ingrediente.idIngrediente} 
                     className="group flex flex-col sm:flex-row justify-between items-start sm:items-center bg-white p-4 rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-0.5"
                   >
                     <div className="flex items-center gap-4 mb-3 sm:mb-0">
-                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-100 to-blue-100 flex items-center justify-center text-indigo-700 font-bold shadow-inner">
+                      <div className="w-10 h-10 rounded-full bg-linear-to-br from-indigo-100 to-blue-100 flex items-center justify-center text-indigo-700 font-bold shadow-inner">
                         {item.ingrediente.nombre.charAt(0).toUpperCase()}
                       </div>
                       <div className="flex flex-col">
@@ -365,7 +373,8 @@ export default function AddCourseForm({ course }: AddCourseFormProps) {
                     </div>
                   </div>
                 ))}
-              </div>
+                </tbody>
+              </table>
             )}
           </div>
         </div>
@@ -375,7 +384,7 @@ export default function AddCourseForm({ course }: AddCourseFormProps) {
           <button
             type="submit"
             disabled={saving}
-            className="inline-flex justify-center rounded-xl bg-green-500 px-6 py-3 text-white font-bold transition hover:bg-green-600 disabled:cursor-not-allowed disabled:opacity-60"
+            className="inline-flex justify-center rounded-xl bg-amber-300 px-6 py-3 text-white font-bold transition hover:bg-yellow-500 disabled:cursor-not-allowed disabled:opacity-60"
           >
             {saving ? 'Guardando...' : 'Guardar Plato'}
           </button>

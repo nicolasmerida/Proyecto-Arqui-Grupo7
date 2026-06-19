@@ -121,23 +121,22 @@ export default function TableStock() {
     }
 
     return (
-        <div className="flex flex-col space-y-6">
-            <div className="flex flex-col sm:flex-row justify-between items-center bg-white p-4 rounded-2xl gap-4">
-                <div className="flex items-center gap-2 overflow-x-auto w-full sm:w-auto pb-2 sm:pb-0">
-                    <button className={`whitespace-nowrap px-5 py-2.5 rounded-xl text-sm font-bold transition-all ${condicion === "todos" ? 'bg-slate-800 text-white shadow-md' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`} onClick={() => setCondicion("todos")}>Todos</button>
-                    <button className={`whitespace-nowrap px-5 py-2.5 rounded-xl text-sm font-bold transition-all ${condicion === "regla" ? 'bg-emerald-600 text-white shadow-md' : 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100'}`} onClick={() => setCondicion("regla")}>En regla</button>
-                    <button className={`whitespace-nowrap px-5 py-2.5 rounded-xl text-sm font-bold transition-all ${condicion === "advertencia" ? 'bg-amber-500 text-white shadow-md' : 'bg-amber-50 text-amber-700 hover:bg-amber-100'}`} onClick={() => setCondicion("advertencia")}>Advertencia</button>
-                    <button className={`whitespace-nowrap px-5 py-2.5 rounded-xl text-sm font-bold transition-all ${condicion === "bajo" ? 'bg-rose-600 text-white shadow-md' : 'bg-rose-50 text-rose-700 hover:bg-rose-100'}`} onClick={() => setCondicion("bajo")}>Bajo</button>
-                </div>
-                <button onClick={() => setShowCreate(true)}
-                        className="w-full sm:w-auto flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 px-6 py-3 text-sm font-bold text-white transition-all hover:from-blue-700 hover:to-indigo-700 shadow-md hover:shadow-lg hover:-translate-y-0.5"
+        <>
+        <div className="flex items-center justify-between mb-2">
+            <div className="grid grid-cols-4 rounded-md p-2 space-x-3 bg-slate-300">
+                <button className={`${(condicion === "todos") ? 'text-white border border-orange-400 bg-amber-400 rounded-md' : 'text-amber-200'}`} onClick={() => setCondicion("todos")}>Todos</button>
+                <button className={`${(condicion === "regla") ? 'text-white border border-orange-400 bg-amber-400 rounded-md' : 'text-amber-200'}`} onClick={() => setCondicion("regla")}>En regla</button>
+                <button className={`${(condicion === "advertencia") ? 'text-white border border-orange-400 bg-amber-400 rounded-md' : 'text-amber-200'}`} onClick={() => setCondicion("advertencia")}>Advertencia</button>
+                <button className={`${(condicion === "bajo") ? 'text-white border border-orange-400 bg-amber-400 rounded-md' : 'text-amber-200'}`} onClick={() => setCondicion("bajo")}>Bajo</button>
+            </div>
+            <button onClick={() => setShowCreate(true)}
+                        className="w-full sm:w-auto flex items-center justify-center gap-2 rounded-xl bg-linear-to-r from-blue-600 to-indigo-600 px-6 py-3 text-sm font-bold text-white transition-all hover:from-blue-700 hover:to-indigo-700 shadow-md hover:shadow-lg hover:-translate-y-0.5"
                 >
                     <HiOutlinePlusSm size={20} /> Nuevo ingrediente
-                </button>
-            </div>
-            
-            <div className="overflow-x-auto bg-white rounded-2xl">
-                <table className="w-full text-left border-collapse">
+            </button>
+        </div>
+        <div className="overflow-x-auto bg-white rounded-2xl border">
+            <table className="w-full text-left border-collapse">
                     <thead>
                         <tr className="bg-slate-50 border-b border-slate-200">
                             <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider cursor-pointer hover:bg-slate-100 transition-colors" onClick={() => requestSort('nombre')}>
@@ -211,9 +210,9 @@ export default function TableStock() {
                         )}
                     </tbody>
                 </table>
-            </div>
-            <AddStock show={showDetail} onClose={() => setShowDetail(false)} onStockUpdate={handleStockUpdate} ingredient={selectedIng} />
-            <AddIngredient show={showCreate} onClose={() => setShowCreate(false)} onIngredientCreate={handleCreateIngredient} />
         </div>
+        <AddStock show={showDetail} onClose={() => setShowDetail(false)} onStockUpdate={handleStockUpdate} ingredient={selectedIng} />
+        <AddIngredient show={showCreate} onClose={() => setShowCreate(false)} onIngredientCreate={handleCreateIngredient} />
+        </>
     );
 }

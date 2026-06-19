@@ -17,19 +17,22 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
   const session = await auth();
 
   return (
-    <html lang="es">
-      <head>
-        <link rel="icon" href="/logo.png" />
-      </head>
+      <html lang="es">
+        <head>
+          <link rel="icon" href="/logo.png" />
+        </head>
+        
+        <body className="flex flex-col min-h-screen">
+          <SessionProvider session={session}>
+            <Navbar />
 
-      <body className="flex flex-col min-h-screen">
-        <SessionProvider session={session}>
-          <Userbar />
-          <Navbar session={session} />
-          <main className="flex-auto">{children}</main>
-          <Footer />
-        </SessionProvider>
-      </body>
-    </html>
+            <main className="flex-auto bg-[url('/bg_home.jpeg')] bg-cover bg-center bg-fixed">
+              {children}
+            </main>
+
+            <Footer />
+          </SessionProvider>
+        </body>
+      </html>
   );
 }

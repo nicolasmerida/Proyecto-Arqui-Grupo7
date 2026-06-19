@@ -6,11 +6,11 @@ import { useActionState, useState } from 'react';
 import { HiOutlineEye, HiOutlineEyeOff } from 'react-icons/hi';
 
 const navLinkClass =
-  "relative text-white text-sm transition-transform duration-300 hover:scale-105";
+  "relative text-amber-200 text-sm transition-transform duration-300 hover:scale-105";
 
 const underlineClass = `
   after:content-[''] after:absolute after:-bottom-1 after:left-0
-  after:w-0 after:h-[1px] after:bg-white
+  after:w-0 after:h-[1px] after:bg-amber-200
   hover:after:w-full after:transition-all after:duration-300
 `;
 
@@ -29,7 +29,7 @@ export function LoginForm() {
     <div className="min-h-screen flex items-center justify-center px-4">
       <form
         action={formAction}
-        className="bg-white/10 backdrop-blur-md p-8 rounded-2xl shadow-xl w-full max-w-md text-white"
+        className="bg-slate-700/75 backdrop-blur-md p-8 rounded-2xl shadow-xl w-full max-w-md text-white"
       >
         <h1 className="text-3xl font-bold mb-6 text-center">Iniciar sesión</h1>
 
@@ -41,7 +41,7 @@ export function LoginForm() {
             id="username"
             type="text"
             name="email"
-            className="w-full px-4 py-2 rounded-md bg-white/20 text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-white"
+            className="w-full px-4 py-2 rounded-md bg-amber-200 text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-amber-400"
             placeholder="Ingrese su usuario"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
@@ -58,7 +58,8 @@ export function LoginForm() {
               id="password"
               type={showPassword ? 'text' : 'password'} // Cambia el tipo según el estado `showPassword`
               name="password"
-              className="w-full px-4 py-2 rounded-md bg-white/20 text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-white pr-10"
+              className="w-full px-4 py-2 rounded-md bg-amber-200 text-white placeholder-white/60
+                         focus:outline-none focus:ring-2 focus:ring-amber-400 pr-10"
               placeholder="Ingrese su contraseña"
               value={password}
               minLength={8}
@@ -68,13 +69,13 @@ export function LoginForm() {
             <button
               type="button"
               onClick={handleTogglePassword}
-              className="absolute inset-y-0 right-0 pr-3 flex items-center text-white/60 hover:text-white focus:outline-none"
+              className="absolute inset-y-0 right-0 pr-3 flex items-center text-amber-400 hover:text-yellow-500 focus:outline-none"
               aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
             >
               {showPassword ? (
-                <HiOutlineEyeOff className="h-5 w-5" /> // Icono de ojo cerrado
+                <HiOutlineEyeOff className="h-5 w-5 text-amber-400 hover:text-amber-500" /> // Icono de ojo cerrado
               ) : (
-                <HiOutlineEye className="h-5 w-5" /> // Icono de ojo abierto
+                <HiOutlineEye className="h-5 w-5 text-yellow-400 hover:text-yellow-500" /> // Icono de ojo abierto
               )}
             </button>
           </div>
@@ -85,12 +86,12 @@ export function LoginForm() {
         <button
           type="submit"
           aria-disabled={isPending} // Deshabilita el botón mientras la acción está pendiente
-          className="mb-4 w-full py-2 bg-green/80 hover:bg-green text-white font-semibold rounded-md shadow-md transition"
+          className="mb-4 w-full py-2 bg-orange-300 hover:bg-orange-500 text-lg text-yellow-300 font-semibold rounded-md shadow-md transition"
         >
           {isPending ? 'Ingresando...' : 'Ingresar'}
         </button>
-        <Link href="/user" className={`${navLinkClass} ${underlineClass}`}>
-          Crear una cuenta
+        <Link href="/user" className={`text-lg text-amber-200 bg-yellow-500 ${navLinkClass} ${underlineClass}`}>
+          Crear cuenta
         </Link>
 
         <div className="flex h-8 items-end space-x-1" aria-live="polite" aria-atomic="true">

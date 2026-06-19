@@ -8,8 +8,8 @@ export const metadata: Metadata = {
 export default function MozoLayout({ children }: { children: React.ReactNode }) {
 
     return (
-        <main>
+        <div className="bg-[url('/bg_salon.jpeg')] bg-cover bg-center bg-fixed min-h-screen">
             {children}
-        </main>
+        </div>
     );
 }
