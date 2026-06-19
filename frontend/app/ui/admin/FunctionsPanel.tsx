@@ -9,26 +9,26 @@ export default function FunctionsPanel() {
 
     return (
         <aside className="fixed top-16 left-0 h-screen overflow-y-auto w-36 border-r">  {/* Agregar margen superior segun Userbar y definir ancho de pnael */}
-            <nav className="flex flex-col bg-sky-500 gap-4 rounded-lg mt-10 p-2" aria-label="Funciones del administrador">
+            <nav className="flex flex-col bg-amber-400 gap-4 rounded-lg mt-10 p-2" aria-label="Funciones del administrador">
                 <Link href="/user/admin"
-                    className={`flex gap-1 items-center hover:underline ${(pathName === "/user/admin" ? 'text-blue-400 font-semibold border border-slate-500 bg-slate-700 rounded-md' :'text-slate-700')}`}>
-                    <HiOutlineChartSquareBar className="text-lg" /> Inicio
+                    className={`flex gap-1 items-center hover:underline ${(pathName === "/user/admin" ? 'text-amber-200 font-semibold border border-orange-500 bg-amber-600 rounded-md' :'text-amber-600')}`}>
+                    <HiOutlineChartSquareBar className={`text-lg ${(pathName === "/user/admin" ? 'text-blue-400 font-semibold bg-slate-500' :'text-slate-500')}`} /> Inicio
                 </Link>
                 <Link href="/user/admin/menu" 
-                    className={`flex gap-1 items-center hover:underline ${(pathName.startsWith("/user/admin/menu") ? 'text-blue-400 font-semibold border border-slate-700 bg-slate-500 rounded-md' :'text-slate-700')}`}>
-                    <HiOutlineClipboardList className="text-lg" /> Menú
+                    className={`flex gap-1 items-center hover:underline ${(pathName.startsWith("/user/admin/menu") ? 'text-amber-200 font-semibold border border-orange-500 bg-amber-600 rounded-md' :'text-amber-600')}`}>
+                    <HiOutlineClipboardList className={`text-lg ${(pathName === "/user/admin" ? 'text-amber-200 font-semibold bg-amber-600' :'text-amber-600')}`} /> Menú
                 </Link>
                 <Link href="/user/admin/stock"
-                    className={`flex gap-1 items-center hover:underline ${(pathName.startsWith("/user/admin/stock") ? 'text-blue-400 font-semibold border border-slate-700 bg-slate-500 rounded-md' :'text-slate-700')}`}>
-                    <HiOutlineCube className="text-lg" /> Stock
+                    className={`flex gap-1 items-center hover:underline ${(pathName.startsWith("/user/admin/stock") ? 'text-amber-200 font-semibold border border-orange-500 bg-amber-600 rounded-md' :'text-amber-600')}`}>
+                    <HiOutlineCube className={`text-lg ${(pathName === "/user/admin" ? 'text-amber-200 font-semibold bg-amber-600' :'text-amber-600')}`} /> Stock
                 </Link>
                 <Link href="/user/admin/movements"
-                    className={`flex gap-1 items-center hover:underline ${(pathName.startsWith("/user/admin/movements") ? 'text-blue-400 font-semibold border border-slate-700 bg-slate-500 rounded-md' :'text-slate-700')}`}>
-                    <HiOutlineClock className="text-lg" /> Movimientos
+                    className={`flex gap-1 items-center hover:underline ${(pathName.startsWith("/user/admin/movements") ? 'text-amber-200 font-semibold border border-orange-500 bg-amber-600 rounded-md' :'text-amber-600')}`}>
+                    <HiOutlineClock className={`text-lg ${(pathName === "/user/admin" ? 'text-amber-200 font-semibold bg-amber-600' :'text-amber-600')}`} /> Movimientos
                 </Link>
                 <Link href="/user/admin/staff"
-                    className={`flex gap-1 items-center hover:underline ${(pathName.startsWith("/user/admin/staff") ? 'text-blue-400 font-semibold border border-slate-700 bg-slate-500 rounded-md' :'text-slate-700')}`}>
-                    <HiOutlineUserGroup className="text-lg" /> Usuarios
+                    className={`flex gap-1 items-center hover:underline ${(pathName.startsWith("/user/admin/staff") ? 'text-amber-200 font-semibold border border-orange-500 bg-amber-600 rounded-md' :'text-amber-600')}`}>
+                    <HiOutlineUserGroup className={`text-lg ${(pathName === "/user/admin" ? 'text-amber-200 font-semibold bg-amber-600' :'text-amber-600')}`} /> Usuarios
                 </Link>
             </nav>
         </aside>

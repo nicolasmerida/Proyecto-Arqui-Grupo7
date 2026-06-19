@@ -124,7 +124,7 @@ export default function CocineroDashboard({ initialComandas }: CocineroDashboard
           <h2 className="absolute top-2 left-2 z-10 lg:static font-bold text-lg uppercase tracking-wide">
             Pendientes ({pendientes.length})
           </h2>
-          <div className="flex flex-row lg:flex-col py-1 w-full gap-4 pt-10 lg:pt-1">
+          <div className="flex flex-row flex-wrap lg:flex-col py-1 w-full gap-4 pt-10 lg:pt-1 overflow-y-auto overflow-x-hidden lg:overflow-x-auto lg:overflow-y-hidden">
             {pendientes.map((comanda) => (
               <div key={comanda.numeroComanda} className={`flex flex-col sm:flex-row lg:flex-col border-y-4 ${colorByState[comanda.estadoComanda]} shadow-sm`}>
                 <CommandCard command={comanda} state={comanda.estadoComanda} lastUpdate={lastItemUpdate} />
@@ -147,7 +147,7 @@ export default function CocineroDashboard({ initialComandas }: CocineroDashboard
           <h2 className="absolute top-2 left-2 z-10 lg:static font-bold text-lg uppercase tracking-wide">
             En Preparación ({enPreparacion.length})
           </h2>
-          <div className="flex flex-row lg:flex-col py-1 w-full gap-4 pt-10 lg:pt-1">
+          <div className="flex flex-row flex-wrap lg:flex-col py-1 w-full gap-4 pt-10 lg:pt-1 overflow-y-auto overflow-x-hidden lg:overflow-x-auto lg:overflow-y-hidden">
             {enPreparacion.map((comanda) => (
               <div key={comanda.numeroComanda} className={`flex flex-col sm:flex-row lg:flex-col border-y-4 ${colorByState[comanda.estadoComanda]} shadow-sm`}>
                 <CommandCard command={comanda} state={comanda.estadoComanda} lastUpdate={lastItemUpdate} />
@@ -170,7 +170,7 @@ export default function CocineroDashboard({ initialComandas }: CocineroDashboard
           <h2 className="absolute top-2 left-2 z-10 lg:static font-bold text-lg uppercase tracking-wide">
             Listas ({listos.length})
           </h2>
-          <div className="flex flex-row lg:flex-col py-1 w-full gap-4 pt-10 lg:pt-1">
+          <div className="flex flex-row flex-wrap lg:flex-col py-1 w-full gap-4 pt-10 lg:pt-1 overflow-y-auto overflow-x-hidden lg:overflow-x-auto lg:overflow-y-hidden">
             {listos.map((comanda) => (
               <div key={comanda.numeroComanda} className={`flex flex-col sm:flex-row lg:flex-col border-y-4 ${colorByState[comanda.estadoComanda]} shadow-sm`}>
                 <CommandCard command={comanda} state={comanda.estadoComanda} lastUpdate={lastItemUpdate} />
