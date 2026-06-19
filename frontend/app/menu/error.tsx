@@ -5,7 +5,7 @@ export default function MenuError({ error, reset }: { error: Error; reset: () =>
   console.error(error); 
 
   return (
-    <div className="min-h-full mt-40 flex flex-col items-center justify-center text-center text-white px-6">
+    <div className="min-h-full mt-40 flex flex-col items-center justify-center text-center text-slate-700 px-6">
         <h1 className="text-4xl sm:text-5xl font-semibold tracking-tight mb-6">
             Algo salió mal.
         </h1>
@@ -22,8 +22,8 @@ export default function MenuError({ error, reset }: { error: Error; reset: () =>
         />
         <button
             onClick={() => reset()}
-            className="bg-gray-500 text-white px-6 py-3 rounded-full 
-            text-sm font-medium hover:bg-neutral-200/50 hover:text-white transition"
+            className="bg-slate-700 text-slate-400 px-6 py-3 rounded-full 
+            text-sm font-medium hover:bg-neutral-500 hover:text-slate-200 transition"
         >
             Reintentar
         </button>

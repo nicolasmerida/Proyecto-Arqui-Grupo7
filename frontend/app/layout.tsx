@@ -1,7 +1,7 @@
 // app/layout.tsx
-import "./ui/globals.css";
-import Navbar from "./ui/navbar";
-import Footer from "./ui/footer";
+import "@/app/ui/globals.css";
+import Navbar from "@/app/ui/navbar";
+import Footer from "@/app/ui/footer";
 import type { Metadata } from "next";
 import { SessionProvider } from "next-auth/react";
 import { auth } from "@/auth";

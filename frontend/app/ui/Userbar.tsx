@@ -6,9 +6,9 @@ export default async function Userbar() {
     const session = await auth();
 
     return (
-        <nav className="fixed top-10 left-0 w-full z-auto shadow-sm m-8">
+        <nav className="fixed top-10 left-0 w-full z-auto bg-blue-400 shadow-sm m-8">
             <div className="flex items-center justify-between px-6 py-3">
-                <div className="text-sm text-white font-medium">
+                <div className="text-sm text-slate-600 font-medium">
                     Hola, <span className="font-medium">{session?.user?.name}!</span>
                 </div>
                 <form
@@ -17,7 +17,7 @@ export default async function Userbar() {
                     await signOut({ redirectTo: '/' });
                     }}
                 >
-                    <button className="flex flex-row items-center gap-x-1 text-white hover:text-gray-300 transition duration-200 text-xs sm:text-sm">
+                    <button className="flex flex-row items-center gap-x-1 text-slate-600 hover:text-slate-700 transition duration-200 text-xs sm:text-sm">
                         <span className="hidden sm:inline">Cerrar sesión</span>
                         <HiOutlineLogout className="text-lg sm:text-base" />
                     </button>

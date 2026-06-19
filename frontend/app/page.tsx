@@ -9,10 +9,10 @@ export default function Home() {
           Bienvenido al
           <strong className="text-white m-4"> Sistema de Gestión de Restaurante 🧑‍🍳</strong>
         </h1>
-        <p className="text-lg sm:text-xl text-white/70 max-w-3xl mx-auto">
+        <p className="text-lg sm:text-xl text-slate-700 max-w-3xl mx-auto">
           El sistema de gestión pensado para agilizar las operaciones de las personas que asisten al establecimiento.
         </p> 
-        <p className="text-lg sm:text-xl text-white/70 max-w-3xl mx-auto"> 
+        <p className="text-lg sm:text-xl text-slate-700 max-w-3xl mx-auto"> 
           Explorá el menú con las distintas opciones que se brindan y disfruta de una linda experiencia culinaria.
         </p>
       </section>

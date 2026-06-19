@@ -51,7 +51,7 @@ export default function Menu({ searchParams, addItem }: MenuProps) {
 
   return (
     <main>  {/* Agregar margen superior segun Navbar */}
-      <h1 className="flex flex-1 items-center m-5">
+      <h1 className="flex flex-1 items-center text-slate-700 m-5">
         Bienvenido al menú de nuestro restaurante 🍽️
       </h1>
       <div className="px-5">

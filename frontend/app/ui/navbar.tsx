@@ -41,13 +41,13 @@ export default function Navbar() {
                 <Link href="/">Gestion_Restaurante</Link>
 
                 {/* Menú de navegación principal para desktop */}
-                <div className="hidden md:flex justify-center space-x-6">
+                <div className="hidden md:flex justify-center space-x-6 text-slate-700">
                     <Link href={inicioHref} className={`${navLinkClass} ${underlineClass}`}>Inicio</Link>
                     <Link href={menuHref} className={`${navLinkClass} ${underlineClass}`}>Menú</Link>
                 </div>
 
                 {/* Icono de login - Si hay una sesión iniciada ocultar */}
-                <div className="flex items-center justify-end space-x-2 md:space-x-4">
+                <div className="flex items-center justify-end space-x-2 md:space-x-4 text-slate-700">
                     {!isUserArea && (
                         <Link href="/login" className={`flex flex-row space-x-1 ${navLinkClass} ${underlineClass}`}>
                             <span>Iniciar sesión</span>
@@ -62,17 +62,17 @@ export default function Navbar() {
                     aria-label="Toggle Mobile Menu"
                     >
                     <span
-                        className={`absolute h-0.5 w-4 bg-white transition-all duration-300 ease-in-out
+                        className={`absolute h-0.5 w-4 bg-cyan-300 transition-all duration-300 ease-in-out
                                     ${isMobileMenuOpen ? 'rotate-45' : '-translate-y-1.5'}
                                     `}
                     />
                     <span
-                        className={`absolute h-0.5 w-4 bg-white transition-all duration-300 ease-in-out
+                        className={`absolute h-0.5 w-4 bg-cyan-300 transition-all duration-300 ease-in-out
                                     ${isMobileMenuOpen ? 'opacity-0' : 'opacity-100'}
                                     `}
                     />
                     <span
-                        className={`absolute h-0.5 w-4 bg-white transition-all duration-300 ease-in-out
+                        className={`absolute h-0.5 w-4 bg-cyan-300 transition-all duration-300 ease-in-out
                                     ${isMobileMenuOpen ? '-rotate-45' : 'translate-y-1.5'}
                                     `}
                     />
@@ -89,7 +89,7 @@ export default function Navbar() {
                 ${isMobileMenuOpen ? 'max-h-64 py-4 opacity-100' : 'max-h-0 py-0 opacity-0'}
             `}
             >
-                <div className="flex flex-col space-y-4 transition-opacity duration-300 delay-100">
+                <div className="flex flex-col space-y-4 text-slate-700 transition-opacity duration-300 delay-100">
                     <Link href="/" className={`${navLinkClass} ${underlineClass}`} onClick={toggleMobileMenu}>
                         Inicio
                     </Link>

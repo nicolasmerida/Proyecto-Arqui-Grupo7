@@ -32,23 +32,23 @@ export default function MenuList({ items, addItem }: MenuListProps) {
   return (
     <>
       <div className="grid grid-cols-5 items-center p-1 gap-1">
-        <button className={`border rounded-lg transition ${category === null ? "text-black bg-amber-200" : "text-slate-400"}`}
+        <button className={`border rounded-lg transition ${category === null ? "text-slate-400 bg-sky-400" : "text-blue-400"}`}
                 onClick={() => setCategory(null)}>
                   Todos
         </button>
-        <button className={`border rounded-lg transition ${category === Category.Entrada ? "text-black bg-amber-200" : "text-slate-400"}`}
+        <button className={`border rounded-lg transition ${category === Category.Entrada ? "text-slate-400 bg-sky-400" : "text-blue-400"}`}
                 onClick={() => setCategory(Category.Entrada)}>
                   Entradas
         </button>
-        <button className={`border rounded-lg transition ${category === Category.Principal ? "text-black bg-amber-200" : "text-slate-400"}`}
+        <button className={`border rounded-lg transition ${category === Category.Principal ? "text-slate-400 bg-sky-400" : "text-blue-400"}`}
                 onClick={() => setCategory(Category.Principal)}>
                   Principales
         </button>
-        <button className={`border rounded-lg transition ${category === Category.Postre ? "text-black bg-amber-200" : "text-slate-400"}`}
+        <button className={`border rounded-lg transition ${category === Category.Postre ? "text-slate-400 bg-sky-400" : "text-blue-400"}`}
                 onClick={() => setCategory(Category.Postre)}>
                   Postres
         </button>
-        <button className={`border rounded-lg transition ${category === Category.Bebida ? "text-black bg-amber-200" : "text-slate-400"}`}
+        <button className={`border rounded-lg transition ${category === Category.Bebida ? "text-slate-400 bg-sky-400" : "text-blue-400"}`}
                 onClick={() => setCategory(Category.Bebida)}>
                   Bebidas
         </button>
@@ -63,7 +63,7 @@ export default function MenuList({ items, addItem }: MenuListProps) {
             />
           ))
         ) : (
-          <p className="col-span-full text-center italic text-slate-500">
+          <p className="col-span-full text-center italic text-slate-700">
             No hay platos disponibles.
           </p>
         )}
