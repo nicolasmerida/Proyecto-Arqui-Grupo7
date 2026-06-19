@@ -14,7 +14,7 @@ export default auth((req) => {
         return NextResponse.redirect(new URL("/login", req.url));
     }
 
-    const role = session.user.role;
+    const role = session.user.role?.toUpperCase();
     const pathname = req.nextUrl.pathname;
 
     // Redirección inicial post-login desde la ruta base "/user"
