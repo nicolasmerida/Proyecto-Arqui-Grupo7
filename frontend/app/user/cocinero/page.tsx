@@ -10,7 +10,7 @@ export default async function Cocinero() {
 
   return (
     <div className="flex flex-col flex-1 items-center justify-center">
-      <div className="w-full">
+      <div className="w-full bg-slate-700/75 rounded-2xl m-4 p-4">
         <CocineroDashboard initialComandas={initialComandas} />
       </div>
     </div>

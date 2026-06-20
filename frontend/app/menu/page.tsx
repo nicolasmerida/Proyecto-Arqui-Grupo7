@@ -53,7 +53,7 @@ export default function Menu({ searchParams, addItem }: MenuProps) {
 
   return (
     <main className={`flex-1 flex flex-col items-center px-4 w-full min-h-screen bg-[url('/bg_salon.jpeg')] bg-cover bg-center bg-fixed ${isPublicMenu ? 'pt-24 pb-12' : 'pt-6 pb-6'}`}>
-      <div className={`w-full max-w-7xl bg-slate-800/80 backdrop-blur-sm shadow-2xl p-6 sm:p-10 border border-slate-600 ${isPublicMenu ? 'rounded-4xl' : 'rounded-xl'}`}>
+      <div className={`w-full max-w-7xl bg-slate-700/75 backdrop-blur-sm shadow-2xl p-6 sm:p-10 border border-slate-600 ${isPublicMenu ? 'rounded-4xl' : 'rounded-xl'}`}>
 
         {isPublicMenu && (
           <h1 className="text-3xl sm:text-4xl font-black text-amber-400 text-center mb-8 tracking-tight drop-shadow-md">

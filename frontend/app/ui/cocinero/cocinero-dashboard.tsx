@@ -120,7 +120,7 @@ export default function CocineroDashboard({ initialComandas }: CocineroDashboard
       <div className="flex flex-col lg:flex-row w-full h-[calc(100vh-120px)] p-4 lg:p-6 gap-6 overflow-x-auto">
 
         {/* Pendientes */}
-        <div className="w-full lg:flex-1 min-w-[300px] flex flex-col bg-slate-100/90 backdrop-blur-sm rounded-xl border border-slate-300 shadow-md overflow-hidden">
+        <div className="w-full lg:flex-1 min-w-75 flex flex-col bg-slate-100/90 backdrop-blur-sm rounded-xl border border-slate-300 shadow-md overflow-hidden">
           <div className="p-4 bg-white/50 border-b border-slate-200">
             <h2 className="font-bold text-lg uppercase tracking-wide text-slate-800">
               Pendientes ({pendientes.length})
@@ -145,7 +145,7 @@ export default function CocineroDashboard({ initialComandas }: CocineroDashboard
         </div>
 
         {/* En Preparación */}
-        <div className="w-full lg:flex-1 min-w-[300px] flex flex-col bg-slate-100/90 backdrop-blur-sm rounded-xl border border-slate-300 shadow-md overflow-hidden">
+        <div className="w-full lg:flex-1 min-w-75 flex flex-col bg-slate-100/90 backdrop-blur-sm rounded-xl border border-slate-300 shadow-md overflow-hidden">
           <div className="p-4 bg-white/50 border-b border-slate-200">
             <h2 className="font-bold text-lg uppercase tracking-wide text-slate-800">
               En Preparación ({enPreparacion.length})
@@ -170,7 +170,7 @@ export default function CocineroDashboard({ initialComandas }: CocineroDashboard
         </div>
 
         {/* Listas */}
-        <div className="w-full lg:flex-1 min-w-[300px] flex flex-col bg-slate-100/90 backdrop-blur-sm rounded-xl border border-slate-300 shadow-md overflow-hidden">
+        <div className="w-full lg:flex-1 min-w-75 flex flex-col bg-slate-100/90 backdrop-blur-sm rounded-xl border border-slate-300 shadow-md overflow-hidden">
           <div className="p-4 bg-white/50 border-b border-slate-200">
             <h2 className="font-bold text-lg uppercase tracking-wide text-slate-800">
               Listas ({listos.length})
