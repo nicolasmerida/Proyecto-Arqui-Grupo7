@@ -2,7 +2,7 @@
 
 :root {
   --background: #ffffff;
-  --foreground: #78350F;
+  --foreground: #e17100;
 }
 
 @theme inline {
@@ -27,26 +27,26 @@ body {
 
 @layer components {
   .comanda-abierta {
-    @apply border-solid rounded-md border-gray-300
+    @apply border-2 border-solid rounded-md border-gray-300
   }
 
   .comanda-preparacion {
-    @apply border-solid rounded-md border-amber-200
+    @apply border-2 border-solid rounded-md border-amber-200
   }
 
   .comanda-lista {
-    @apply border-solid rounded-md border-green-500
+    @apply border-2 border-solid rounded-md border-green-500
   }
 
   .comanda-entregada {
-    @apply border-solid rounded-md border-yellow-300
+    @apply border-2 border-solid rounded-md border-yellow-300
   }
 
   .comanda-cerrada {
-    @apply border-solid rounded-md border-black
+    @apply border-2 border-solid rounded-md border-black
   }
 
   .comanda-cancelada {
-    @apply border-solid rounded-md border-red-500
+    @apply border-2 border-solid rounded-md border-red-500
   }
 }

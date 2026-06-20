@@ -77,7 +77,7 @@ export default function MenuList({ items, addItem }: MenuListProps) {
             />
           ))
         ) : (
-          <p className="col-span-full text-center italic text-slate-500 text-lg font-medium bg-slate-700/75 py-8 rounded-xl border border-slate-600/50">
+          <p className="col-span-full text-center italic text-slate-500 text-lg font-medium bg-slate-500/75 py-8 rounded-xl border border-slate-600/50">
             No hay platos disponibles en esta categoría.
           </p>
         )}

@@ -209,8 +209,8 @@ export default function AddCourseForm({ course }: AddCourseFormProps) {
     <>
       <div className="flex items-center justify-start gap-4">
         <button type="button" onClick={() => router.back()}
-          className="items-center gap-2 rounded-xl px-4 py-2 bg-amber-200 border border-orange-400 text-amber-400 transition hover:text-amber-600 hover:bg-amber-300">
-          <HiOutlineArrowSmLeft className='text-lg text-amber-400' />
+          className="items-center gap-2 rounded-xl px-4 py-2 bg-amber-200 border border-orange-400 text-white transition hover:text-amber-600 hover:bg-amber-300">
+          <HiOutlineArrowSmLeft className='text-lg text-white' />
           <span>Volver</span>
         </button>
         <span className="text-2xl font-serif italic text-amber-400">

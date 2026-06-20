@@ -29,7 +29,7 @@ export function LoginForm() {
     <div className="min-h-screen flex items-center justify-center px-4">
       <form
         action={formAction}
-        className="bg-slate-700/75 backdrop-blur-md p-8 rounded-2xl shadow-xl w-full max-w-md text-white"
+        className="bg-slate-500/75 backdrop-blur-md p-8 rounded-2xl shadow-xl w-full max-w-md text-white"
       >
         <h1 className="text-3xl font-bold mb-6 text-center">Iniciar sesión</h1>
 

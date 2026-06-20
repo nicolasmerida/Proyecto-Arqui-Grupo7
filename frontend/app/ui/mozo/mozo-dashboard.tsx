@@ -248,7 +248,7 @@ export default function MozoDashboard({ initialComandas }: MozoDashboardProps) {
   };
 
   return (
-    <div className="flex flex-row flex-1 items-start p-4 gap-6">
+    <div className="flex flex-row flex-1 items-start justify-around p-4 gap-6">
       {!connected && (
         <div className="fixed bottom-4 right-4 bg-red-500 text-white px-3 py-1 rounded-full text-xs shadow-lg animate-pulse">
           Desconectado del servidor...
