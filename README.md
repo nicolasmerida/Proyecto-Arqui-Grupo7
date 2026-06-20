@@ -11,7 +11,7 @@ Se trata de una aplicación web para un Sistema de Gestión de Restaurante
 - **Frontend:** NextJS (App Router), React, Tailwind CSS
 - **Base de datos:** PostgreSQL
 - **ORM:** Neon Supabase
-- **API externas:** API Mercado Pago, API Dolar, API Google Sheets
+- **API externas:** API Mercado Pago, API Google Sheets
 
 ---
 
@@ -28,6 +28,11 @@ Se trata de una aplicación web para un Sistema de Gestión de Restaurante
 
 - **Tester:**
     - Mérida, Nicolas
+
+---
+
+## Ayudante a cargo
+    - Giacomodonato, Giulia
 
 ---
 
