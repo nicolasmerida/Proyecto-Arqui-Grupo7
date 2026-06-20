@@ -90,9 +90,6 @@ export function LoginForm() {
         >
           {isPending ? 'Ingresando...' : 'Ingresar'}
         </button>
-        <Link href="/user" className={`text-lg text-amber-200 bg-yellow-500 ${navLinkClass} ${underlineClass}`}>
-          Crear cuenta
-        </Link>
 
         <div className="flex h-8 items-end space-x-1" aria-live="polite" aria-atomic="true">
           {(errorMessage) && (

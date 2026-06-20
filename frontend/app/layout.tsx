@@ -1,7 +1,6 @@
 import "@/app/ui/globals.css";
 import Navbar from "@/app/ui/navbar";
 import Footer from "@/app/ui/footer";
-import Userbar from "@/app/ui/Userbar";
 import type { Metadata } from "next";
 import { SessionProvider } from "next-auth/react";
 import { auth } from "@/auth";
@@ -24,7 +23,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
         
         <body className="flex flex-col min-h-screen">
           <SessionProvider session={session}>
-            <Navbar />
+            <Navbar session={session} />
 
             <main className="flex-auto bg-[url('/bg_home.jpeg')] bg-cover bg-center bg-fixed">
               {children}

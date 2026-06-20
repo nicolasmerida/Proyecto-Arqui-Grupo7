@@ -4,7 +4,6 @@ import Link from "next/link"
 import { useState } from "react";
 import { HiOutlineLogin } from "react-icons/hi";
 import { usePathname } from 'next/navigation';
-import { Session } from "next-auth";
 
 const navLinkClass =
     "relative text-amber-100 text-lg transition-transform duration-300 hover:scale-105";
@@ -15,7 +14,7 @@ const underlineClass = `
   hover:after:w-full after:transition-all after:duration-300
 `;
 
-export default function Navbar({ session }: { session?: Session | null }) {
+export default function Navbar({ session }: { session: any }) {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const pathname = usePathname();
     const isUserArea = pathname?.startsWith('/user') || false;
