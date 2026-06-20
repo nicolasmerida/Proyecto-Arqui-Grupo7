@@ -1,4 +1,5 @@
 export default function PagoPendiente() {
+    
     return (
         <main style={{ textAlign: "center", padding: "60px" }}>
             <h1 style={{ color: "orange", fontSize: "2rem" }}>⏳ Pago pendiente</h1>

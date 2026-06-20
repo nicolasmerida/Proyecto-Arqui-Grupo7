@@ -56,7 +56,7 @@ export default function StatsBar() {
         return (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 {[...Array(4)].map((_, i) => (
-                    <div key={i} className="flex flex-col bg-white/50 border border-slate-200/60 rounded-2xl p-5 shadow-sm h-[130px] justify-center gap-4 animate-pulse">
+                    <div key={i} className="flex flex-col bg-white/50 border border-slate-200/60 rounded-2xl p-5 shadow-sm h-32 justify-center gap-4 animate-pulse">
                         <div className="flex items-center gap-3">
                             <div className="w-12 h-12 rounded-xl bg-slate-200/80"></div>
                             <div className="h-4 bg-slate-200/80 rounded-full w-24"></div>

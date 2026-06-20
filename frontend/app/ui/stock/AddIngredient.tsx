@@ -63,11 +63,11 @@ export default function AddIngredient({ show, onClose, onIngredientCreate } : Ad
     };
 
     return (
-        <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in duration-200">
+        <div className="fixed inset-0 bg-slate-700/75 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in duration-200">
             <div className="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden transform transition-all animate-in zoom-in-95 duration-200">
                 <div className="px-6 py-5 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
                     <div>
-                        <h3 className="text-xl font-bold font-serif italic text-slate-800">
+                        <h3 className="text-xl font-bold font-serif italic text-amber-600">
                             Nuevo Ingrediente
                         </h3>
                         <p className="text-sm text-slate-500 mt-1">Registra un nuevo elemento en el inventario</p>
@@ -85,7 +85,7 @@ export default function AddIngredient({ show, onClose, onIngredientCreate } : Ad
                         <input
                             value={nombre}
                             onChange={(event) => setNombre(event.target.value)}
-                            className="w-full px-4 py-2.5 rounded-xl bg-slate-50 text-slate-900 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all placeholder:text-slate-400"
+                            className="w-full px-4 py-2.5 rounded-xl bg-slate-50 text-slate-900 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500 transition-all placeholder:text-slate-400"
                             placeholder="Ej: Harina"
                             required
                         />
@@ -101,7 +101,7 @@ export default function AddIngredient({ show, onClose, onIngredientCreate } : Ad
                                 min={0}
                                 value={stock === 0 ? '' : stock}
                                 onChange={(event) => setStock(Number(event.target.value))}
-                                className="w-full px-4 py-2.5 rounded-xl bg-slate-50 text-slate-900 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all placeholder:text-slate-400"
+                                className="w-full px-4 py-2.5 rounded-xl bg-slate-50 text-slate-900 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500 transition-all placeholder:text-slate-400"
                                 placeholder="0"
                                 required
                             />
@@ -115,7 +115,7 @@ export default function AddIngredient({ show, onClose, onIngredientCreate } : Ad
                                 min={0}
                                 value={stockMinimo === 0 ? '' : stockMinimo}
                                 onChange={(event) => setStockMinimo(Number(event.target.value))}
-                                className="w-full px-4 py-2.5 rounded-xl bg-slate-50 text-slate-900 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all placeholder:text-slate-400"
+                                className="w-full px-4 py-2.5 rounded-xl bg-slate-50 text-slate-900 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500 transition-all placeholder:text-slate-400"
                                 placeholder="0"
                                 required
                             />
@@ -129,7 +129,7 @@ export default function AddIngredient({ show, onClose, onIngredientCreate } : Ad
                         <select
                             value={unidad}
                             onChange={(event) => setUnidad(event.target.value)}
-                            className="w-full px-4 py-2.5 rounded-xl bg-slate-50 text-slate-900 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all cursor-pointer"
+                            className="w-full px-4 py-2.5 rounded-xl bg-slate-50 text-slate-900 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500 transition-all cursor-pointer"
                             required
                         >
                             {UNIDADES_OPTIONS.map((option) => (
@@ -151,7 +151,7 @@ export default function AddIngredient({ show, onClose, onIngredientCreate } : Ad
                     <button className="px-5 py-2.5 text-sm font-bold rounded-xl text-slate-600 hover:bg-slate-200 transition-colors" onClick={onClose} disabled={loading}>
                         Cancelar
                     </button>
-                    <button className={`px-6 py-2.5 text-sm font-bold rounded-xl text-white shadow-md transition-all ${loading || !nombre ? 'bg-blue-400 cursor-not-allowed opacity-70' : 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 hover:shadow-lg hover:-translate-y-0.5'}`} onClick={handleAdd} disabled={loading || !nombre}>
+                    <button className={`px-6 py-2.5 text-sm font-bold rounded-xl text-white shadow-md transition-all ${loading || !nombre ? 'bg-amber-400 cursor-not-allowed opacity-70' : 'bg-linear-to-r bg-transparent text-slate-700 hover:bg-amber-200 hover:shadow-lg hover:-translate-y-0.5'}`} onClick={handleAdd} disabled={loading || !nombre}>
                         {loading ? "Creando..." : "Crear Ingrediente"}
                     </button>
                 </div>

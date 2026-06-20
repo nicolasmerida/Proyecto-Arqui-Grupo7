@@ -101,10 +101,10 @@ export default function AddStock({ show, onClose, onStockUpdate, ingredient} : A
                                 <span className="text-sm text-slate-500 font-medium">Actual</span>
                                 <span className="text-xl font-bold text-slate-700">{ingredient.stock}</span>
                             </div>
-                            <HiOutlineArrowRight className="text-blue-400 mx-2" size={24} />
+                            <HiOutlineArrowRight className="text-amber-400 mx-2" size={24} />
                             <div className="flex flex-col items-center">
-                                <span className="text-sm text-blue-600 font-bold">Resultante</span>
-                                <span className="text-2xl font-bold text-blue-700">{ingredient.stock + (newStock || 0)}</span>
+                                <span className="text-sm text-amber-600 font-bold">Resultante</span>
+                                <span className="text-2xl font-bold text-amber-700">{ingredient.stock + (newStock || 0)}</span>
                             </div>
                         </div>
                     </div>
@@ -114,7 +114,8 @@ export default function AddStock({ show, onClose, onStockUpdate, ingredient} : A
                     <button className="px-5 py-2.5 text-sm font-bold rounded-xl text-slate-600 hover:bg-slate-200 transition-colors" onClick={onClose} disabled={loading}>
                         Cancelar
                     </button>
-                    <button className={`px-6 py-2.5 text-sm font-bold rounded-xl text-white shadow-md transition-all ${loading || !newStock || newStock <= 0 ? 'bg-blue-400 cursor-not-allowed opacity-70' : 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 hover:shadow-lg hover:-translate-y-0.5'}`} onClick={handleAdd} disabled={loading || !newStock || newStock <= 0}>
+                    <button className={`px-6 py-2.5 text-sm font-bold rounded-xl text-white shadow-md transition-all ${loading || !newStock || newStock <= 0 ? 'bg-amber-400 cursor-not-allowed opacity-70' : 'bg-linear-to-r from-amber-300 to-yellow-600 hover:from-amber-400 hover:to-yellow-600 hover:shadow-lg hover:-translate-y-0.5'}`}
+                            onClick={handleAdd} disabled={loading || !newStock || newStock <= 0}>
                         {loading ? "Confirmando..." : "Confirmar Ingreso"}
                     </button>
                 </div>

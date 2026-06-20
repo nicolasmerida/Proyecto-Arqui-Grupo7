@@ -14,7 +14,7 @@ export default function StaffCard({ staff }: StaffCardProps) {
         <div className="flex flex-col bg-white border border-slate-200 rounded-2xl p-5 shadow-sm hover:shadow-md transition-all">
             <div className="flex font-semibold text-sm text-slate-500 justify-between items-center mb-4">
                 <span className="uppercase tracking-wider">Mozos Activos</span>
-                <div className="p-2 bg-indigo-50 text-indigo-600 rounded-lg">
+                <div className="p-2 bg-orange-50 text-orange-400 rounded-lg">
                     <HiOutlineUserGroup size={20} />
                 </div>
             </div>

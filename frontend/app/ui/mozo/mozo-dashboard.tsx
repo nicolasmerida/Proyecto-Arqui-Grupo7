@@ -282,7 +282,7 @@ export default function MozoDashboard({ initialComandas }: MozoDashboardProps) {
       <div className="flex-col p-1 w-full max-w-md">
         <div className="flex flex-row justify-between content-center bg-gray-100 p-3 rounded-t-lg border-b border-gray-200">
           <h2 className="text-lg font-semibold text-gray-800">Comandas Activas</h2>
-          <div className="flex items-center justify-center bg-blue-600 text-white text-sm font-bold rounded-full w-8 h-8 shadow-sm">
+          <div className="flex items-center justify-center bg-amber-500 text-white text-sm font-bold rounded-full w-8 h-8 shadow-sm">
             {comandas.length}
           </div>
         </div>
@@ -379,7 +379,7 @@ export default function MozoDashboard({ initialComandas }: MozoDashboardProps) {
                     }
                   }}
                   disabled={cerrando}
-                  className="w-full bg-blue-500 hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-semibold py-2 rounded-lg flex items-center justify-center gap-2 transition"
+                  className="w-full bg-amber-300 hover:bg-amber-500 disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-semibold py-2 rounded-lg flex items-center justify-center gap-2 transition"
                 >
                   {cerrando ? "Entregando..." : "Marcar como entregada"}
                 </button>
@@ -390,7 +390,7 @@ export default function MozoDashboard({ initialComandas }: MozoDashboardProps) {
                   <button
                     onClick={handlePagarYCerrar}
                     disabled={cerrando}
-                    className="w-full bg-blue-500 hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-semibold py-2 rounded-lg flex items-center justify-center gap-2 transition"
+                    className="w-full bg-amber-300 hover:bg-amber-500 disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-semibold py-2 rounded-lg flex items-center justify-center gap-2 transition"
                   >
                     <HiOutlineCash size={18} />
                     {cerrando ? "Procesando pago..." : "Cobrar (Mercado Pago)"}

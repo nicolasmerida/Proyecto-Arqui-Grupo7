@@ -15,7 +15,7 @@ export default function SalesCard({ sales }: SalesCardProps) {
         <div className="flex flex-col bg-white border border-slate-200 rounded-2xl p-5 shadow-sm hover:shadow-md transition-all">
             <div className="flex font-semibold text-sm text-slate-500 justify-between items-center mb-4">
                 <span className="uppercase tracking-wider">Ventas</span>
-                <div className="p-2 bg-blue-50 text-blue-600 rounded-lg">
+                <div className="p-2 bg-blue-50 text-amber-500 rounded-lg">
                     <HiOutlineTrendingUp size={20} />
                 </div>
             </div>
@@ -24,7 +24,7 @@ export default function SalesCard({ sales }: SalesCardProps) {
                     ${sales.toLocaleString('es-AR')}
                 </span>
             </div>
-            {/* Si quisieras mostrar ganancias:
+            {/* Para mostrar ganancias:
             <div className="mt-3">
                 <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${colorTotal}`}>
                     {total > 0 ? '+' : ''}{total}% desde el mes pasado

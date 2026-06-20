@@ -42,25 +42,25 @@ export default function MenuList({ items, addItem }: MenuListProps) {
 
   return (
     <>
-      <div className="flex flex-col sm:flex-row justify-center items-center bg-white/80 backdrop-blur-sm p-3 sm:p-4 rounded-2xl border border-blue-200 shadow-sm gap-2 sm:gap-4 mb-8">
-        <div className="flex flex-wrap items-center justify-center gap-2">
-          <button className={`px-5 py-2.5 rounded-xl text-sm font-bold transition-all ${category === null ? 'bg-sky-500 text-white shadow-md' : 'bg-transparent text-slate-700 hover:bg-sky-100'}`}
+      <div className="flex flex-col sm:flex-row justify-center items-center bg-white backdrop-blur-sm p-3 sm:p-4 rounded-2xl border border-amber-200 shadow-sm gap-2 sm:gap-4 mb-8">
+        <div className="flex flex-wrap items-center justify-center bg-slate-200 gap-2">
+          <button className={`px-5 py-2.5 rounded-xl text-sm font-bold transition-all ${category === null ? 'text-white border border-orange-400 bg-amber-400 rounded-md' : 'bg-transparent text-slate-700 hover:bg-amber-200'}`}
                   onClick={() => setCategory(null)}>
                     Todos
           </button>
-          <button className={`px-5 py-2.5 rounded-xl text-sm font-bold transition-all ${category === Category.Entrada ? 'bg-sky-500 text-white shadow-md' : 'bg-transparent text-slate-700 hover:bg-sky-100'}`}
+          <button className={`px-5 py-2.5 rounded-xl text-sm font-bold transition-all ${category === Category.Entrada ? 'text-white border border-orange-400 bg-amber-400 rounded-md' : 'bg-transparent text-slate-700 hover:bg-amber-200'}`}
                   onClick={() => setCategory(Category.Entrada)}>
                     Entradas
           </button>
-          <button className={`px-5 py-2.5 rounded-xl text-sm font-bold transition-all ${category === Category.Principal ? 'bg-sky-500 text-white shadow-md' : 'bg-transparent text-slate-700 hover:bg-sky-100'}`}
+          <button className={`px-5 py-2.5 rounded-xl text-sm font-bold transition-all ${category === Category.Principal ? 'text-white border border-orange-400 bg-amber-400 rounded-md' : 'bg-transparent text-slate-700 hover:bg-amber-200'}`}
                   onClick={() => setCategory(Category.Principal)}>
                     Principales
           </button>
-          <button className={`px-5 py-2.5 rounded-xl text-sm font-bold transition-all ${category === Category.Postre ? 'bg-sky-500 text-white shadow-md' : 'bg-transparent text-slate-700 hover:bg-sky-100'}`}
+          <button className={`px-5 py-2.5 rounded-xl text-sm font-bold transition-all ${category === Category.Postre ? 'text-white border border-orange-400 bg-amber-400 rounded-md' : 'bg-transparent text-slate-700 hover:bg-amber-200'}`}
                   onClick={() => setCategory(Category.Postre)}>
                     Postres
           </button>
-          <button className={`px-5 py-2.5 rounded-xl text-sm font-bold transition-all ${category === Category.Bebida ? 'bg-sky-500 text-white shadow-md' : 'bg-transparent text-slate-700 hover:bg-sky-100'}`}
+          <button className={`px-5 py-2.5 rounded-xl text-sm font-bold transition-all ${category === Category.Bebida ? 'text-white border border-orange-400 bg-amber-400 rounded-md' : 'bg-transparent text-slate-700 hover:bg-amber-200'}`}
                   onClick={() => setCategory(Category.Bebida)}>
                     Bebidas
           </button>
@@ -77,7 +77,7 @@ export default function MenuList({ items, addItem }: MenuListProps) {
             />
           ))
         ) : (
-          <p className="col-span-full text-center italic text-slate-200 text-lg font-medium bg-slate-800/50 py-8 rounded-xl border border-slate-600/50">
+          <p className="col-span-full text-center italic text-slate-500 text-lg font-medium bg-slate-700/75 py-8 rounded-xl border border-slate-600/50">
             No hay platos disponibles en esta categoría.
           </p>
         )}

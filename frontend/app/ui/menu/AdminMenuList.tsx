@@ -58,7 +58,7 @@ export default function AdminMenuList({ items }: AdminMenuListProps) {
 
         <button
           onClick={openNewCourse}
-          className="w-full sm:w-auto flex items-center justify-center gap-2 rounded-xl bg-cyan-600 px-6 py-3 text-sm font-bold text-white transition-all hover:bg-sky-500 shadow-md hover:shadow-lg hover:-translate-y-0.5"
+          className="w-full sm:w-auto flex items-center justify-center gap-2 rounded-xl bg-amber-300 px-6 py-3 text-sm font-bold text-white transition-all hover:bg-amber-500 shadow-md hover:shadow-lg hover:-translate-y-0.5"
         >
           <HiOutlinePlus size={20} />
           Nuevo Plato
@@ -66,8 +66,8 @@ export default function AdminMenuList({ items }: AdminMenuListProps) {
       </div>
 
       {filteredCourses.length === 0 ? (
-         <div className="flex flex-col items-center justify-center py-20 bg-white/50 backdrop-blur-sm border-2 border-dashed border-sky-300 rounded-3xl">
-           <HiOutlineViewGrid size={48} className="text-sky-300 mb-4" />
+         <div className="flex flex-col items-center justify-center py-20 bg-white/50 backdrop-blur-sm border-2 border-dashed border-amber-300 rounded-3xl">
+           <HiOutlineViewGrid size={48} className="text-amber-400 mb-4" />
            <p className="text-xl font-bold text-slate-700">No hay platos en esta categoría.</p>
            <p className="text-slate-500 mt-2">Prueba seleccionar otra categoría o crear uno nuevo.</p>
          </div>

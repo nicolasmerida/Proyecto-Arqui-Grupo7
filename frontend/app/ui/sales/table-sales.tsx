@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 
 export default function TableSales() {
+    //Ajustar tipo de ventas segun backend
     const [sales, setSales] = useState<Venta[]>([]);
 
     //Consultar movimientos de stock al backend
@@ -10,6 +11,7 @@ export default function TableSales() {
             try {
                 const baseUrl = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8080";
                 const response = await fetch(`${baseUrl}/api/ventas`)
+                //Ajustar endpoint de ventas
                 if (!response.ok) {
                     let errorMessage = `Error ${response.status} inesperado al consultar ventas`;
                     let errorCode = `ERROR_DESCONOCIDO`;

@@ -1,4 +1,5 @@
 export default function PagoFallido() {
+    
     return (
         <main style={{ textAlign: "center", padding: "60px" }}>
             <h1 style={{ color: "red", fontSize: "2rem" }}>❌ Pago fallido</h1>

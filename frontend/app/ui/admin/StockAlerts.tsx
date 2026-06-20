@@ -48,7 +48,7 @@ export default function StockAlerts({ initialAlerts }: StockAlertsProps) {
                 <span className="text-slate-500 text-sm font-medium">Ingredientes por debajo del mínimo</span>
             </div>
             
-            <div className="flex-grow overflow-y-auto pr-2 space-y-3">
+            <div className="flex grow overflow-y-auto pr-2 space-y-3">
                 {alerts.length > 0 ? (
                     alerts.map((alert) => (
                         <div key={alert.idIngrediente} className="flex flex-col border border-rose-100 bg-rose-50/50 rounded-xl p-3 hover:bg-rose-50 transition-colors">

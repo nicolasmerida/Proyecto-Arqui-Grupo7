@@ -165,7 +165,7 @@ export default function AddStaff({ show, onClose, onAddStaff } : AddStaffProps) 
                     <button className="px-5 py-2.5 text-sm font-bold rounded-xl text-slate-600 hover:bg-slate-200 transition-colors" onClick={onClose} disabled={loading}>
                         Cancelar
                     </button>
-                    <button className={`px-6 py-2.5 text-sm font-bold rounded-xl text-white shadow-md transition-all ${loading || !name || !email || !password || !rol ? 'bg-blue-400 cursor-not-allowed opacity-70' : 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 hover:shadow-lg hover:-translate-y-0.5'}`} onClick={handleAdd} disabled={loading || !name || !email || !password || !rol}>
+                    <button className={`px-6 py-2.5 text-sm font-bold rounded-xl text-white shadow-md transition-all ${loading || !name || !email || !password || !rol ? 'bg-amber-400 cursor-not-allowed opacity-70' : 'bg-linear-to-r from-amber-300 to-yellow-600 hover:from-amber-400 hover:to-yellow-600 hover:shadow-lg hover:-translate-y-0.5'}`} onClick={handleAdd} disabled={loading || !name || !email || !password || !rol}>
                         {loading ? "Creando..." : "Crear Usuario"}
                     </button>
                 </div>

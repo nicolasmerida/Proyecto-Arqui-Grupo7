@@ -55,7 +55,7 @@ export default function TopSales() {
                 <span className="text-slate-900 text-xl font-bold font-serif italic">Platos Más Vendidos</span>
                 <span className="text-slate-500 text-sm font-medium">Top 5 preferidos por los clientes</span>
             </div>
-            <div className="space-y-5 flex-grow">
+            <div className="flex space-y-5 grow">
                 {sales.length > 0 ? sales.map((item, index) => {
                     const porcentaje = (item.cantidad / max) * 100;
                     const isTop = index === 0;
@@ -67,7 +67,7 @@ export default function TopSales() {
                                     <span className={`flex items-center justify-center w-6 h-6 rounded-full text-xs font-bold ${isTop ? 'bg-amber-100 text-amber-700' : 'bg-slate-100 text-slate-500'}`}>
                                         {index + 1}
                                     </span>
-                                    <span className={`font-semibold ${isTop ? 'text-slate-900' : 'text-slate-700'} group-hover:text-blue-600 transition-colors`}>
+                                    <span className={`font-semibold ${isTop ? 'text-slate-900' : 'text-slate-700'} group-hover:text-amber-500 transition-colors`}>
                                         {item.plato.nombre}
                                     </span>
                                 </div>
@@ -75,7 +75,7 @@ export default function TopSales() {
                             </div>
                             {/* Barra */}
                             <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
-                                <div className={`h-full rounded-full transition-all duration-1000 ease-out ${isTop ? 'bg-gradient-to-r from-amber-400 to-amber-500' : 'bg-gradient-to-r from-blue-400 to-indigo-500'}`}
+                                <div className={`h-full rounded-full transition-all duration-1000 ease-out ${isTop ? 'bg-linear-to-r from-amber-400 to-amber-500' : 'bg-linear-to-r from-amber-400 to-amber-500'}`}
                                     style={{ width: `${porcentaje}%` }}
                                 ></div>
                             </div>

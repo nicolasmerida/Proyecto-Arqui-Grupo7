@@ -37,7 +37,7 @@ export default function CourseCard({ course, onSelect, isAdmin = false, isIntera
           : ''
       }`}
     >
-      <div className={`absolute inset-0 bg-gradient-to-br from-slate-100/50 to-transparent opacity-0 transition-opacity pointer-events-none ${isInteractive ? 'group-hover:opacity-100' : ''}`} />
+      <div className={`absolute inset-0 bg-linear-to-br from-slate-100/50 to-transparent opacity-0 transition-opacity pointer-events-none ${isInteractive ? 'group-hover:opacity-100' : ''}`} />
       
       <div className="flex justify-between items-start mb-4 z-10">
         <span className={`px-3 py-1 text-xs font-bold rounded-full border ${categoryColor} uppercase tracking-wider`}>
@@ -51,7 +51,7 @@ export default function CourseCard({ course, onSelect, isAdmin = false, isIntera
       </div>
       
       <h3 className={`text-xl font-bold text-slate-900 mb-2 leading-tight z-10 transition-colors ${isInteractive ? 'group-hover:text-amber-700' : ''}`}>{course.nombre}</h3>
-      <p className="text-sm text-slate-600 font-medium flex-grow mb-4 line-clamp-3 z-10">{course.descripcion}</p>
+      <p className="text-sm text-slate-600 font-medium grow mb-4 line-clamp-3 z-10">{course.descripcion}</p>
       
       <div className="flex justify-between items-center pt-4 border-t border-slate-200 z-10">
         <span className="text-2xl font-black text-slate-900 tracking-tight">${course.precio.toFixed(2)}</span>

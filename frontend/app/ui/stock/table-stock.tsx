@@ -201,7 +201,7 @@ export default function TableStock() {
                         ) : (
                             <tr>
                                 <td colSpan={5} className="px-6 py-12 text-center">
-                                    <div className="flex flex-col items-center justify-center text-slate-400">
+                                    <div className="flex flex-col items-center justify-center text-slate-500">
                                         <HiOutlineCube size={48} className="mb-3 opacity-20" />
                                         <span className="text-slate-500 font-medium">No hay ingredientes para mostrar</span>
                                     </div>

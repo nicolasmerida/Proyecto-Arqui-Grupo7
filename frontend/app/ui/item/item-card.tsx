@@ -33,7 +33,7 @@ export default function ItemCard({ item, onIncrement, onDecrement, onDelete, onE
             <div className="flex flex-col items-end gap-1">
                 <span className="text-lg font-bold text-black">${precioTotal}</span>
                 <div className="flex gap-2">
-                    <button onClick={onEdit} className="text-blue-500 hover:text-blue-700">
+                    <button onClick={onEdit} className="text-amber-500 hover:text-amber-700">
                         <HiOutlinePencil />
                     </button>
                     <button onClick={onDelete} className="text-red-500 hover:text-red-700">
