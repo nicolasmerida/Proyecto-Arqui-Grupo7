@@ -8,11 +8,11 @@ export default function FunctionsPanel() {
     const pathName = usePathname();
 
     return (
-        <aside className="fixed top-16 left-0 h-screen overflow-y-auto w-36 border-r">  {/* Agregar margen superior segun Userbar y definir ancho de pnael */}
-            <nav className="flex flex-col bg-amber-400 gap-4 rounded-lg mt-10 p-2" aria-label="Funciones del administrador">
+        <aside className="fixed top-20 left-0 h-screen overflow-y-auto w-36">  {/* Agregar margen superior segun Userbar y definir ancho de pnael */}
+            <nav className="flex flex-col bg-amber-200 gap-4 rounded-lg mt-10 p-2" aria-label="Funciones del administrador">
                 <Link href="/user/admin"
                     className={`flex gap-1 items-center hover:underline ${(pathName === "/user/admin" ? 'text-amber-200 font-semibold border border-orange-500 bg-amber-600 rounded-md' :'text-amber-600')}`}>
-                    <HiOutlineChartSquareBar className={`text-lg ${(pathName === "/user/admin" ? 'text-blue-400 font-semibold bg-slate-500' :'text-slate-500')}`} /> Inicio
+                    <HiOutlineChartSquareBar className={`text-lg ${(pathName === "/user/admin" ? 'text-amber-200 font-semibold bg-amber-600' :'text-amber-600')}`} /> Inicio
                 </Link>
                 <Link href="/user/admin/menu" 
                     className={`flex gap-1 items-center hover:underline ${(pathName.startsWith("/user/admin/menu") ? 'text-amber-200 font-semibold border border-orange-500 bg-amber-600 rounded-md' :'text-amber-600')}`}>

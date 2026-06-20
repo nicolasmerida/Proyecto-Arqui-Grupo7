@@ -161,7 +161,7 @@ export default function PlanoSalon() {
     const mesasLibres = mesas.filter(mesa => mesa.estadoMesa === EstadoMesa.Libre);
 
     return (
-        <div className="flex flex-col">
+        <div className="flex flex-col mt-16">
             <div className="flex flex-row justify-between">
                 <div className="flex flex-col">
                     <span className="text-xl text-white font-serif italic">Plano del salon</span>

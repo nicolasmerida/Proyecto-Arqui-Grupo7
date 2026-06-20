@@ -86,7 +86,7 @@ export function LoginForm() {
         <button
           type="submit"
           aria-disabled={isPending} // Deshabilita el botón mientras la acción está pendiente
-          className="mb-4 w-full py-2 bg-orange-300 hover:bg-orange-500 text-lg text-yellow-300 font-semibold rounded-md shadow-md transition"
+          className="mb-4 w-full py-2 bg-orange-300 hover:bg-orange-500 text-lg text-white font-semibold rounded-md shadow-md transition"
         >
           {isPending ? 'Ingresando...' : 'Ingresar'}
         </button>
